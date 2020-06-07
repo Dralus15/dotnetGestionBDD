@@ -1,4 +1,7 @@
-﻿namespace GestionBDDApp
+﻿using GestionBDDApp.data.model;
+using System;
+
+namespace GestionBDDApp
 {
     partial class FormMain
     {
@@ -20,6 +23,41 @@
             base.Dispose(disposing);
         }
 
+        public void InserColonne()
+        {
+            listView1.Columns.Insert(1, this.Familles);
+            listView1.Columns.Insert(2, this.SousFamilles);
+            listView1.Columns.Insert(3, this.Marques);
+            listView1.Columns.Insert(4, this.Quantité);
+        }
+
+        public void InserItem()
+        {
+            System.Windows.Forms.ListViewItem dummyItem = new System.Windows.Forms.ListViewItem(new string[] {
+            "Une description",
+            "une famille",
+            "marque",
+            "Quantité"}, -1);
+            listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] { dummyItem });
+        }
+
+        public void SupprItem()
+        {
+            listView1.Items.Clear();
+        }
+
+        public void SupprColonne()
+        {
+            if(listView1.Columns.IndexOf(Familles) != -1)
+                listView1.Columns.RemoveAt(listView1.Columns.IndexOf(Familles));
+            if (listView1.Columns.IndexOf(SousFamilles) != -1)
+                listView1.Columns.RemoveAt(listView1.Columns.IndexOf(SousFamilles));
+            if (listView1.Columns.IndexOf(Marques) != -1)
+                listView1.Columns.RemoveAt(listView1.Columns.IndexOf(Marques));
+            if (listView1.Columns.IndexOf(Quantité) != -1)
+                listView1.Columns.RemoveAt(listView1.Columns.IndexOf(Quantité));
+        }
+
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -28,6 +66,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Tous les articles");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Familles");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Marques");
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.actualiserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -37,6 +78,11 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.Description = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Familles = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.SousFamilles = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Marques = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Quantité = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -67,20 +113,20 @@
             // actualiserToolStripMenuItem
             // 
             this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
-            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.actualiserToolStripMenuItem.Text = "Actualiser";
             // 
             // importerToolStripMenuItem
             // 
             this.importerToolStripMenuItem.Name = "importerToolStripMenuItem";
-            this.importerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importerToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.importerToolStripMenuItem.Text = "Importer";
             this.importerToolStripMenuItem.Click += new System.EventHandler(this.importerToolStripMenuItem_Click);
             // 
             // exporterToolStripMenuItem
             // 
             this.exporterToolStripMenuItem.Name = "exporterToolStripMenuItem";
-            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.exporterToolStripMenuItem.Text = "Exporter";
             // 
             // statusStrip1
@@ -114,11 +160,24 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
+            treeNode1.Name = "TousArticles";
+            treeNode1.Text = "Tous les articles";
+            treeNode2.Name = "Familles";
+            treeNode2.Text = "Familles";
+            treeNode3.Name = "Marques";
+            treeNode3.Text = "Marques";
+            this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
             this.treeView1.Size = new System.Drawing.Size(441, 404);
             this.treeView1.TabIndex = 0;
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // listView1
             // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.Description});
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
@@ -127,6 +186,28 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // Description
+            // 
+            this.Description.Text = "Description";
+            this.Description.Width = 70;
+            // 
+            // Familles
+            // 
+            this.Familles.Text = "Familles";
+            // 
+            // SousFamilles
+            // 
+            this.SousFamilles.Text = "Sous-Familles";
+            this.SousFamilles.Width = 80;
+            // 
+            // Marques
+            // 
+            this.Marques.Text = "Marques";
+            // 
+            // Quantité
+            // 
+            this.Quantité.Text = "Quantité";
             // 
             // FormMain
             // 
@@ -138,7 +219,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
-            this.Text = "Form1";
+            this.Text = "Bacchus";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -161,6 +242,12 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader Description;
+        private System.Windows.Forms.ColumnHeader Familles;
+        private System.Windows.Forms.ColumnHeader SousFamilles;
+        private System.Windows.Forms.ColumnHeader Marques;
+        private System.Windows.Forms.ColumnHeader Quantité;
     }
+
 }
 

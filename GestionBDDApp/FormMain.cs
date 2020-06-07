@@ -25,5 +25,23 @@ namespace GestionBDDApp
                 ImporterMenu.ShowDialog(this);
             }
         }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if(e.Action == TreeViewAction.ByMouse || e.Action == TreeViewAction.ByKeyboard)
+            {
+                Console.WriteLine("Charging: " + e.Node.Name + " " + e.Node.Text + " " + e.Node.Index);
+                if (e.Node.Name.Equals("TousArticles"))
+                {
+                    InserColonne();
+                    InserItem();
+                }
+                else
+                {
+                    SupprColonne();
+                    SupprItem();
+                }
+            }
+        }
     }
 }
