@@ -14,7 +14,7 @@ namespace GestionBDDApp.data.model
 
         private SousFamilles SousFamille;
 
-        private Marques Marque;
+        private Familles Marque;
 
         private float Prix;
 
@@ -24,13 +24,15 @@ namespace GestionBDDApp.data.model
             string PrixStr, string QuantityStr)
         {
             int Quantity;
+            float Prix;
             try
             {
                 Quantity = int.Parse(QuantityStr);
+                Prix = float.Parse(PrixStr);
             }
             catch (FormatException e)
             {
-                throw new ParsingException("Valeur incorrecte pour la colonne quantité");
+                throw new ParsingException("Valeur incorrecte pour la colonne quantité ou prix");
             }
 
             return new Articles();

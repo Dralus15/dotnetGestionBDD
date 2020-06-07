@@ -11,6 +11,7 @@ using GestionBDDApp.data;
 using GestionBDDApp.data.csv;
 using GestionBDDApp.data.model;
 
+
 namespace GestionBDDApp
 {
     public partial class ImporterMenu : Form
@@ -22,6 +23,7 @@ namespace GestionBDDApp
 
         private void AppendModeButton_Click(object sender, EventArgs e)
         {
+            int Id = 0;
             string ChoosedFilePath = this.PathChoosedFile.Text;
             if (ChoosedFilePath.Length != 0) {
                 try
@@ -43,13 +45,23 @@ namespace GestionBDDApp
                         {
                             annomalies.Add(ParsingException);
                         }
-
+                        
                         Console.WriteLine("Description :" + strings[0] +
                                           "| Ref : " + strings[1] +
                                           "| Marque : " + strings[2] +
                                           "| Famille : " + strings[3] +
                                           "| Sous-Famille : " + strings[4] +
-                                          "Prix H.T : " + strings[5]);
+                                          "| Prix H.T : " + strings[5]);
+
+                        DAOFamille DaoFamille = new DAOFamille();
+                        if (DaoFamille.GetFamilleByNom(strings[3]) == null)
+                        {
+                            Familles Famille = new Familles(Id, strings[3]);
+                            DaoFamille.NewFamille(Famille);
+                            Id++;
+                        }
+                        //Articles a = new Articles(strings[1], strings[0], strings[4], strings[2], strings[5], 1);
+
                     });
 
                     StatusText.Text = "Calcul des données à creer...";
