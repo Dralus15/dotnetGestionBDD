@@ -9,27 +9,34 @@ namespace GestionBDDApp.data.csv
 {
     class CSVReader
     {
-        public static void ReadFile(String Path, Action<string[]> WhatToDo)
+        public static void ReadFile(String Path, Action<string[], int> WhatToDo)
         {
             try
             {
-                using (StreamReader Reader = new StreamReader(Path))
+                using (StreamReader Reader = new StreamReader(Path, Encoding.Default))
                 {
                     if (! Reader.EndOfStream)
                     {
                         //Definition des colones
                         Reader.ReadLine();
                     }
+
+                    int LineNumber = 0;
                     while (! Reader.EndOfStream)
                     {
                         string Line = Reader.ReadLine();
-                        WhatToDo.Invoke(Line.Split(';'));
+                        if (Line != null)
+                        {
+                            WhatToDo.Invoke(Line.Split(';'), LineNumber);
+                        }
+
+                        LineNumber++;
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception Exception)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(Exception);
                 throw;
             }
         }

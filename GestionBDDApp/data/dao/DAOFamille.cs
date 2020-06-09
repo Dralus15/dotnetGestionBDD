@@ -6,34 +6,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GestionBDDApp.data
+namespace GestionBDDApp.data.dao
 {
-    class DAOFamille
+    public class DAOFamille : AbstractDao
     {
-        private const string DbPath = "Data Source=Bacchus.SQLite";
-
-        private SQLiteConnection connection;
-
-
-        public void NewFamille(Familles Famille)
-        {
-            SQLiteCommand Requete = new SQLiteCommand("INSERT INTO Familles (RefFamille, Nom) VALUES (" + Famille.getId() + ", " + Famille.getNom() + ");", connection);
-        }
 
         public List<Familles> GetAllFamilles()
         {
+            return ParseQueryResult(new SQLiteCommand("SELECT * FROM Familles;",
+                NewConnection()).ExecuteReader());
+        }
+
+        private static List<Familles> ParseQueryResult(SQLiteDataReader DataReader)
+        {
             List<Familles> Familles = new List<Familles>();
-
-            SQLiteCommand Requete = new SQLiteCommand("SELECT * FROM Familles;",
-                connection);
-            SQLiteDataReader DataReader = Requete.ExecuteReader();
-
             if (DataReader.HasRows)
             {
                 while (DataReader.Read())
                 {
                     Familles.Add(new Familles(DataReader.GetInt32(0), DataReader.GetString(1)));
-
                 }
             }
 
@@ -44,9 +35,8 @@ namespace GestionBDDApp.data
         public Familles GetFamilleById(int Id)
         {
             Familles Famille;
-            SQLiteCommand Requete = new SQLiteCommand(
-                "SELECT * FROM Familles WHERE RefFamille = " + Id + ";",
-                connection);
+            SQLiteCommand Requete = new SQLiteCommand("SELECT * FROM Familles WHERE RefFamille = @refFamille", NewConnection());
+            Requete.Parameters.AddWithValue("@refFamille", Id);
             SQLiteDataReader DataReader = Requete.ExecuteReader();
 
             if (DataReader.HasRows)
@@ -61,24 +51,33 @@ namespace GestionBDDApp.data
             }
         }
 
-
-        public Familles GetFamilleByNom(string Nom)
+        public List<Familles> GetFamilleByName(string FamilleName)
         {
-            Familles Famille;
-            SQLiteCommand Requete = new SQLiteCommand(
-                "SELECT * FROM Familles WHERE Nom = " + Nom + ";",
-                connection);
-            SQLiteDataReader DataReader = Requete.ExecuteReader();
+            var SqLiteCommand = new SQLiteCommand(NewConnection());
+            SqLiteCommand.CommandText = "SELECT * FROM Familles WHERE Nom = '@name'";
+            SqLiteCommand.Parameters.AddWithValue("@name", FamilleName);
+            return ParseQueryResult(SqLiteCommand.ExecuteReader());
+        }
 
-            if (DataReader.HasRows)
+        public void save(Familles Famille)
+        {
+            var Connection = NewConnection();
+            var Command = new SQLiteCommand(Connection);
+            if (Famille.Id == null)
             {
-                DataReader.Read();
-                Famille = new Familles(DataReader.GetInt32(0), DataReader.GetString(1));
-                return Famille;
+                Command.CommandText = "INSERT INTO Familles(Nom) VALUES (@name)";
             }
             else
             {
-                return null;
+                Command.CommandText = @"UPDATE Familles SET Nom='@name' WHERE RefFamille = @refFamille";
+                Command.Parameters.AddWithValue("@refFamille", Famille.Id);
+            }
+        
+            Command.Parameters.AddWithValue("@name", Famille.Nom);
+            Command.ExecuteNonQuery();
+            if (Famille.Id == null)
+            {
+                Famille.Id = (int) Connection.LastInsertRowId;
             }
         }
     }

@@ -6,66 +6,21 @@ using System.Threading.Tasks;
 
 namespace GestionBDDApp.data.model
 {
-    class SousFamilles
+    public class SousFamilles
     {
         //auto-increment
-        private int Id;
+        public int? Id { get; set; }
 
-        private Familles Famille;
+        public Familles Famille { get; }
 
-        private string Nom;
+        public string Nom { get; }
 
 
-        public SousFamilles(int Id, Familles Famille, string Nom)
+        public SousFamilles(int? Id, Familles Famille, string Nom)
         {
             this.Id = Id;
             this.Famille = Famille;
             this.Nom = Nom;
-        }
-
-
-        public SousFamilles(int Id, int IdFamille, string NomFamille, string Nom)
-        {
-            Familles Famille = new Familles(IdFamille, NomFamille);
-            this.Id = Id;
-            this.Famille = Famille;
-            this.Nom = Nom;
-        }
-
-
-        public int getId()
-        {
-            return this.Id;
-        }
-
-
-        public void setId(int Id)
-        {
-            this.Id = Id;
-        }
-
-
-        public string getNom()
-        {
-            return (this.Nom);
-        }
-
-
-        public void setNom(string Nom)
-        {
-            this.Nom = Nom;
-        }
-
-
-        public Familles getFamille()
-        {
-            return this.Famille;
-        }
-
-
-        public void setFamille(Familles Famille)
-        {
-            this.Famille = Famille;
         }
     }
 }

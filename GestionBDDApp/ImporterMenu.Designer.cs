@@ -87,8 +87,7 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.StatusText});
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {this.StatusText});
             this.statusStrip1.Location = new System.Drawing.Point(0, 150);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(399, 22);
@@ -97,7 +96,7 @@
             // StatusText
             // 
             this.StatusText.Name = "StatusText";
-            this.StatusText.Size = new System.Drawing.Size(118, 17);
+            this.StatusText.Size = new System.Drawing.Size(167, 17);
             this.StatusText.Text = "Choisisez un fichier à importer";
             // 
             // ImporterMenu
@@ -118,17 +117,16 @@
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
-        private System.Windows.Forms.Button SelectCsvButton;
-        private System.Windows.Forms.TextBox PathChoosedFile;
-        private System.Windows.Forms.Button EreaseModeButton;
         private System.Windows.Forms.Button AppendModeButton;
+        private System.Windows.Forms.Button EreaseModeButton;
         private System.Windows.Forms.ProgressBar ImportProgress;
+        private System.Windows.Forms.TextBox PathChoosedFile;
+        private System.Windows.Forms.Button SelectCsvButton;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StatusText;
+
+        #endregion
     }
 }

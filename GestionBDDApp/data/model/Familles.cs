@@ -9,38 +9,13 @@ namespace GestionBDDApp.data.model
     public class Familles
     {
         //auto-increment
-        private int Id;
+        public int? Id { get; set; }
 
-        private string Nom;
-    
-
-        public Familles(int Id, string Nom)
+        public string Nom { get; }
+        
+        public Familles(int? Id, string Nom)
         {
             this.Id = Id;
-            this.Nom = Nom;
-        }
-
-
-        public int getId()
-        {
-            return this.Id;
-        }
-
-
-        public void setId(int Id)
-        {
-            this.Id = Id;
-        }
-
-
-        public string getNom()
-        {
-            return (this.Nom);
-        }
-
-
-        public void setNom(string Nom)
-        {
             this.Nom = Nom;
         }
     }
