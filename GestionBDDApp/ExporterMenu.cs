@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using GestionBDDApp.data.dao;
-using GestionBDDApp.data.model;
 
 namespace GestionBDDApp
 {

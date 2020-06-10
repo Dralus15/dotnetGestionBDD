@@ -52,7 +52,6 @@ namespace GestionBDDApp
         private void LoadCorrespondingList(TreeNode TreeNodeSelected)
         {
             LastTreeNodeSelected = TreeNodeSelected;
-            DisplayChanged();
             BrandFilter = null;
             SubFamilyFilter = null;
             SupprColonne();
@@ -98,7 +97,7 @@ namespace GestionBDDApp
                     }
                 }
             }
-
+            SortColumn(0);
             UpdateStatusBar();
         }
 
@@ -132,7 +131,8 @@ namespace GestionBDDApp
             AllFamilyNode = new TreeNode("Familles");
             AllBrandNode = new TreeNode("Marques");
             treeView1.Nodes.AddRange(new [] {AllArticles, AllFamilyNode, AllBrandNode});
-            LoadArticles();
+            treeView1.SelectedNode = AllArticles;
+            LoadCorrespondingList(AllArticles);
         }
 
         private List<Articles> ArticlesModel = new List<Articles>();
@@ -155,18 +155,6 @@ namespace GestionBDDApp
 
         private List<string> DescriptionModel = null;
 
-        private void ClearModel()
-        {
-            SubFamilyFilter = null;
-            BrandFilter = null;
-            DescriptionModel = null;
-            
-            ArticlesModel.Clear();
-            SubFamilyModel.Clear();
-            FamilyModel.Clear();
-            MarquesModel.Clear();
-        }
-        
         private void DisplayFamilyDescription()
         {
             listView1.Items.Clear();
@@ -275,15 +263,6 @@ namespace GestionBDDApp
         private ColumnHeader LastSortedColumn;
         private const int COLUMN_QUANTITY = 4;
 
-        private void DisplayChanged()
-        {
-            if (LastSortedColumn != null)
-            {
-                LastSortedColumn.Text = LastSortedColumn.Text.Substring(2, LastSortedColumn.Text.Length - 2);
-                LastSortedColumn = null;
-            }
-        }
-        
         private void listView1_ColumnClick(object Sender, ColumnClickEventArgs Event)
         {
             if (listView1.Sorting == SortOrder.Ascending)
