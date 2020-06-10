@@ -45,10 +45,17 @@ namespace GestionBDDApp
         private TreeNode AllArticles;
         private TreeNode AllFamilyNode;
         private TreeNode AllBrandNode;
-        
         private TreeNode LastTreeNodeSelected;
 
-        private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
+        public void View_MouseDown(object sender, MouseEventArgs Event)
+        {
+            if(Event.Button == MouseButtons.Right)
+            {
+                contextMenu.Show(Control.MousePosition);
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs Event)
         {
             if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
             {
@@ -358,6 +365,32 @@ namespace GestionBDDApp
             {
                 LoadCorrespondingList(LastTreeNodeSelected);
             }
+        }
+
+        private void contextMenu_Click(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Text)
+            {
+                case "Ajout":
+                    using (AjoutForm AjoutFormulaire = new AjoutForm())
+                    {
+                        AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                        AjoutFormulaire.ShowDialog(this);
+                    }
+                    break;
+                case "Modification":
+                    string ArticleId = (string)listView1.FocusedItem.Tag;
+                    using (AjoutForm AjoutFormulaire = new AjoutForm(ArticleId))
+                    {
+                        AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                        AjoutFormulaire.ShowDialog(this);
+                    }
+                    break;
+                case "Supprimer":
+                case null: break;
+            }
+
+                
         }
 
         private void FormMain_KeyDown(object Sender, KeyEventArgs KeyEvent)
