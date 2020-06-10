@@ -51,5 +51,10 @@ namespace GestionBDDApp.data.dao
             Command.Parameters.AddWithValue("@quantity", Article.Quantite);
             Command.ExecuteNonQueryAsync();
         }
+
+        public void delete(Articles Article)
+        {
+
+        }
     }
 }
