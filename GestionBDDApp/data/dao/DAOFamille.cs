@@ -15,7 +15,7 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Articles;", Connection))
+                using (var Command = new SQLiteCommand("SELECT * FROM Familles;", Connection))
                 {
                     using (var Reader = Command.ExecuteReader())
                     {
@@ -116,7 +116,7 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection))
+                using (var Command = new SQLiteCommand("DELETE FROM Familles WHERE RefFamille = @ref", Connection))
                 {
                     Command.Parameters.AddWithValue("@ref", Id);
                     Command.ExecuteNonQuery();
