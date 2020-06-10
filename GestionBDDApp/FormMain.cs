@@ -209,7 +209,7 @@ namespace GestionBDDApp
                             Article.SousFamille.Famille.Nom,
                             Article.SousFamille.Nom, 
                             Article.Marque.Nom, 
-                            Article.Quantite.ToString()}));
+                            Article.Quantite.ToString()}) { Tag = Article.RefArticle });
                     }
                 }
             }
