@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.Windows.Forms;
 
 namespace GestionBDDApp
@@ -12,7 +11,6 @@ namespace GestionBDDApp
         [STAThread]
         static void Main()
         {
-            //TODO le nom doit etre Bacchus ou Baccus ?
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormMain());
