@@ -7,6 +7,7 @@ using System.Windows.Forms.VisualStyles;
 using GestionBDDApp.data;
 using GestionBDDApp.data.csv;
 using GestionBDDApp.data.dao;
+using GestionBDDApp.data.dto;
 using GestionBDDApp.data.model;
 using GestionBDDApp.data.utils;
 
@@ -53,33 +54,37 @@ namespace GestionBDDApp
             if (ChoosedFilePath.Length != 0) {
                 try
                 {
-                    var Annomalies = new Dictionary<int, ParsingException>();
+                    var Annomalies = new Dictionary<int, string>();
+                    var ArticlesRef = new Dictionary<string, int>();
                     var ToImport = new List<ArticlesDto>();
                     ImportProgress.Style = ProgressBarStyle.Marquee;;
                     ImportProgress.MarqueeAnimationSpeed = 30;
                     ImportProgress.Maximum = 100;
                     StatusText.Text = "Lecture du fichier en cours...";
                     CSVReader.ReadFile(ChoosedFilePath, (Strings, LineNumber) => {
-                        // Description;Ref;Marque;Famille;Sous-Famille;Prix H.T.
                         try
                         {
-                            ToImport.Add(Articles.FromRawData(
-                                Strings[0], Strings[1], Strings[2], Strings[3], Strings[4], Strings[5]));
+                            var DescStr = Strings[1];
+                            int previousLineDefinition;
+                            if (ArticlesRef.TryGetValue(DescStr, out previousLineDefinition))
+                            {
+                                Annomalies.Add(LineNumber, String.Format("Réference d'article en doublon (précédement défini à la ligne {0})", previousLineDefinition));
+                            }
+                            else
+                            {
+                                ArticlesRef.Add(DescStr, LineNumber);
+                                ToImport.Add(ArticlesDto.FromRawData(
+                                    // Description;Ref;Marque;Famille;Sous-Famille;Prix H.T.
+                                    Strings[0], DescStr, Strings[2], Strings[3], Strings[4], Strings[5]));
+                            }
                         }
                         catch (ParsingException ParsingException)
                         {
-                            Annomalies.Add(LineNumber, ParsingException);
+                            Annomalies.Add(LineNumber, ParsingException.Message);
                         }
-                        
-                        Console.WriteLine("Description :" + Strings[0] +
-                                          "| Ref : " + Strings[1] +
-                                          "| Marque : " + Strings[2] +
-                                          "| Famille : " + Strings[3] +
-                                          "| Sous-Famille : " + Strings[4] +
-                                          "| Prix H.T : " + Strings[5]);
                     });
 
-                    StatusText.Text = "Calcul des données à creer...";
+                    StatusText.Text = "Calcul des données à créer...";
 
                     ImportProgress.Style = ProgressBarStyle.Continuous;
                     ImportProgress.Maximum = ToImport.Count;
@@ -89,14 +94,14 @@ namespace GestionBDDApp
                     //si annomalie(s), demander confirmation
                     if (Annomalies.Count > 0)
                     {
-                        StringBuilder Sb = new StringBuilder();
+                        StringBuilder AnnomaliesError = new StringBuilder();
                         foreach (var Annomaly in Annomalies)
                         {
-                            Sb.Append(String.Format(" - Line {0} : {1}\n", Annomaly.Key, Annomaly.Value.Message));
+                            AnnomaliesError.Append(String.Format(" - Line {0} : {1}\n", Annomaly.Key, Annomaly.Value));
                         }
                         StatusText.Text = "Résolution des annomalies...";
                         var ConfirmResult =  MessageBox.Show("Il y a " + Annomalies.Count + " annomalies dans le fichier d'import, ces articles ne seront pas importés :\n" + 
-                                                             Sb + "\n Voulez vous annuler l'opération ?",
+                                                             AnnomaliesError + "\n Voulez vous annuler l'opération ?",
                             "Annomalies détéctées",
                             MessageBoxButtons.OKCancel);
                         if (ConfirmResult == DialogResult.Cancel)
@@ -116,8 +121,12 @@ namespace GestionBDDApp
                     StringBuilder NameSakeErrorBuilder = new StringBuilder();
                     if (! ShouldEreaseBase)
                     {
+                        ImportProgress.Maximum = ToImport.Count * 2;
+                        StatusText.Text = "Dédoublonnage...";
+                        ImportProgress.Value = 0;
                         foreach (var ArticlesDto in ToImport)
                         {
+                            ImportProgress.Value += 1;
 
                             var FamilyName = ArticlesDto.Famille;
                             if (! NewFamilies.ContainsKey(FamilyName))
@@ -151,60 +160,77 @@ namespace GestionBDDApp
                                     NewSubFamilies.Add(SubFamilyName, SubFamilyNameSake[0]);
                                 }
                             }
-                            //TODO tester les modifications des familles
                         }
-                        NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés", DuplicateFamilyCount);
-                        NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés", DuplicateSubFamilyCount);
-                        NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés", DuplicateBrandCount);
-                    }
-                    
-                    var NewArticles = new List<Articles>();
-
-                    //calculer les autres tables crées
-                    for (var ToImportIndex = 0; ToImportIndex < ToImport.Count; ToImportIndex++)
-                    {
-                        //barre de chargement
-                        ImportProgress.Value = ToImportIndex + 1;
-
-                        var ArticleDto = ToImport[ToImportIndex];
-
-                        var MarqueName = ArticleDto.Marque;
-                        var FamilleName = ArticleDto.Famille;
-                        var SousFamilleName = ArticleDto.SousFamille;
-                        
-                        //TODO dedoublonnage d'article
-                        //TODO modif si doublons
-
-                        //résolution des dépendances des marques
-                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, MarqueName, () => new Marques(null, MarqueName));
-                        
-                        //résolution des dépendances des Familles
-                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, FamilleName, () => new Familles(null, FamilleName));
-                        
-                        //résolution des dépendances des Sous-Familles
-                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, SousFamilleName,() => new SousFamilles(null, Famille, SousFamilleName));
-
-                        NewArticles.Add(new Articles(ArticleDto.RefArticle, ArticleDto.Description, SousFamille, Marque, ArticleDto.Prix, 0));
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés\n", DuplicateFamilyCount);
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés\n", DuplicateSubFamilyCount);
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés\n", DuplicateBrandCount);
                     }
 
-                    if (ShouldEreaseBase)
+                    if (!ShouldEreaseBase)
                     {
-                        DaoRegistery.GetInstance.ClearAll();
-                    }
-                    else
-                    {
-                        if (NameSakeErrorBuilder.Length > 0)
+                        var Error = NameSakeErrorBuilder.ToString();
+                        if (Error.Length > 0)
                         {
                             var Result = MessageBox.Show(
-                                "Des doublons ont été détéctés : \n" + NameSakeErrorBuilder.ToString() + "\n" +
-                                "Voulez-vous concerver les doublons ? (les nouvelles valeurs ne seront pas importées)",
-                                "Doublons détéctés", MessageBoxButtons.YesNoCancel);
+                                "Des doublons ont été détéctés : \n" + Error +
+                                "Si vous continuer, les doublons ne serons pas importés",
+                                "Doublons détéctés", MessageBoxButtons.OKCancel);
                             if (Result == DialogResult.Cancel)
                             {
                                 StatusText.Text = "Import annulé.";
                                 return;
                             }
                         }
+                    }
+                    
+                    var NewArticles = new Dictionary<Articles, Articles>();
+                    int ArticleNameSakeCount = 0;
+
+                    //calculer les autres tables crées
+                    foreach (var ArticleDto in ToImport)
+                    {
+                        //barre de chargement
+                        ImportProgress.Value += 1;
+                        
+                        //résolution des dépendances des marques
+                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticleDto.Marque, () => new Marques(null, ArticleDto.Marque));
+                        
+                        //résolution des dépendances des Familles
+                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.Famille, () => new Familles(null, ArticleDto.Famille));
+                        
+                        //résolution des dépendances des Sous-Familles
+                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SousFamille,() => new SousFamilles(null, Famille, ArticleDto.SousFamille));
+
+                        var ArticleNameSake = DaoArticle.GetArticleById(ArticleDto.RefArticle);
+                        if (ArticleNameSake != null)
+                        {
+                            ArticleNameSakeCount++;
+                        }
+                        NewArticles.Add(new Articles(ArticleDto.RefArticle, ArticleDto.Description, SousFamille, Marque, ArticleDto.Prix, 0), ArticleNameSake);
+                    }
+
+                    var NamesakeStrategyChoosed = NamesakeStrategy.IGNORE;
+                    
+                    if (ArticleNameSakeCount > 0)
+                    {
+                        var Result = MessageBox.Show(
+                            String.Format("{0} doublons d'articles ont été détéctés : \n", ArticleNameSakeCount) +
+                            "Voulez-vous ignorer ces doublons ? (sinon les valeurs dans la base seront mise à jour)",
+                            "Doublons détéctés", MessageBoxButtons.YesNoCancel);
+                        switch (Result)
+                        {
+                            case DialogResult.Cancel:
+                                StatusText.Text = "Import annulé.";
+                                return;
+                            case DialogResult.No:
+                                NamesakeStrategyChoosed = NamesakeStrategy.REPLACE;
+                                break;
+                        }
+                    }
+
+                    if (ShouldEreaseBase)
+                    {
+                        DaoRegistery.GetInstance.ClearAll();
                     }
 
                     StatusText.Text = "Import des données...";
@@ -238,11 +264,22 @@ namespace GestionBDDApp
                     
                     ImportProgress.Value = 0;
                     ImportProgress.Maximum = NewArticles.Count;
-                    foreach (var Article in NewArticles)
+                    foreach (var ArticlePair in NewArticles)
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des articles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        await Task.Run(() => DaoArticle.create(Article));
+                        //pas de doublons
+                        if (ArticlePair.Value == null)
+                        {
+                            await Task.Run(() => DaoArticle.create(ArticlePair.Key));
+                        }
+                        else
+                        {
+                            if (NamesakeStrategyChoosed == NamesakeStrategy.REPLACE)
+                            {
+                                await Task.Run(() => DaoArticle.update(ArticlePair.Key));
+                            }
+                        }
                     }
                     
                     StatusText.Text = "Import terminé";
@@ -293,5 +330,11 @@ namespace GestionBDDApp
                 PathChoosedFile.Text = OpenFileDialog.FileName;
             }
         }
+    }
+
+    public enum NamesakeStrategy
+    {
+        REPLACE,
+        IGNORE
     }
 }

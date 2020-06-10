@@ -52,7 +52,7 @@ namespace GestionBDDApp
                         $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
                 }
             }
-            //TODO afficher bravo export terminé
+            MessageBox.Show("Export terminé !", "Information", MessageBoxButtons.OK);
         }
     }
 }

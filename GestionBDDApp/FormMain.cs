@@ -118,11 +118,16 @@ namespace GestionBDDApp
 
         private void supprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
-            listView1.Items.Clear();
-            AllBrandNode.Nodes.Clear();
-            AllFamilyNode.Nodes.Clear();
-            DaoRegistery.GetInstance.ClearAll();
-            ReloadList();
+            var Result = MessageBox.Show("Cette action est irreversible, êtes vous certain de continuer ?",
+                "Suppression de la base, confirmation", MessageBoxButtons.YesNoCancel);
+            if (Result == DialogResult.Yes)
+            {
+                listView1.Items.Clear();
+                AllBrandNode.Nodes.Clear();
+                AllFamilyNode.Nodes.Clear();
+                DaoRegistery.GetInstance.ClearAll();
+                ReloadList();
+            }
         }
 
         private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
@@ -213,7 +218,7 @@ namespace GestionBDDApp
             {
                 if (! BrandFilter.HasValue || BrandFilter.Equals(Article.Marque.Id))
                 {
-                    if (!SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.Marque.Id))
+                    if (!SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SousFamille.Id))
                     {
                         listView1.Items.Add(new ListViewItem(new [] {
                             Article.Description, 

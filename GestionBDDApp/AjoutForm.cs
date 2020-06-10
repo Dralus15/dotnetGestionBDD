@@ -89,7 +89,7 @@ namespace GestionBDDApp
                 {
 
                     Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, (float) PriceBox.Value, (int) QuantityBox.Value);
-                    DaoRegistery.GetInstance.DaoArticle.save(Article);
+                    DaoRegistery.GetInstance.DaoArticle.create(Article);
                     Console.WriteLine("Création de : " + Article.Description);
                 }
                 this.Close();

@@ -51,8 +51,8 @@ namespace GestionBDDApp
             this.QuantityBox = new System.Windows.Forms.NumericUpDown();
             this.ReferenceBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.PriceBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.QuantityBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.PriceBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.QuantityBox)).BeginInit();
             this.SuspendLayout();
             // 
             // BrandComboBox
@@ -218,30 +218,29 @@ namespace GestionBDDApp
             this.Controls.Add(this.BrandComboBox);
             this.Name = "AjoutForm";
             this.Text = "Ajout/Modification";
-            ((System.ComponentModel.ISupportInitialize)(this.PriceBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.QuantityBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.PriceBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.QuantityBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
         private System.Windows.Forms.ComboBox BrandComboBox;
-        private System.Windows.Forms.ComboBox SubFamillyComboBox;
+        private System.Windows.Forms.TextBox DescriptionBox;
         private System.Windows.Forms.ComboBox FamillyComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button ValidateButton;
-        private System.Windows.Forms.Button NotValidateButton;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox DescriptionBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button NotValidateButton;
         private System.Windows.Forms.NumericUpDown PriceBox;
         private System.Windows.Forms.NumericUpDown QuantityBox;
         private System.Windows.Forms.TextBox ReferenceBox;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox SubFamillyComboBox;
+        private System.Windows.Forms.Button ValidateButton;
+
+        #endregion
     }
 }
