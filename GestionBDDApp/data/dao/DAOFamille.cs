@@ -1,4 +1,5 @@
-﻿﻿using GestionBDDApp.data.model;
+﻿﻿using System;
+ using GestionBDDApp.data.model;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -113,6 +114,22 @@ namespace GestionBDDApp.data.dao
 
         public void delete(int Id)
         {
+            var UseCount = DaoRegistery.GetInstance.DaoSousFamille.CountSubFamilyOfFamily(Id);
+            if (UseCount > 0)
+            {                
+                string Error;
+                if (UseCount == 1)
+                {
+                    Error = "Cette famille est utilisée par 1 sous-famille, veuilliez supprimer la sous-famille utilisant cette famille avant de la supprimer.";
+                }
+                else
+                {
+                    Error = String.Format(
+                        "Cette famille est utilisée par {0} sous-familles, veuilliez supprimer les sous-familles utilisant cette famille avant de la supprimer.",
+                        UseCount);
+                }
+                throw new ArgumentException(Error);
+            }
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();

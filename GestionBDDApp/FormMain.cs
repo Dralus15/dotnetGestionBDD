@@ -111,7 +111,11 @@ namespace GestionBDDApp
 
         private void supprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
+            listView1.Items.Clear();
+            AllBrandNode.Nodes.Clear();
+            AllFamilyNode.Nodes.Clear();
             DaoRegistery.GetInstance.ClearAll();
+            ReloadList();
         }
 
         private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
@@ -150,12 +154,11 @@ namespace GestionBDDApp
 
         private void UpdateStatusBar()
         {
-            var CountSubFamily = 0;
-            foreach (var SubFamily in SubFamilyModel.Values)
-            {
-                CountSubFamily += SubFamily.Count;
-            }
-            StatusText.Text = ArticlesModel.Count + " articles, " + FamilyModel.Count + " familles, " + CountSubFamily + " sous-familles et " + BrandModel.Count + " marques en base.";
+            var CountArticle = DaoRegistery.GetInstance.DaoArticle.count();
+            var CountFamily = DaoRegistery.GetInstance.DaoFamille.count();
+            var CountBrand = DaoRegistery.GetInstance.DaoMarque.count();
+            var CountSubFamily = DaoRegistery.GetInstance.DaoSousFamille.count();
+            StatusText.Text = CountArticle + " articles, " + CountFamily + " familles, " + CountSubFamily + " sous-familles et " + CountBrand + " marques en base.";
         }
 
         private int? SubFamilyFilter = null;
@@ -364,34 +367,42 @@ namespace GestionBDDApp
 
         private void Delete(ListViewItem ItemToDelete)
         {
-            if (ActiveList.Article == ArticleViewOn)
+            try
             {
-                string ArticleId = (string) ItemToDelete.Tag;
-                DaoRegistery.GetInstance.DaoArticle.delete(ArticleId);
-            }
-            else
-            {
-                int Id = (int) listView1.Tag;
-                switch (ArticleViewOn)
+                if (ActiveList.Article == ArticleViewOn)
                 {
-                    case ActiveList.Brand:
+                    string ArticleId = (string) ItemToDelete.Tag;
+                    DaoRegistery.GetInstance.DaoArticle.delete(ArticleId);
+                }
+                else
+                {
+                    int Id = (int) ItemToDelete.Tag;
+                    switch (ArticleViewOn)
                     {
-                        DaoRegistery.GetInstance.DaoMarque.delete(Id);
-                        break;
-                    }
-                    case ActiveList.Family:
-                    {
-                        DaoRegistery.GetInstance.DaoFamille.delete(Id);
-                        break;
-                    }
-                    case ActiveList.Subfamily:
-                    {
-                        DaoRegistery.GetInstance.DaoSousFamille.delete(Id);
-                        break;
+                        case ActiveList.Brand:
+                        {
+                            DaoRegistery.GetInstance.DaoMarque.delete(Id);
+                            break;
+                        }
+                        case ActiveList.Family:
+                        {
+                            DaoRegistery.GetInstance.DaoFamille.delete(Id);
+                            break;
+                        }
+                        case ActiveList.Subfamily:
+                        {
+                            DaoRegistery.GetInstance.DaoSousFamille.delete(Id);
+                            break;
+                        }
                     }
                 }
+                listView1.Items.Remove(ItemToDelete);
+                UpdateStatusBar(); 
             }
-            listView1.Items.Remove(ItemToDelete);
+            catch (Exception Error)
+            {
+                MessageBox.Show("Cette opération a échouée : \n" + Error.Message, "Erreur");
+            }
         }
 
         private void listView1_KeyDown(object Sender, KeyEventArgs KeyEvent)

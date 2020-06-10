@@ -32,6 +32,10 @@ namespace GestionBDDApp.data.dao
                         {
                             var SousFamille = DaoSousFamille.getSousFamilleById(Reader.GetInt32(2));
                             var Marque = DaoMarque.GetMarqueById(Reader.GetInt32(3));
+                            if (Marque == null || SousFamille == null)
+                            {
+                                continue;
+                            }
                             Articles.Add(new Articles(
                                 Reader.GetString(0), 
                                 Reader.GetString(1), 
@@ -46,6 +50,51 @@ namespace GestionBDDApp.data.dao
             return Articles;
         }
 
+        public int CountArticleOfSubFamily(int SubFamilyId)
+        {
+            var Result = 0;
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefSousFamille = @refSubFamily", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refSubFamily", SubFamilyId);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Result = Reader.GetInt32(0);
+                        }
+                    }
+                }
+            }
+
+            return Result;
+        }
+        
+        public int CountArticleOfBrand(int BrandId)
+        {
+            var Result = 0;
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefMarque = @refBrand", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refBrand", BrandId);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Result = Reader.GetInt32(0);
+                        }
+                    }
+                }
+            }
+
+            return Result;
+        }
         public Articles GetArticleById(string Id)
         {
             Articles Article = null;
@@ -103,12 +152,13 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection) )
+                using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection))
                 {
                     Command.Parameters.AddWithValue("@ref", Id);
                     Command.ExecuteNonQuery();
                 }
             }
         }
+
     }
 }

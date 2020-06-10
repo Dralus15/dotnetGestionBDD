@@ -1,4 +1,5 @@
-﻿﻿using GestionBDDApp.data.model;
+﻿﻿using System;
+ using GestionBDDApp.data.model;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -98,11 +99,48 @@ namespace GestionBDDApp.data.dao
                     }
                 }
             }
-            
+        }
+        public int CountSubFamilyOfFamily(int FamilyId)
+        {
+            var Result = 0;
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT count(*) FROM Familles WHERE RefFamille = @refFamily", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refFamily", FamilyId);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Result = Reader.GetInt32(0);
+                        }
+                    }
+                }
+            }
+
+            return Result;
         }
 
         public void delete(int Id)
         {
+            var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfSubFamily(Id);
+            if (UseCount > 0)
+            {
+                string Error;
+                if (UseCount == 1)
+                {
+                    Error = "Cette sous-famille est utilisée par 1 article, veuilliez supprimer l'article utilisant cette sous-famille avant de la supprimer.";
+                }
+                else
+                {
+                    Error = String.Format(
+                        "Cette sous-famille est utilisée par {0} articles, veuilliez supprimer les articles utilisant cette sous-famille avant de la supprimer.",
+                        UseCount);
+                }
+                throw new ArgumentException(Error);
+            }
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();

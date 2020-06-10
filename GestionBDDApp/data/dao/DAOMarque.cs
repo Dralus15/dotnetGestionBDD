@@ -1,4 +1,5 @@
-﻿﻿using GestionBDDApp.data.model;
+﻿﻿using System;
+ using GestionBDDApp.data.model;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -93,6 +94,22 @@ namespace GestionBDDApp.data.dao
 
         public void delete(int Id)
         {
+            var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfBrand(Id);
+            if (UseCount > 0)
+            {
+                string Error;
+                if (UseCount == 1)
+                {
+                    Error = "Cette marque est utilisée par 1 article, veuilliez supprimer l'article utilisant cette marque avant de la supprimer.";
+                }
+                else
+                {
+                    Error = String.Format(
+                        "Cette marque est utilisée par {0} articles, veuilliez supprimer les articles utilisant cette marque avant de la supprimer.",
+                        UseCount);
+                }
+                throw new ArgumentException(Error);
+            }
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();

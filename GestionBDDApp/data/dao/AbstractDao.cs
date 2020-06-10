@@ -17,14 +17,36 @@ namespace GestionBDDApp.data.dao
 
         public void clear()
         {
-            using (SQLiteConnection Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();
-                using (SQLiteCommand Command = new SQLiteCommand(String.Format("DELETE FROM {0}; VACUUM;", BaseName)))
+                using (var Command = new SQLiteCommand(String.Format("DELETE FROM {0}; VACUUM;", BaseName), Connection))
                 {
                     Command.ExecuteNonQuery();
                 }
             }
+        }
+
+        public int count()
+        {
+            int Result = 0;
+            using (SQLiteConnection Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (SQLiteCommand Command = new SQLiteCommand(String.Format("SELECT count(*) FROM {0}", BaseName), Connection))
+                {
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Result = Reader.GetInt32(0);
+                        }
+                    }
+                }
+            }
+
+            return Result;
         }
     }
 }
