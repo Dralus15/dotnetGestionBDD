@@ -69,6 +69,7 @@ namespace GestionBDDApp
             this.exporterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.supprimerLaBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.listView1 = new System.Windows.Forms.ListView();
@@ -77,7 +78,6 @@ namespace GestionBDDApp
             this.SousFamilles = new System.Windows.Forms.ColumnHeader();
             this.Marques = new System.Windows.Forms.ColumnHeader();
             this.Quantité = new System.Windows.Forms.ColumnHeader();
-            this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize) (this.splitContainer1)).BeginInit();
@@ -138,6 +138,11 @@ namespace GestionBDDApp
             this.statusStrip1.Size = new System.Drawing.Size(800, 22);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusText
+            // 
+            this.StatusText.Name = "StatusText";
+            this.StatusText.Size = new System.Drawing.Size(0, 17);
             // 
             // splitContainer1
             // 
@@ -201,11 +206,6 @@ namespace GestionBDDApp
             // Quantité
             // 
             this.Quantité.Text = "Quantité";
-            // 
-            // StatusText
-            // 
-            this.StatusText.Name = "StatusText";
-            this.StatusText.Size = new System.Drawing.Size(0, 17);
             // 
             // FormMain
             // 

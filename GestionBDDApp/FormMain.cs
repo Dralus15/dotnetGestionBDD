@@ -45,58 +45,60 @@ namespace GestionBDDApp
             if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
             {
                 var TreeNodeSelected = Event.Node;
-                if (LastTreeNodeSelected == TreeNodeSelected)
+                LoadCorrespondingList(TreeNodeSelected);
+            }
+        }
+
+        private void LoadCorrespondingList(TreeNode TreeNodeSelected)
+        {
+            LastTreeNodeSelected = TreeNodeSelected;
+            DisplayChanged();
+            MarquesChoosed = null;
+            SousFamillesChoosed = null;
+            SupprColonne();
+            listView1.Groups.Clear();
+            if (TreeNodeSelected.Equals(AllArticles))
+            {
+                LoadArticles();
+                DisplayArticlesWithFilter();
+            }
+            else
+            {
+                if (TreeNodeSelected.Equals(AllBrandNode))
                 {
-                    return;
+                    LoadBrands();
+                    DisplayBrandDescription();
                 }
-                LastTreeNodeSelected = TreeNodeSelected;
-                ResetSort();
-                MarquesChoosed = null;
-                SousFamillesChoosed = null;
-                SupprColonne();
-                listView1.Groups.Clear();
-                if (TreeNodeSelected.Equals(AllArticles))
+                else if (TreeNodeSelected.Equals(AllFamilyNode))
                 {
-                    LoadArticles();
-                    DisplayArticlesWithFilter();
+                    LoadFamilies();
+                    DisplayFamilyDescription();
                 }
                 else
                 {
-                    if (TreeNodeSelected.Equals(AllBrandNode))
+                    var NodeParent = TreeNodeSelected.Parent;
+                    if (NodeParent.Equals(AllBrandNode))
+                        // Une marque est séléctionnée
                     {
-                        LoadBrands();
-                        DisplayBrandDescription();
+                        MarquesChoosed = (int?) TreeNodeSelected.Tag;
+                        DisplayArticlesWithFilter();
                     }
-                    else if (TreeNodeSelected.Equals(AllFamilyNode))
+                    else if (NodeParent.Equals(AllFamilyNode))
+                        // Une famille est séléctionnée
                     {
-                        LoadFamilies();
-                        DisplayFamilyDescription();
+                        var Id = ((int?) TreeNodeSelected.Tag).Value;
+                        LoadSubFamily(TreeNodeSelected, Id);
+                        DisplaySubFamilyDescription(Id);
                     }
                     else
-                    {
-                        var NodeParent = TreeNodeSelected.Parent;
-                        if (NodeParent.Equals(AllBrandNode))
-                        // Une marque est séléctionnée
-                        {
-                            MarquesChoosed = (int?) TreeNodeSelected.Tag;
-                            DisplayArticlesWithFilter();
-                        } else 
-                        if (NodeParent.Equals(AllFamilyNode))
-                        // Une famille est séléctionnée
-                        {
-                            var Id = ((int?) TreeNodeSelected.Tag).Value;
-                            LoadSubFamily(TreeNodeSelected, Id);
-                            DisplaySubFamilyDescription(Id);
-                        }
-                        else
                         // Une sous-famille est séléctionnée
-                        {
-                            SousFamillesChoosed = (int?) TreeNodeSelected.Tag;
-                            DisplayArticlesWithFilter();
-                        }
+                    {
+                        SousFamillesChoosed = (int?) TreeNodeSelected.Tag;
+                        DisplayArticlesWithFilter();
                     }
                 }
             }
+
             UpdateStatusBar();
         }
 
@@ -273,7 +275,7 @@ namespace GestionBDDApp
         private ColumnHeader LastSortedColumn;
         private const int COLUMN_QUANTITY = 4;
 
-        private void ResetSort()
+        private void DisplayChanged()
         {
             if (LastSortedColumn != null)
             {
@@ -341,12 +343,26 @@ namespace GestionBDDApp
             LastSortedColumn = SortedColumn;
         }
 
+        protected override bool ProcessCmdKey(ref Message Message, Keys KeyData)
+        {
+            if (KeyData == Keys.F5)
+            {
+                ReloadList();
+            }
+            return base.ProcessCmdKey(ref Message, KeyData);
+        }
+
         private void actualiserToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
-            listView1.Clear();
-            AllFamilyNode.Nodes.Clear();
-            AllBrandNode.Nodes.Clear();
-            ClearModel();
+            ReloadList();
+        }
+
+        private void ReloadList()
+        {
+            if (LastTreeNodeSelected != null)
+            {
+                LoadCorrespondingList(LastTreeNodeSelected);
+            }
         }
     }
 }
