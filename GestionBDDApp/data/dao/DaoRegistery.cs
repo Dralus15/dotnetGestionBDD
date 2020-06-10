@@ -17,7 +17,7 @@
             DaoArticle = new DAOArticle(DaoSousFamille, DaoMarque);
         }
 
-        public void clearAll()
+        public void ClearAll()
         {
             DaoArticle.clear();
             DaoSousFamille.clear();

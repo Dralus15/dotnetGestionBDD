@@ -175,8 +175,10 @@ namespace GestionBDDApp
             // 
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {this.Description});
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.FullRowSelect = true;
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(355, 404);
             this.listView1.Sorting = System.Windows.Forms.SortOrder.Ascending;
@@ -220,6 +222,7 @@ namespace GestionBDDApp
             this.Text = "Bacchus";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);

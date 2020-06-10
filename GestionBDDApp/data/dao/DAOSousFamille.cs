@@ -18,7 +18,7 @@ namespace GestionBDDApp.data.dao
             return ParseQueryResult(new SQLiteCommand("SELECT * FROM SousFamilles", NewConnection()).ExecuteReader());
         }
 
-        private static List<SousFamilles> ParseQueryResult(SQLiteDataReader DataReader)
+        private List<SousFamilles> ParseQueryResult(SQLiteDataReader DataReader)
         {
             List<SousFamilles> SousFamilles = new List<SousFamilles>();
             if (DataReader.HasRows)
@@ -26,7 +26,7 @@ namespace GestionBDDApp.data.dao
                 while (DataReader.Read())
                 {
                     DAOFamille DaoFamille = new DAOFamille();
-                    Familles Famille = DaoFamille.GetFamilleById(DataReader.GetInt32(1));
+                    Familles Famille = this.DaoFamille.GetFamilleById(DataReader.GetInt32(1));
                     SousFamilles.Add(new SousFamilles(DataReader.GetInt32(0), Famille, DataReader.GetString(2)));
                 }
             }

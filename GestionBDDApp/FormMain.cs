@@ -8,6 +8,14 @@ using GestionBDDApp.Properties;
 
 namespace GestionBDDApp
 {
+    public enum ActiveList
+    {
+        Article,
+        Brand,
+        Family,
+        Subfamily,
+        Unknown
+    }
     public partial class FormMain : Form
     {
         
@@ -103,7 +111,7 @@ namespace GestionBDDApp
 
         private void supprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
-            DaoRegistery.GetInstance.clearAll();
+            DaoRegistery.GetInstance.ClearAll();
         }
 
         private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
@@ -138,7 +146,7 @@ namespace GestionBDDApp
         private List<Articles> ArticlesModel = new List<Articles>();
         private Dictionary<int?, List<SousFamilles>> SubFamilyModel = new Dictionary<int?, List<SousFamilles>>();
         private List<Familles> FamilyModel = new List<Familles>();
-        private List<Marques> MarquesModel = new List<Marques>();
+        private List<Marques> BrandModel = new List<Marques>();
 
         private void UpdateStatusBar()
         {
@@ -147,43 +155,48 @@ namespace GestionBDDApp
             {
                 CountSubFamily += SubFamily.Count;
             }
-            StatusText.Text = ArticlesModel.Count + " articles, " + FamilyModel.Count + " familles, " + CountSubFamily + " sous-familles et " + MarquesModel.Count + " marques en base.";
+            StatusText.Text = ArticlesModel.Count + " articles, " + FamilyModel.Count + " familles, " + CountSubFamily + " sous-familles et " + BrandModel.Count + " marques en base.";
         }
 
         private int? SubFamilyFilter = null;
         private int? BrandFilter = null;
 
-        private List<string> DescriptionModel = null;
+
+        private ActiveList ArticleViewOn = ActiveList.Unknown;
 
         private void DisplayFamilyDescription()
         {
+            ArticleViewOn = ActiveList.Family;
             listView1.Items.Clear();
             foreach (var Family in FamilyModel)
             {
-                listView1.Items.Add(Family.Nom);
+                listView1.Items.Add(new ListViewItem(Family.Nom) { Tag =  Family.Id });
             }
         }
 
         private void DisplayBrandDescription()
         {
+            ArticleViewOn = ActiveList.Brand;
             listView1.Items.Clear();
-            foreach (var Family in MarquesModel)
+            foreach (var Brand in BrandModel)
             {
-                listView1.Items.Add(Family.Nom);
+                listView1.Items.Add(new ListViewItem(Brand.Nom) { Tag =  Brand.Id });
             }
         }
 
         private void DisplaySubFamilyDescription(int Id)
         {
+            ArticleViewOn = ActiveList.Subfamily;
             listView1.Items.Clear();
-            foreach (var Family in SubFamilyModel[Id])
+            foreach (var SubFamily in SubFamilyModel[Id])
             {
-                listView1.Items.Add(Family.Nom);
+                listView1.Items.Add(new ListViewItem(SubFamily.Nom) { Tag =  SubFamily.Id });
             }
         }
         
         private void DisplayArticlesWithFilter()
         {
+            ArticleViewOn = ActiveList.Article;
             InserColonne();
             listView1.Items.Clear();
             foreach (var Article in ArticlesModel)
@@ -210,9 +223,9 @@ namespace GestionBDDApp
 
         private void LoadBrands()
         {
-            MarquesModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
+            BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
             AllBrandNode.Nodes.Clear();
-            foreach (var TreeNode in MarquesModel.Select(Marque => new TreeNode(Marque.Nom) { Tag = Marque.Id }))
+            foreach (var TreeNode in BrandModel.Select(Marque => new TreeNode(Marque.Nom) { Tag = Marque.Id }))
             {
                 AllBrandNode.Nodes.Add(TreeNode);
             }
@@ -342,6 +355,46 @@ namespace GestionBDDApp
             {
                 LoadCorrespondingList(LastTreeNodeSelected);
             }
+        }
+
+        private void FormMain_KeyDown(object Sender, KeyEventArgs KeyEvent)
+        {
+            if (KeyEvent.KeyCode == Keys.Delete && listView1.SelectedItems.Count > 0)
+            {
+                Delete(listView1.SelectedItems[0]);
+            }
+        }
+
+        private void Delete(ListViewItem ItemToDelete)
+        {
+            if (ActiveList.Article == ArticleViewOn)
+            {
+                string ArticleId = (string) ItemToDelete.Tag;
+                DaoRegistery.GetInstance.DaoArticle.delete(ArticleId);
+            }
+            else
+            {
+                int Id = (int) listView1.Tag;
+                switch (ArticleViewOn)
+                {
+                    case ActiveList.Brand:
+                    {
+                        DaoRegistery.GetInstance.DaoMarque.delete(Id);
+                        break;
+                    }
+                    case ActiveList.Family:
+                    {
+                        DaoRegistery.GetInstance.DaoFamille.delete(Id);
+                        break;
+                    }
+                    case ActiveList.Subfamily:
+                    {
+                        DaoRegistery.GetInstance.DaoSousFamille.delete(Id);
+                        break;
+                    }
+                }
+            }
+            listView1.Items.Remove(ItemToDelete);
         }
     }
 }

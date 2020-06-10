@@ -26,7 +26,6 @@ namespace GestionBDDApp.data.model
             this.Quantite = Quantite;
         }
 
-
         //TODO changer ca poru que ca corrige juste les champs
         public static ArticlesDto FromRawData(string DescStr, string RefStr, string MarqueStr, string FamilleStr,
             string SousFamilleStr, string PrixStr)
