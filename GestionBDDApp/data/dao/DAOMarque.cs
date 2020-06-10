@@ -34,6 +34,7 @@ namespace GestionBDDApp.data.dao
             SqLiteCommand.CommandText = "SELECT * FROM Marques WHERE RefMarque = @refMarque";
             SqLiteCommand.Parameters.AddWithValue("@refMarque", Id);
             var Marques = ParseQueryResult(SqLiteCommand.ExecuteReader());
+            //SqLiteCommand.Connection.Close();
             if (Marques.Count == 0)
             {
                 return null;
@@ -68,6 +69,7 @@ namespace GestionBDDApp.data.dao
             {
                 Marques.Id = (int) Connection.LastInsertRowId;
             }
+            //Command.Connection.Close();
         }
 
         public void delete(int Id)
@@ -76,6 +78,7 @@ namespace GestionBDDApp.data.dao
             Command.CommandText = "DELETE FROM Marques WHERE RefMarque = @ref";
             Command.Parameters.AddWithValue("@ref", Id);
             Command.ExecuteNonQuery();
+            //Command.Connection.Close();
         }
 
     }

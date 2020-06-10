@@ -40,10 +40,12 @@ namespace GestionBDDApp.data.dao
             {
                 DataReader.Read();
                 Famille = new Familles(DataReader.GetInt32(0), DataReader.GetString(1));
+                //Requete.Connection.Close();
                 return Famille;
             }
             else
             {
+                //Requete.Connection.Close();
                 return null;
             }
         }
@@ -76,6 +78,7 @@ namespace GestionBDDApp.data.dao
             {
                 Famille.Id = (int) Connection.LastInsertRowId;
             }
+            //Command.Connection.Close();
         }
 
         public void delete(int Id)
@@ -85,6 +88,7 @@ namespace GestionBDDApp.data.dao
             Command.CommandText = "DELETE FROM Familles WHERE RefFamille = @ref";
             Command.Parameters.AddWithValue("@ref", Id);
             Command.ExecuteNonQuery();
+            //Command.Connection.Close();
 
         }
     }

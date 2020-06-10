@@ -32,9 +32,8 @@ namespace GestionBDDApp.data.dao
                     
                     Articles.Add(new Articles(DataReader.GetString(0), DataReader.GetString(1), SousFamille, Marque, DataReader.GetFloat(4), DataReader.GetInt32(5)));
                 }
-                DataReader.Close();
             }
-
+            //Requete.Connection.Close();
             return Articles;
         }
 
@@ -50,6 +49,7 @@ namespace GestionBDDApp.data.dao
             Command.Parameters.AddWithValue("@prix", Article.Prix);
             Command.Parameters.AddWithValue("@quantity", Article.Quantite);
             Command.ExecuteNonQueryAsync();
+            //Command.Connection.Close();
         }
 
         public void delete(string Id)
@@ -58,6 +58,7 @@ namespace GestionBDDApp.data.dao
             Command.CommandText = "DELETE FROM Articles WHERE RefArticle = @ref";
             Command.Parameters.AddWithValue("@ref", Id);
             Command.ExecuteNonQuery();
+            Command.Connection.Close();
         }
     }
 }

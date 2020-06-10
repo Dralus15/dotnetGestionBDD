@@ -48,6 +48,7 @@ namespace GestionBDDApp.data.dao
             SqLiteCommand.CommandText = "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille";
             SqLiteCommand.Parameters.AddWithValue("@refSousFamille", id);
             var SousFamilles = ParseQueryResult(SqLiteCommand.ExecuteReader());
+            //SqLiteCommand.Connection.Close();
             if (SousFamilles.Count == 0)
             {
                 return null;
@@ -76,6 +77,7 @@ namespace GestionBDDApp.data.dao
             {
                 SousFamille.Id = (int) Connection.LastInsertRowId;
             }
+            //Command.Connection.Close();
         }
 
         public void delete(int Id)
@@ -85,6 +87,7 @@ namespace GestionBDDApp.data.dao
             Command.CommandText = "DELETE FROM SousFamilles WHERE RefSousFamille = @ref";
             Command.Parameters.AddWithValue("@ref", Id);
             Command.ExecuteNonQuery();
+            //Command.Connection.Close();
         }
     }
 }
