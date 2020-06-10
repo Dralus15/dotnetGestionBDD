@@ -1,6 +1,4 @@
 ﻿using GestionBDDApp.data.model;
-using GestionBDDApp.data.dao;
-using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -10,7 +8,7 @@ namespace GestionBDDApp.data.dao
     {
         private readonly DAOFamille DaoFamille;
 
-        public DAOSousFamille(DAOFamille DaoFamille)
+        public DAOSousFamille(DAOFamille DaoFamille) : base("SousFamilles")
         {
             this.DaoFamille = DaoFamille;
         }

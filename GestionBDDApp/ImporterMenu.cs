@@ -39,7 +39,7 @@ namespace GestionBDDApp
                 MessageBoxButtons.YesNo);
             if (ConfirmResult == DialogResult.Yes)
             {
-                //TODO clear la base
+                DaoRegistery.GetInstance.clearAll();
                 Import(true);
             }
         }

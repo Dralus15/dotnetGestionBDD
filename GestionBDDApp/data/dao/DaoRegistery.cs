@@ -17,6 +17,14 @@
             DaoArticle = new DAOArticle(DaoSousFamille, DaoMarque);
         }
 
+        public void clearAll()
+        {
+            DaoArticle.clear();
+            DaoSousFamille.clear();
+            DaoMarque.clear();
+            DaoFamille.clear();
+        }
+
         public static DaoRegistery GetInstance
         {
             get

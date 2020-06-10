@@ -1,7 +1,10 @@
 ﻿using GestionBDDApp.data.model;
 using GestionBDDApp.data.dao;
 using System;
+using System.ComponentModel;
+using System.Configuration;
 using System.Windows.Forms;
+using GestionBDDApp.Properties;
 
 namespace GestionBDDApp
 {
@@ -32,16 +35,7 @@ namespace GestionBDDApp
             listView1.Columns.Insert(3, this.Marques);
             listView1.Columns.Insert(4, this.Quantité);
         }
-
-        private DAOArticle DaoArticle = DaoRegistery.GetInstance.DaoArticle;
-
-        public void InserItem()
-        {
-            foreach (var Article in DaoArticle.getAll())
-            {
-                listView1.Items.Add(new ListViewItem(new string[] {Article.Description, Article.SousFamille.Nom, Article.SousFamille.Nom, Article.Marque.Nom, Article.Quantite.ToString()}));
-            }
-        }
+        
 
         public void SupprItem()
         {
@@ -68,14 +62,12 @@ namespace GestionBDDApp
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Tous les articles");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Familles");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Marques");
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.actualiserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exporterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.supprimerLaBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
@@ -103,7 +95,7 @@ namespace GestionBDDApp
             // 
             // fichierToolStripMenuItem
             // 
-            this.fichierToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.actualiserToolStripMenuItem, this.importerToolStripMenuItem, this.exporterToolStripMenuItem});
+            this.fichierToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.actualiserToolStripMenuItem, this.importerToolStripMenuItem, this.exporterToolStripMenuItem, this.supprimerLaBaseToolStripMenuItem});
             this.fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
             this.fichierToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
             this.fichierToolStripMenuItem.Text = "Fichier";
@@ -111,21 +103,29 @@ namespace GestionBDDApp
             // actualiserToolStripMenuItem
             // 
             this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
-            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.actualiserToolStripMenuItem.Text = "Actualiser";
             // 
             // importerToolStripMenuItem
             // 
             this.importerToolStripMenuItem.Name = "importerToolStripMenuItem";
-            this.importerToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.importerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.importerToolStripMenuItem.Text = "Importer";
             this.importerToolStripMenuItem.Click += new System.EventHandler(this.importerToolStripMenuItem_Click);
             // 
             // exporterToolStripMenuItem
             // 
             this.exporterToolStripMenuItem.Name = "exporterToolStripMenuItem";
-            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.exporterToolStripMenuItem.Text = "Exporter";
+            this.exporterToolStripMenuItem.Click += new System.EventHandler(this.exporterToolStripMenuItem_Click);
+            // 
+            // supprimerLaBaseToolStripMenuItem
+            // 
+            this.supprimerLaBaseToolStripMenuItem.Name = "supprimerLaBaseToolStripMenuItem";
+            this.supprimerLaBaseToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.supprimerLaBaseToolStripMenuItem.Text = "Supprimer la base";
+            this.supprimerLaBaseToolStripMenuItem.Click += new System.EventHandler(this.supprimerLaBaseToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -158,13 +158,6 @@ namespace GestionBDDApp
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            treeNode1.Name = "TousArticles";
-            treeNode1.Text = "Tous les articles";
-            treeNode2.Name = "Familles";
-            treeNode2.Text = "Familles";
-            treeNode3.Name = "Marques";
-            treeNode3.Text = "Marques";
-            this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {treeNode1, treeNode2, treeNode3});
             this.treeView1.Size = new System.Drawing.Size(441, 404);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -180,6 +173,7 @@ namespace GestionBDDApp
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
             // 
             // Description
             // 
@@ -214,6 +208,8 @@ namespace GestionBDDApp
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Bacchus";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -237,6 +233,7 @@ namespace GestionBDDApp
         private System.Windows.Forms.ColumnHeader SousFamilles;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripMenuItem supprimerLaBaseToolStripMenuItem;
         private System.Windows.Forms.TreeView treeView1;
 
         #endregion

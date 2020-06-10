@@ -1,5 +1,4 @@
 ﻿using GestionBDDApp.data.model;
-using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -7,6 +6,8 @@ namespace GestionBDDApp.data.dao
 {
     public class DAOMarque : AbstractDao
     {
+        public DAOMarque() : base("Marques") { }
+        
         public List<Marques> GetAllMarques()
         {
             return ParseQueryResult(new SQLiteCommand( "SELECT * FROM Marques", NewConnection()).ExecuteReader());

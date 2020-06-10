@@ -1,15 +1,12 @@
 ﻿using GestionBDDApp.data.model;
-using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GestionBDDApp.data.dao
 {
     public class DAOFamille : AbstractDao
     {
+        public DAOFamille() : base("Familles") { }
 
         public List<Familles> GetAllFamilles()
         {

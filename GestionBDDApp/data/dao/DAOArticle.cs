@@ -10,7 +10,7 @@ namespace GestionBDDApp.data.dao
         private readonly DAOSousFamille DaoSousFamille;
         private readonly DAOMarque DaoMarque;
 
-        public DAOArticle(DAOSousFamille DaoSousFamille, DAOMarque DaoMarque)
+        public DAOArticle(DAOSousFamille DaoSousFamille, DAOMarque DaoMarque): base("Articles")
         {
             this.DaoSousFamille = DaoSousFamille;
             this.DaoMarque = DaoMarque;

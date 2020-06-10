@@ -79,6 +79,12 @@
     <Compile Include="data\model\SousFamilles.cs" />
     <Compile Include="data\ParsingException.cs" />
     <Compile Include="data\utils\CollectionsUtils.cs" />
+    <Compile Include="ExporterMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExporterMenu.Designer.cs">
+      <DependentUpon>ExporterMenu.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,6 +99,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ExporterMenu.resx">
+      <DependentUpon>ExporterMenu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
