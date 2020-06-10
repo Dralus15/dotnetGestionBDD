@@ -10,7 +10,21 @@ namespace GestionBDDApp.data.dao
         
         public List<Marques> GetAllMarques()
         {
-            return ParseQueryResult(new SQLiteCommand( "SELECT * FROM Marques", NewConnection()).ExecuteReader());
+            List<Marques> Marques;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Marques;", Connection))
+                {
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        Marques = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return Marques;
         }
 
         private static List<Marques> ParseQueryResult(SQLiteDataReader DataReader)
@@ -20,8 +34,7 @@ namespace GestionBDDApp.data.dao
             {
                 while (DataReader.Read())
                 {
-                    Marques.Add(new Marques(DataReader.GetInt32(0),
-                        DataReader.GetString(1)));
+                    Marques.Add(new Marques(DataReader.GetInt32(0), DataReader.GetString(1)));
                 }
             }
 
@@ -30,53 +43,65 @@ namespace GestionBDDApp.data.dao
 
         public Marques GetMarqueById(int Id)
         {
-            var SqLiteCommand = new SQLiteCommand(NewConnection());
-            SqLiteCommand.CommandText = "SELECT * FROM Marques WHERE RefMarque = @refMarque";
-            SqLiteCommand.Parameters.AddWithValue("@refMarque", Id);
-            var Marques = ParseQueryResult(SqLiteCommand.ExecuteReader());
-            if (Marques.Count == 0)
+            Marques Marque = null;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                return null;
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE RefMarque = @refMarque", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refMarque", Id);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Marque = new Marques(Reader.GetInt32(0), Reader.GetString(1));
+                        }
+                    }
+                }
             }
-            return Marques[0];
-        }
-        
-        public List<Marques> GetMarqueByName(string MarqueName)
-        {
-            var SqLiteCommand = new SQLiteCommand(NewConnection());
-            SqLiteCommand.CommandText = "SELECT * FROM Marques WHERE Nom = @name";
-            SqLiteCommand.Parameters.AddWithValue("@name", MarqueName);
-            return ParseQueryResult(SqLiteCommand.ExecuteReader());
+
+            return Marque;
         }
 
         public void save(Marques Marques)
         {
-            var Command = new SQLiteCommand(NewConnection());
-            if (Marques.Id == null)
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                Command.CommandText = "INSERT INTO Marques(Nom) VALUES (@name)";
-            }
-            else
-            {
-                Command.CommandText = @"UPDATE Marques SET Nom=@name WHERE RefMarque = @refMarque";
-                Command.Parameters.AddWithValue("@refMarque", Marques.Id);
-            }
-            
-            Command.Parameters.AddWithValue("@name", Marques.Nom);
-            Command.ExecuteNonQuery();
-            if (Marques.Id == null)
-            {
-                Marques.Id = (int) Connection.LastInsertRowId;
+                Connection.Open();
+                using (var Command = new SQLiteCommand(Connection))
+                {
+                    if (Marques.Id == null)
+                    {
+                        Command.CommandText = "INSERT INTO Marques(Nom) VALUES (@name)";
+                    }
+                    else
+                    {
+                        Command.CommandText = @"UPDATE Marques SET Nom=@name WHERE RefMarque = @refMarque";
+                        Command.Parameters.AddWithValue("@refMarque", Marques.Id);
+                    }
+                    Command.Parameters.AddWithValue("@name", Marques.Nom);
+                    Command.ExecuteNonQuery();
+                    if (Marques.Id == null)
+                    {
+                        Marques.Id = (int) Connection.LastInsertRowId;
+                    }
+                }
             }
         }
 
         public void delete(int Id)
         {
-            var Command = new SQLiteCommand(NewConnection());
-            Command.CommandText = "DELETE FROM Marques WHERE RefMarque = @ref";
-            Command.Parameters.AddWithValue("@ref", Id);
-            Command.ExecuteNonQuery();
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("DELETE FROM Marques WHERE RefMarque = @ref", Connection) )
+                {
+                    Command.Parameters.AddWithValue("@ref", Id);
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
-
     }
 }

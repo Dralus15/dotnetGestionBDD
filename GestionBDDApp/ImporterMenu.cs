@@ -193,7 +193,13 @@ namespace GestionBDDApp
                     }
                     
                     StatusText.Text = "Import terminé";
-                    //TODO fenetre de fin d'import
+                    MessageBox.Show("Import terminé :\n" + 
+                            NewMarques.Values.Count + " nouvelles marques \n" +
+                            NewFamilles.Values.Count + " nouvelles familles \n" +
+                            NewSousFamilles.Values.Count + " nouvelles sous-familles\n" +
+                            NewArticles.Count + " nouveaux articles \n",
+                        "Import terminé avec succés.",
+                        MessageBoxButtons.OK);
                 }
                 catch (Exception Exception)
                 {

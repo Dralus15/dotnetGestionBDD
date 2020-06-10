@@ -396,11 +396,9 @@ namespace GestionBDDApp
 
         private void listView1_KeyDown(object Sender, KeyEventArgs KeyEvent)
         {
-            Console.WriteLine("je supp oui");
             if (KeyEvent.KeyCode == Keys.Delete && listView1.SelectedItems.Count > 0)
             {
                 Delete(listView1.SelectedItems[0]);
-              
             }
         }
     }

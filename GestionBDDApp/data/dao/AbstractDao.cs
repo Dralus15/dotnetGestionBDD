@@ -8,29 +8,23 @@ namespace GestionBDDApp.data.dao
     {
         private readonly string BaseName;
 
-        private const string DbPath = "Data Source=Bacchus.SQLite";
-
-        protected SQLiteConnection Connection = null;
+        protected const string ConnectionString = "Data Source=Bacchus.SQLite";
 
         public AbstractDao(String BaseName)
         {
             this.BaseName = BaseName;
         }
 
-        protected SQLiteConnection NewConnection()
-        {
-            if (Connection == null || Connection.State == ConnectionState.Closed)
-            {
-                Connection = new SQLiteConnection(DbPath);
-                Connection.Open();
-            }
-
-            return Connection;
-        }
-
         public void clear()
         {
-            new SQLiteCommand(String.Format("DELETE FROM {0}; VACUUM;", BaseName), NewConnection()).ExecuteNonQuery();
+            using (SQLiteConnection Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (SQLiteCommand Command = new SQLiteCommand(String.Format("DELETE FROM {0}; VACUUM;", BaseName)))
+                {
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

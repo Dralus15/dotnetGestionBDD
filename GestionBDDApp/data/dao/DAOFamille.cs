@@ -10,19 +10,30 @@ namespace GestionBDDApp.data.dao
 
         public List<Familles> GetAllFamilles()
         {
-            return ParseQueryResult(new SQLiteCommand("SELECT * FROM Familles;",
-                NewConnection()).ExecuteReader());
+            List<Familles> Familles;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Articles;", Connection))
+                {
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        Familles = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return Familles;
         }
 
         private static List<Familles> ParseQueryResult(SQLiteDataReader DataReader)
         {
             List<Familles> Familles = new List<Familles>();
-            if (DataReader.HasRows)
+            if (!DataReader.HasRows) return Familles;
+            while (DataReader.Read())
             {
-                while (DataReader.Read())
-                {
-                    Familles.Add(new Familles(DataReader.GetInt32(0), DataReader.GetString(1)));
-                }
+                Familles.Add(new Familles(DataReader.GetInt32(0), DataReader.GetString(1)));
             }
 
             return Familles;
@@ -31,61 +42,86 @@ namespace GestionBDDApp.data.dao
 
         public Familles GetFamilleById(int Id)
         {
-            Familles Famille;
-            SQLiteCommand Requete = new SQLiteCommand("SELECT * FROM Familles WHERE RefFamille = @refFamille", NewConnection());
-            Requete.Parameters.AddWithValue("@refFamille", Id);
-            SQLiteDataReader DataReader = Requete.ExecuteReader();
+            Familles Famille = null;
 
-            if (DataReader.HasRows)
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                DataReader.Read();
-                Famille = new Familles(DataReader.GetInt32(0), DataReader.GetString(1));
-                return Famille;
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE RefFamille = @refFamille", Connection))
+                {
+                    
+                    Command.Parameters.AddWithValue("@refFamille", Id);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Famille = new Familles(Reader.GetInt32(0), Reader.GetString(1));
+                        }
+                    }
+                }
             }
-            else
-            {
-                return null;
-            }
+
+            return Famille;
         }
 
         public List<Familles> GetFamilleByName(string FamilleName)
         {
-            var SqLiteCommand = new SQLiteCommand(NewConnection());
-            SqLiteCommand.CommandText = "SELECT * FROM Familles WHERE Nom = '@name'";
-            SqLiteCommand.Parameters.AddWithValue("@name", FamilleName);
-            return ParseQueryResult(SqLiteCommand.ExecuteReader());
+            List<Familles> Familles;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE Nom = '@name'", Connection))
+                {
+                    Command.Parameters.AddWithValue("@name", FamilleName);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        Familles = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return Familles;
         }
 
         public void save(Familles Famille)
         {
-            var Connection = NewConnection();
-            var Command = new SQLiteCommand(Connection);
-            if (Famille.Id == null)
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                Command.CommandText = "INSERT INTO Familles(Nom) VALUES (@name)";
-            }
-            else
-            {
-                Command.CommandText = @"UPDATE Familles SET Nom='@name' WHERE RefFamille = @refFamille";
-                Command.Parameters.AddWithValue("@refFamille", Famille.Id);
-            }
-        
-            Command.Parameters.AddWithValue("@name", Famille.Nom);
-            Command.ExecuteNonQuery();
-            if (Famille.Id == null)
-            {
-                Famille.Id = (int) Connection.LastInsertRowId;
+                Connection.Open();
+                using (var Command = new SQLiteCommand(Connection))
+                {
+                    if (Famille.Id == null)
+                    {
+                        Command.CommandText = "INSERT INTO Familles(Nom) VALUES (@name)";
+                    }
+                    else
+                    {
+                        Command.CommandText = @"UPDATE Familles SET Nom='@name' WHERE RefFamille = @refFamille";
+                        Command.Parameters.AddWithValue("@refFamille", Famille.Id);
+                    }
+                    Command.Parameters.AddWithValue("@name", Famille.Nom);
+                    Command.ExecuteNonQuery();
+                    if (Famille.Id == null)
+                    {
+                        Famille.Id = (int) Connection.LastInsertRowId;
+                    }
+                }
             }
         }
 
         public void delete(int Id)
         {
-            var Connection = NewConnection();
-            var Command = new SQLiteCommand(Connection);
-            Command.CommandText = "DELETE FROM Familles WHERE RefFamille = @ref";
-            Command.Parameters.AddWithValue("@ref", Id);
-            Command.ExecuteNonQuery();
-
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection))
+                {
+                    Command.Parameters.AddWithValue("@ref", Id);
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

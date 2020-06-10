@@ -18,46 +18,97 @@ namespace GestionBDDApp.data.dao
 
         public List<Articles> getAll()
         {
-            List<Articles> Articles = new List<Articles>();
+            var Articles = new List<Articles>();
 
-            SQLiteCommand Requete = new SQLiteCommand("SELECT * FROM Articles;", NewConnection());
-            SQLiteDataReader DataReader = Requete.ExecuteReader();
-
-            if (DataReader.HasRows)
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                while (DataReader.Read())
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Articles;", Connection))
                 {
-                    SousFamilles SousFamille = DaoSousFamille.getSousFamilleById(DataReader.GetInt32(2));
-                    Marques Marque = DaoMarque.GetMarqueById(DataReader.GetInt32(3));
-                    
-                    Articles.Add(new Articles(DataReader.GetString(0), DataReader.GetString(1), SousFamille, Marque, DataReader.GetFloat(4), DataReader.GetInt32(5)));
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (!Reader.HasRows) return Articles;
+                        while (Reader.Read())
+                        {
+                            var SousFamille = DaoSousFamille.getSousFamilleById(Reader.GetInt32(2));
+                            var Marque = DaoMarque.GetMarqueById(Reader.GetInt32(3));
+                            Articles.Add(new Articles(
+                                Reader.GetString(0), 
+                                Reader.GetString(1), 
+                                SousFamille, Marque, 
+                                Reader.GetFloat(4), 
+                                Reader.GetInt32(5)));
+                        }
+                    }
                 }
-                DataReader.Close();
             }
 
             return Articles;
         }
 
+        public Articles GetArticleById(string Id)
+        {
+            Articles Article = null;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Articles WHERE RefArticle = @refArticle", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refArticle", Id);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            var SousFamille = DaoSousFamille.getSousFamilleById(Reader.GetInt32(2));
+                            var Marque = DaoMarque.GetMarqueById(Reader.GetInt32(3));
+                            Article = new Articles(
+                                Reader.GetString(0), 
+                                Reader.GetString(1), 
+                                SousFamille, Marque, 
+                                Reader.GetFloat(4), 
+                                Reader.GetInt32(5));
+                        }
+                    }
+                }
+            }
+
+            return Article;
+        }
+
         public void save(Articles Article)
         {
-            var Command = new SQLiteCommand(NewConnection());
-            Command.CommandText = @"INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES (@ref,@desc, @refSousFamille, @refMarque, @prix, @quantity) " + 
-                                      "ON CONFLICT(RefArticle) DO UPDATE SET Description=@desc, RefSousFamille=@refSousFamille, RefMarque=@refMarque, PrixHT=@prix, Quantite=@quantity";
-            Command.Parameters.AddWithValue("@ref", Article.RefArticle);
-            Command.Parameters.AddWithValue("@desc", Article.Description);
-            Command.Parameters.AddWithValue("@refSousFamille", Article.SousFamille.Id);
-            Command.Parameters.AddWithValue("@refMarque", Article.Marque.Id);
-            Command.Parameters.AddWithValue("@prix", Article.Prix);
-            Command.Parameters.AddWithValue("@quantity", Article.Quantite);
-            Command.ExecuteNonQueryAsync();
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand(
+                    @"INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES (@ref,@desc, @refSousFamille, @refMarque, @prix, @quantity)"
+                    , Connection)
+                )
+                {
+                    Command.Parameters.AddWithValue("@ref", Article.RefArticle);
+                    Command.Parameters.AddWithValue("@desc", Article.Description);
+                    Command.Parameters.AddWithValue("@refSousFamille", Article.SousFamille.Id);
+                    Command.Parameters.AddWithValue("@refMarque", Article.Marque.Id);
+                    Command.Parameters.AddWithValue("@prix", Article.Prix);
+                    Command.Parameters.AddWithValue("@quantity", Article.Quantite);
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
 
         public void delete(string Id)
         {
-            var Command = new SQLiteCommand(NewConnection());
-            Command.CommandText = "DELETE FROM Articles WHERE RefArticle = @ref";
-            Command.Parameters.AddWithValue("@ref", Id);
-            Command.ExecuteNonQuery();
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection) )
+                {
+                    Command.Parameters.AddWithValue("@ref", Id);
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

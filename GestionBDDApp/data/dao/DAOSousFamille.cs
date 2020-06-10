@@ -15,7 +15,21 @@ namespace GestionBDDApp.data.dao
 
         public List<SousFamilles> GetAllSousFamilles()
         {
-            return ParseQueryResult(new SQLiteCommand("SELECT * FROM SousFamilles", NewConnection()).ExecuteReader());
+            List<SousFamilles> SousFamilles;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles", Connection))
+                {
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        SousFamilles = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return SousFamilles;
         }
 
         private List<SousFamilles> ParseQueryResult(SQLiteDataReader DataReader)
@@ -25,7 +39,6 @@ namespace GestionBDDApp.data.dao
             {
                 while (DataReader.Read())
                 {
-                    DAOFamille DaoFamille = new DAOFamille();
                     Familles Famille = this.DaoFamille.GetFamilleById(DataReader.GetInt32(1));
                     SousFamilles.Add(new SousFamilles(DataReader.GetInt32(0), Famille, DataReader.GetString(2)));
                 }
@@ -34,57 +47,71 @@ namespace GestionBDDApp.data.dao
             return SousFamilles;
         }
 
-        public List<SousFamilles> getSousFamilleByName(string Name)
-        {
-            var SqLiteCommand = new SQLiteCommand(NewConnection());
-            SqLiteCommand.CommandText = "SELECT * FROM SousFamilles WHERE Nom = @name";
-            SqLiteCommand.Parameters.AddWithValue("@name", Name);
-            return ParseQueryResult(SqLiteCommand.ExecuteReader());
-        }       
-        
         public SousFamilles getSousFamilleById(int id)
         {
-            var SqLiteCommand = new SQLiteCommand(NewConnection());
-            SqLiteCommand.CommandText = "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille";
-            SqLiteCommand.Parameters.AddWithValue("@refSousFamille", id);
-            var SousFamilles = ParseQueryResult(SqLiteCommand.ExecuteReader());
-            if (SousFamilles.Count == 0)
+            SousFamilles SousFamilles = null;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                return null;
+                Connection.Open();
+                using (var Command = new SQLiteCommand( "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille", Connection))
+                { 
+                    Command.Parameters.AddWithValue("@refSousFamille", id);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        if (Reader.HasRows)
+                        {
+                            Reader.Read();
+                            Familles Famille = this.DaoFamille.GetFamilleById(Reader.GetInt32(1));
+                            SousFamilles = new SousFamilles(Reader.GetInt32(0), Famille, Reader.GetString(2));
+                        }
+                    }
+                }
             }
-            return SousFamilles[0];
+
+            return SousFamilles;
         }
 
         public void save(SousFamilles SousFamille)
         {
-            var Connection = NewConnection();
-            var Command = new SQLiteCommand(Connection);
-            if (SousFamille.Id == null)
+            using (var Connection = new SQLiteConnection(ConnectionString))
             {
-                Command.CommandText = "INSERT INTO SousFamilles(RefFamille, Nom) VALUES (@refFamille, @name)";
-            }
-            else
-            {
-                Command.CommandText = @"UPDATE SousFamilles SET RefFamille='@refFamille', Nom='@name' WHERE RefSousFamille = @refSousFamille";
-                Command.Parameters.AddWithValue("@refSousFamille", SousFamille.Id);
-            }
+                Connection.Open();
+                using (var Command = new SQLiteCommand(Connection))
+                {
+                    if (SousFamille.Id == null)
+                    {
+                        Command.CommandText = "INSERT INTO SousFamilles(RefFamille, Nom) VALUES (@refFamille, @name)";
+                    }
+                    else
+                    {
+                        Command.CommandText = @"UPDATE SousFamilles SET RefFamille='@refFamille', Nom='@name' WHERE RefSousFamille = @refSousFamille";
+                        Command.Parameters.AddWithValue("@refSousFamille", SousFamille.Id);
+                    }
         
-            Command.Parameters.AddWithValue("@refFamille", SousFamille.Famille.Id);
-            Command.Parameters.AddWithValue("@name", SousFamille.Nom);
-            Command.ExecuteNonQuery();
-            if (SousFamille.Id == null)
-            {
-                SousFamille.Id = (int) Connection.LastInsertRowId;
+                    Command.Parameters.AddWithValue("@refFamille", SousFamille.Famille.Id);
+                    Command.Parameters.AddWithValue("@name", SousFamille.Nom);
+                    Command.ExecuteNonQuery();
+                    if (SousFamille.Id == null)
+                    {
+                        SousFamille.Id = (int) Connection.LastInsertRowId;
+                    }
+                }
             }
+            
         }
 
         public void delete(int Id)
         {
-            var Connection = NewConnection();
-            var Command = new SQLiteCommand(Connection);
-            Command.CommandText = "DELETE FROM SousFamilles WHERE RefSousFamille = @ref";
-            Command.Parameters.AddWithValue("@ref", Id);
-            Command.ExecuteNonQuery();
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("DELETE FROM SousFamilles WHERE RefSousFamille = @ref", Connection) )
+                {
+                    Command.Parameters.AddWithValue("@ref", Id);
+                    Command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }
