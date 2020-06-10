@@ -56,10 +56,12 @@ namespace GestionBDDApp
                     if (e.Node.Equals(AllBrandNode))
                     {
                         loadMarques();
+                        DisplayBrandDescription();
                     }
                     else if (e.Node.Equals(AllFamilyNode))
                     {
                         loadFamilies();
+                        DisplayFamilyDescription();
                     }
                     else
                     {
@@ -73,9 +75,9 @@ namespace GestionBDDApp
                         if (NodeParent.Equals(AllFamilyNode))
                         // Une famille est séléctionnée
                         {
-                            loadSubFamily(e.Node, ((int?) e.Node.Tag).Value);
-                            DescriptionModel = e.Node.Text;
-                            DisplayDescription();
+                            var Id = ((int?) e.Node.Tag).Value;
+                            loadSubFamily(e.Node, Id);
+                            DisplaySubFamilyDescription(Id);
                         }
                         else
                         // Une sous-famille est séléctionnée
@@ -129,12 +131,33 @@ namespace GestionBDDApp
         private int? SousFamillesChoosed = null;
         private int? MarquesChoosed = null;
 
-        private string DescriptionModel = null;
+        private List<string> DescriptionModel = null;
 
-        private void DisplayDescription()
+        private void DisplayFamilyDescription()
         {
             listView1.Items.Clear();
-            listView1.Items.Add(new ListViewItem(new[] {DescriptionModel}));
+            foreach (var Family in FamillesModel)
+            {
+                listView1.Items.Add(Family.Nom);
+            }
+        }
+
+        private void DisplayBrandDescription()
+        {
+            listView1.Items.Clear();
+            foreach (var Family in MarquesModel)
+            {
+                listView1.Items.Add(Family.Nom);
+            }
+        }
+
+        private void DisplaySubFamilyDescription(int Id)
+        {
+            listView1.Items.Clear();
+            foreach (var Family in SousFamillesModel[Id])
+            {
+                listView1.Items.Add(Family.Nom);
+            }
         }
         
         private void DisplayArticlesWithFilter()
