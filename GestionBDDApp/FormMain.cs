@@ -18,7 +18,7 @@ namespace GestionBDDApp
 
         private void importerToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
-            using (ImporterMenu ImporterMenu = new ImporterMenu())
+            using (var ImporterMenu = new ImporterMenu())
             {
                 ImporterMenu.StartPosition = FormStartPosition.CenterParent;
                 ImporterMenu.ShowDialog(this);
@@ -27,7 +27,7 @@ namespace GestionBDDApp
         
         private void exporterToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
-            using (ExporterMenu ExporterMenu = new ExporterMenu())
+            using (var ExporterMenu = new ExporterMenu())
             {
                 ExporterMenu.StartPosition = FormStartPosition.CenterParent;
                 ExporterMenu.ShowDialog(this);
@@ -38,7 +38,7 @@ namespace GestionBDDApp
         private TreeNode AllFamilyNode;
         private TreeNode AllBrandNode;
         
-        private TreeNode LastTreeNodeSelected = null;
+        private TreeNode LastTreeNodeSelected;
 
         private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
         {
@@ -49,6 +49,7 @@ namespace GestionBDDApp
                 {
                     return;
                 }
+                LastTreeNodeSelected = TreeNodeSelected;
                 ResetSort();
                 MarquesChoosed = null;
                 SousFamillesChoosed = null;
@@ -137,9 +138,9 @@ namespace GestionBDDApp
         private List<Familles> FamilyModel = new List<Familles>();
         private List<Marques> MarquesModel = new List<Marques>();
 
-        public void UpdateStatusBar()
+        private void UpdateStatusBar()
         {
-            int CountSubFamily = 0;
+            var CountSubFamily = 0;
             foreach (var SubFamily in SubFamilyModel.Values)
             {
                 CountSubFamily += SubFamily.Count;
@@ -152,7 +153,7 @@ namespace GestionBDDApp
 
         private List<string> DescriptionModel = null;
 
-        public void ClearModel()
+        private void ClearModel()
         {
             SousFamillesChoosed = null;
             MarquesChoosed = null;
@@ -225,6 +226,7 @@ namespace GestionBDDApp
             {
                 AllBrandNode.Nodes.Add(TreeNode);
             }
+            AllBrandNode.Expand();
         }
 
         private void LoadFamilies()
@@ -233,23 +235,39 @@ namespace GestionBDDApp
                 .GroupBy(SousFamille => SousFamille.Famille.Id)
                 .ToDictionary(SousFamille => SousFamille.Key, v => v.Select(f => f).ToList());
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
-            AllFamilyNode.Nodes.Clear();//TODO clear les sous familles ? voulu ?
-            foreach (var Famille in FamilyModel)
+            //On sauvegarde les sous familles chargés
+            var SubFamiliesToLoad = new List<int>();
+            foreach (TreeNode Node in AllFamilyNode.Nodes)
             {
-                var SubNode = new TreeNode(Famille.Nom) { Tag = Famille.Id };
-                AllFamilyNode.Nodes.Add(SubNode);
+                if (Node.Nodes.Count > 0)
+                {
+                    SubFamiliesToLoad.Add((int)Node.Tag);
+                }
             }
+            AllFamilyNode.Nodes.Clear();//TODO clear les sous familles ? voulu ?
+            foreach (var Family in FamilyModel)
+            {
+                if (! Family.Id.HasValue) return;
+                
+                var SubNode = new TreeNode(Family.Nom) { Tag = Family.Id.Value };
+                AllFamilyNode.Nodes.Add(SubNode);
+                if (SubFamiliesToLoad.Contains(Family.Id.Value))
+                {
+                    LoadSubFamily(SubNode, Family.Id.Value);
+                }
+            }
+            AllFamilyNode.Expand();
         }
 
         private void LoadSubFamily(TreeNode ParentNode, int FamilyId)
         {
             ParentNode.Nodes.Clear();
-            foreach (var SousFamille in SubFamilyModel[FamilyId])
+            foreach (var SubFamily in SubFamilyModel[FamilyId])
             {
-                var TreeNode = new TreeNode(SousFamille.Nom);
-                TreeNode.Tag = SousFamille.Id;
-                ParentNode.Nodes.Add(TreeNode);
+                if (! SubFamily.Id.HasValue) return;
+                ParentNode.Nodes.Add(new TreeNode(SubFamily.Nom) { Tag = SubFamily.Id });
             }
+            ParentNode.Expand();
         }
 
         private ColumnHeader LastSortedColumn;
@@ -292,7 +310,7 @@ namespace GestionBDDApp
 
             foreach (ListViewItem ListView1Item in listView1.Items)
             {
-                string FirstLetter = ListView1Item.SubItems[ColumnIndex].Text.Substring(0, 1);
+                var FirstLetter = ListView1Item.SubItems[ColumnIndex].Text.Substring(0, 1);
                 var ListView1Group = listView1.Groups[FirstLetter.ToLower()];
                 if (ListView1Group == null)
                 {
@@ -302,10 +320,10 @@ namespace GestionBDDApp
                 ListView1Item.Group = ListView1Group;
             }
 
-            ListViewGroup[] SortedGroup = new ListViewGroup[listView1.Groups.Count];
+            var SortedGroup = new ListViewGroup[listView1.Groups.Count];
             listView1.Groups.CopyTo(SortedGroup, 0);
             listView1.Groups.Clear();
-            string SortIcon = "";
+            var SortIcon = "";
             switch (listView1.Sorting)
             {
                 case SortOrder.Ascending:
