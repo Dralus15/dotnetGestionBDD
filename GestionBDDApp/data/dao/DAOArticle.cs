@@ -41,6 +41,7 @@ namespace GestionBDDApp.data.dao
                         }
                     }
                 }
+                DataReader.Close();
             }
 
             return Articles;
