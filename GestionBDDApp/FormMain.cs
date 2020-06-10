@@ -53,8 +53,8 @@ namespace GestionBDDApp
         {
             LastTreeNodeSelected = TreeNodeSelected;
             DisplayChanged();
-            MarquesChoosed = null;
-            SousFamillesChoosed = null;
+            BrandFilter = null;
+            SubFamilyFilter = null;
             SupprColonne();
             listView1.Groups.Clear();
             if (TreeNodeSelected.Equals(AllArticles))
@@ -80,20 +80,20 @@ namespace GestionBDDApp
                     if (NodeParent.Equals(AllBrandNode))
                         // Une marque est séléctionnée
                     {
-                        MarquesChoosed = (int?) TreeNodeSelected.Tag;
+                        BrandFilter = (int?) TreeNodeSelected.Tag;
                         DisplayArticlesWithFilter();
                     }
                     else if (NodeParent.Equals(AllFamilyNode))
                         // Une famille est séléctionnée
                     {
-                        var Id = ((int?) TreeNodeSelected.Tag).Value;
-                        LoadSubFamily(TreeNodeSelected, Id);
-                        DisplaySubFamilyDescription(Id);
+                        var FamilyId = ((int?) TreeNodeSelected.Tag).Value;
+                        LoadSubFamily(TreeNodeSelected, FamilyId);
+                        DisplaySubFamilyDescription(FamilyId);
                     }
                     else
                         // Une sous-famille est séléctionnée
                     {
-                        SousFamillesChoosed = (int?) TreeNodeSelected.Tag;
+                        SubFamilyFilter = (int?) TreeNodeSelected.Tag;
                         DisplayArticlesWithFilter();
                     }
                 }
@@ -150,15 +150,15 @@ namespace GestionBDDApp
             StatusText.Text = ArticlesModel.Count + " articles, " + FamilyModel.Count + " familles, " + CountSubFamily + " sous-familles et " + MarquesModel.Count + " marques en base.";
         }
 
-        private int? SousFamillesChoosed = null;
-        private int? MarquesChoosed = null;
+        private int? SubFamilyFilter = null;
+        private int? BrandFilter = null;
 
         private List<string> DescriptionModel = null;
 
         private void ClearModel()
         {
-            SousFamillesChoosed = null;
-            MarquesChoosed = null;
+            SubFamilyFilter = null;
+            BrandFilter = null;
             DescriptionModel = null;
             
             ArticlesModel.Clear();
@@ -200,9 +200,9 @@ namespace GestionBDDApp
             listView1.Items.Clear();
             foreach (var Article in ArticlesModel)
             {
-                if (! MarquesChoosed.HasValue || MarquesChoosed.Equals(Article.Marque.Id))
+                if (! BrandFilter.HasValue || BrandFilter.Equals(Article.Marque.Id))
                 {
-                    if (!SousFamillesChoosed.HasValue || SousFamillesChoosed.Equals(Article.Marque.Id))
+                    if (!SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.Marque.Id))
                     {
                         listView1.Items.Add(new ListViewItem(new [] {
                             Article.Description, 
@@ -246,7 +246,7 @@ namespace GestionBDDApp
                     SubFamiliesToLoad.Add((int)Node.Tag);
                 }
             }
-            AllFamilyNode.Nodes.Clear();//TODO clear les sous familles ? voulu ?
+            AllFamilyNode.Nodes.Clear();
             foreach (var Family in FamilyModel)
             {
                 if (! Family.Id.HasValue) return;
