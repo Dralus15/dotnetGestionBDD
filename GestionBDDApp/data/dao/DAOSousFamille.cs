@@ -1,4 +1,4 @@
-﻿using GestionBDDApp.data.model;
+﻿﻿using GestionBDDApp.data.model;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -61,7 +61,6 @@ namespace GestionBDDApp.data.dao
                     {
                         if (Reader.HasRows)
                         {
-                            Reader.Read();
                             Familles Famille = this.DaoFamille.GetFamilleById(Reader.GetInt32(1));
                             SousFamilles = new SousFamilles(Reader.GetInt32(0), Famille, Reader.GetString(2));
                         }

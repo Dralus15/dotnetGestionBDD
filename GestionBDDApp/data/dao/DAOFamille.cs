@@ -1,4 +1,4 @@
-﻿using GestionBDDApp.data.model;
+﻿﻿using GestionBDDApp.data.model;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
