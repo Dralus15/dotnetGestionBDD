@@ -359,10 +359,7 @@ namespace GestionBDDApp
 
         private void FormMain_KeyDown(object Sender, KeyEventArgs KeyEvent)
         {
-            if (KeyEvent.KeyCode == Keys.Delete && listView1.SelectedItems.Count > 0)
-            {
-                Delete(listView1.SelectedItems[0]);
-            }
+            //todo remove
         }
 
         private void Delete(ListViewItem ItemToDelete)
@@ -395,6 +392,16 @@ namespace GestionBDDApp
                 }
             }
             listView1.Items.Remove(ItemToDelete);
+        }
+
+        private void listView1_KeyDown(object Sender, KeyEventArgs KeyEvent)
+        {
+            Console.WriteLine("je supp oui");
+            if (KeyEvent.KeyCode == Keys.Delete && listView1.SelectedItems.Count > 0)
+            {
+                Delete(listView1.SelectedItems[0]);
+              
+            }
         }
     }
 }

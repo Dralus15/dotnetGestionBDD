@@ -52,9 +52,12 @@ namespace GestionBDDApp.data.dao
             Command.ExecuteNonQueryAsync();
         }
 
-        public void delete(Articles Article)
+        public void delete(string Id)
         {
-
+            var Command = new SQLiteCommand(NewConnection());
+            Command.CommandText = "DELETE FROM Articles WHERE RefArticle = @ref";
+            Command.Parameters.AddWithValue("@ref", Id);
+            Command.ExecuteNonQuery();
         }
     }
 }

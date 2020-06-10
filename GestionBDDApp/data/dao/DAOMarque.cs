@@ -70,9 +70,12 @@ namespace GestionBDDApp.data.dao
             }
         }
 
-        public void delete(Marques Marque)
+        public void delete(int Id)
         {
-
+            var Command = new SQLiteCommand(NewConnection());
+            Command.CommandText = "DELETE FROM Marques WHERE RefMarque = @ref";
+            Command.Parameters.AddWithValue("@ref", Id);
+            Command.ExecuteNonQuery();
         }
 
     }
