@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using GestionBDDApp.data;
 using GestionBDDApp.data.csv;
 using GestionBDDApp.data.dao;
@@ -39,13 +41,13 @@ namespace GestionBDDApp
                 MessageBoxButtons.YesNo);
             if (ConfirmResult == DialogResult.Yes)
             {
-                DaoRegistery.GetInstance.ClearAll();
                 Import(true);
             }
         }
 
-        private void Import(bool BaseIsEmpty)
+        private async void Import(bool ShouldEreaseBase)
         {
+            SetBusy(false);
             int Id = 0;
             string ChoosedFilePath = this.PathChoosedFile.Text;
             if (ChoosedFilePath.Length != 0) {
@@ -83,57 +85,6 @@ namespace GestionBDDApp
                     ImportProgress.Maximum = ToImport.Count;
                     ImportProgress.Minimum = 0;
                     ImportProgress.Value = 0;
-                    var NewMarques = new Dictionary<string, Marques>();
-                    var NewFamilles = new Dictionary<string, Familles>();
-                    var NewSousFamilles = new Dictionary<string, SousFamilles>();
-                    
-                    var NewArticles = new List<Articles>();
-
-                    //calculer les autres tables crées
-                    for (var ToImportIndex = 0; ToImportIndex < ToImport.Count; ToImportIndex++)
-                    {
-                        //barre de chargement
-                        ImportProgress.Value = ToImportIndex + 1;
-
-                        var ArticleDto = ToImport[ToImportIndex];
-                        
-
-                        Marques Marque = null;
-                        Familles Famille = null;
-                        SousFamilles SousFamille = null;
-                        
-                        var MarqueName = ArticleDto.Marque;
-                        var FamilleName = ArticleDto.Famille;
-                        var SousFamilleName = ArticleDto.SousFamille;
-                        
-                        if (! BaseIsEmpty)
-                        {
-                            //TODO gerer les modifications des familles
-                            // Famille = DaoFamille.GetFamilleByName(FamilleName);
-                            // Marque = DaoMarque.GetMarqueByName(MarqueName);
-                            // SousFamille = DaoSousFamille.getSousFamilleByName(SousFamilleName);
-                        }
-                        
-                        //résolution des dépendances des marques
-                        if (Marque == null) {
-                            Marque = CollectionsUtils.GetOrCreate(NewMarques, MarqueName, () => new Marques(null, MarqueName));
-                        }
-                        
-                        //résolution des dépendances des Familles
-                        if (Famille == null)
-                        {
-                            Famille = CollectionsUtils.GetOrCreate(NewFamilles, FamilleName, () => new Familles(null, FamilleName));
-                        }
-                        
-                        //résolution des dépendances des Sous-Familles
-                        if (SousFamille == null)
-                        {
-                            SousFamille = CollectionsUtils.GetOrCreate(NewSousFamilles, SousFamilleName,
-                                () => new SousFamilles(null, Famille, SousFamilleName));
-                        }
-
-                        NewArticles.Add(new Articles(ArticleDto.RefArticle, ArticleDto.Description, SousFamille, Marque, ArticleDto.Prix, 0));
-                    }
 
                     //si annomalie(s), demander confirmation
                     if (Annomalies.Count > 0)
@@ -154,33 +105,135 @@ namespace GestionBDDApp
                             return;
                         }
                     }
+                    
+                    var NewBrands = new Dictionary<string, Marques>();
+                    var NewFamilies = new Dictionary<string, Familles>();
+                    var NewSubFamilies = new Dictionary<string, SousFamilles>();
+                    
+                    int DuplicateFamilyCount = 0, DuplicateBrandCount = 0, DuplicateSubFamilyCount = 0;
+
+                    //namesake
+                    StringBuilder NameSakeErrorBuilder = new StringBuilder();
+                    if (! ShouldEreaseBase)
+                    {
+                        foreach (var ArticlesDto in ToImport)
+                        {
+
+                            var FamilyName = ArticlesDto.Famille;
+                            if (! NewFamilies.ContainsKey(FamilyName))
+                            {
+                                var FamilyNameSake = DaoFamille.GetFamilleByName(FamilyName);
+                                if (FamilyNameSake.Count > 0)
+                                {
+                                    DuplicateFamilyCount += FamilyNameSake.Count;
+                                    NewFamilies.Add(FamilyName, FamilyNameSake[0]);
+                                }
+                            }
+                            
+                            var BrandName = ArticlesDto.Marque;
+                            if (! NewBrands.ContainsKey(BrandName))
+                            {
+                                var BrandNameSake = DaoMarque.GetBrandByName(BrandName);
+                                if (BrandNameSake.Count > 0)
+                                {
+                                    DuplicateBrandCount += BrandNameSake.Count;
+                                    NewBrands.Add(BrandName, BrandNameSake[0]);
+                                }
+                            }
+                            
+                            var SubFamilyName = ArticlesDto.Famille;
+                            if (! NewSubFamilies.ContainsKey(SubFamilyName))
+                            {
+                                var SubFamilyNameSake = DaoSousFamille.GetSubFamiliesByName(SubFamilyName);
+                                if (SubFamilyNameSake.Count > 0)
+                                {
+                                    DuplicateSubFamilyCount += SubFamilyNameSake.Count;
+                                    NewSubFamilies.Add(SubFamilyName, SubFamilyNameSake[0]);
+                                }
+                            }
+                            //TODO tester les modifications des familles
+                        }
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés", DuplicateFamilyCount);
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés", DuplicateSubFamilyCount);
+                        NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés", DuplicateBrandCount);
+                    }
+                    
+                    var NewArticles = new List<Articles>();
+
+                    //calculer les autres tables crées
+                    for (var ToImportIndex = 0; ToImportIndex < ToImport.Count; ToImportIndex++)
+                    {
+                        //barre de chargement
+                        ImportProgress.Value = ToImportIndex + 1;
+
+                        var ArticleDto = ToImport[ToImportIndex];
+
+                        var MarqueName = ArticleDto.Marque;
+                        var FamilleName = ArticleDto.Famille;
+                        var SousFamilleName = ArticleDto.SousFamille;
+                        
+                        //TODO dedoublonnage d'article
+                        //TODO modif si doublons
+
+                        //résolution des dépendances des marques
+                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, MarqueName, () => new Marques(null, MarqueName));
+                        
+                        //résolution des dépendances des Familles
+                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, FamilleName, () => new Familles(null, FamilleName));
+                        
+                        //résolution des dépendances des Sous-Familles
+                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, SousFamilleName,() => new SousFamilles(null, Famille, SousFamilleName));
+
+                        NewArticles.Add(new Articles(ArticleDto.RefArticle, ArticleDto.Description, SousFamille, Marque, ArticleDto.Prix, 0));
+                    }
+
+                    if (ShouldEreaseBase)
+                    {
+                        DaoRegistery.GetInstance.ClearAll();
+                    }
+                    else
+                    {
+                        if (NameSakeErrorBuilder.Length > 0)
+                        {
+                            var Result = MessageBox.Show(
+                                "Des doublons ont été détéctés : \n" + NameSakeErrorBuilder.ToString() + "\n" +
+                                "Voulez-vous concerver les doublons ? (les nouvelles valeurs ne seront pas importées)",
+                                "Doublons détéctés", MessageBoxButtons.YesNoCancel);
+                            if (Result == DialogResult.Cancel)
+                            {
+                                StatusText.Text = "Import annulé.";
+                                return;
+                            }
+                        }
+                    }
+
                     StatusText.Text = "Import des données...";
 
                     ImportProgress.Value = 0;
-                    ImportProgress.Maximum = NewMarques.Count;
-                    foreach (var Marques in NewMarques.Values)
+                    ImportProgress.Maximum = NewBrands.Count;
+                    foreach (var Marques in NewBrands.Values)
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des marques " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        DaoMarque.save(Marques);
+                        await Task.Run(() => DaoMarque.save(Marques));
                     }
                     
                     ImportProgress.Value = 0;
-                    ImportProgress.Maximum = NewFamilles.Count;
-                    foreach (var Familles in NewFamilles.Values)
+                    ImportProgress.Maximum = NewFamilies.Count;
+                    foreach (var Familles in NewFamilies.Values)
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        DaoFamille.save(Familles);
+                        await Task.Run(() => DaoFamille.save(Familles));
                     }
                     
                     ImportProgress.Value = 0;
-                    ImportProgress.Maximum = NewSousFamilles.Count;
-                    foreach (var SousFamille in NewSousFamilles.Values)
+                    ImportProgress.Maximum = NewSubFamilies.Count;
+                    foreach (var SousFamille in NewSubFamilies.Values)
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des sous-familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        DaoSousFamille.save(SousFamille);
+                        await Task.Run(() => DaoSousFamille.save(SousFamille));
                     }
                     
                     ImportProgress.Value = 0;
@@ -189,14 +242,14 @@ namespace GestionBDDApp
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des articles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        DaoArticle.save(Article);
+                        await Task.Run(() => DaoArticle.create(Article));
                     }
                     
                     StatusText.Text = "Import terminé";
                     MessageBox.Show("Import terminé :\n" + 
-                            NewMarques.Values.Count + " nouvelles marques \n" +
-                            NewFamilles.Values.Count + " nouvelles familles \n" +
-                            NewSousFamilles.Values.Count + " nouvelles sous-familles\n" +
+                            NewBrands.Values.Count + " nouvelles marques \n" +
+                            NewFamilies.Values.Count + " nouvelles familles \n" +
+                            NewSubFamilies.Values.Count + " nouvelles sous-familles\n" +
                             NewArticles.Count + " nouveaux articles \n",
                         "Import terminé avec succés.",
                         MessageBoxButtons.OK);
@@ -211,9 +264,19 @@ namespace GestionBDDApp
             {
                 MessageBox.Show("Veuillez choisir un fichier", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            SetBusy(true);
         }
 
-        private void SelectCsvButton_Click(object sender, EventArgs e)
+        private void SetBusy(bool IsNotBusy)
+        {
+            ControlBox = IsNotBusy;
+            AppendModeButton.Enabled = IsNotBusy;
+            EreaseModeButton.Enabled = IsNotBusy;
+            SelectCsvButton.Enabled = IsNotBusy;
+            Application.UseWaitCursor = ! IsNotBusy;
+        }
+
+        private void SelectCsvButton_Click(object Sender, EventArgs Event)
         {
             OpenFileDialog OpenFileDialog = new OpenFileDialog();
             OpenFileDialog.Title = "Choose a csv file to import";

@@ -150,6 +150,26 @@ namespace GestionBDDApp.data.dao
                     Command.ExecuteNonQuery();
                 }
             }
+        }        
+        
+        public List<SousFamilles> GetSubFamiliesByName(string SubFamilyName)
+        {
+            List<SousFamilles> SubFamilies;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE Nom = '@name'", Connection))
+                {
+                    Command.Parameters.AddWithValue("@name", SubFamilyName);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        SubFamilies = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return SubFamilies;
         }
     }
 }

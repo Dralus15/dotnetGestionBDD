@@ -126,13 +126,34 @@ namespace GestionBDDApp.data.dao
             return Article;
         }
 
-        public void save(Articles Article)
+        public void create(Articles Article)
         {
             using (var Connection = new SQLiteConnection(ConnectionString))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(
                     @"INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES (@ref,@desc, @refSousFamille, @refMarque, @prix, @quantity)"
+                    , Connection)
+                )
+                {
+                    Command.Parameters.AddWithValue("@ref", Article.RefArticle);
+                    Command.Parameters.AddWithValue("@desc", Article.Description);
+                    Command.Parameters.AddWithValue("@refSousFamille", Article.SousFamille.Id);
+                    Command.Parameters.AddWithValue("@refMarque", Article.Marque.Id);
+                    Command.Parameters.AddWithValue("@prix", Article.Prix);
+                    Command.Parameters.AddWithValue("@quantity", Article.Quantite);
+                    Command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void update(Articles Article)
+        {
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand(
+                    @"UPDATE Articles SET Description = @desc, RefSousFamille = @refSousFamille, RefMarque = @refMarque, PrixHT = @prix, Quantite = @quantity WHERE RefArticle = @ref"
                     , Connection)
                 )
                 {

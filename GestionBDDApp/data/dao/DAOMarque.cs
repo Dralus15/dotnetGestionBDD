@@ -120,5 +120,25 @@ namespace GestionBDDApp.data.dao
                 }
             }
         }
+        
+        public List<Marques> GetBrandByName(string BrandName)
+        {
+            List<Marques> Brand;
+
+            using (var Connection = new SQLiteConnection(ConnectionString))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE Nom = '@name'", Connection))
+                {
+                    Command.Parameters.AddWithValue("@name", BrandName);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        Brand = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return Brand;
+        }
     }
 }
