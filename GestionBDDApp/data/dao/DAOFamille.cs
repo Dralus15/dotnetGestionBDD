@@ -77,5 +77,16 @@ namespace GestionBDDApp.data.dao
                 Famille.Id = (int) Connection.LastInsertRowId;
             }
         }
+
+        public void delete(Familles Famille)
+        {
+            var Connection = NewConnection();
+            var Command = new SQLiteCommand(Connection);
+            Command.CommandText = "DELETE FROM Familles WHERE RefFamille = @RefFamille AND Nom = '@Nom'";
+            Command.Parameters.AddWithValue("@refFamille", Famille.Id);
+            Command.Parameters.AddWithValue("@Nom", Famille.Nom);
+            Command.ExecuteNonQuery();
+
+        }
     }
 }

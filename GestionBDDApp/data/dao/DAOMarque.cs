@@ -70,5 +70,10 @@ namespace GestionBDDApp.data.dao
             }
         }
 
+        public void delete(Marques Marque)
+        {
+
+        }
+
     }
 }

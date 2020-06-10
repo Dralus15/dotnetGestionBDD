@@ -77,5 +77,10 @@ namespace GestionBDDApp.data.dao
                 SousFamille.Id = (int) Connection.LastInsertRowId;
             }
         }
+
+        public void delete(SousFamilles SousFamille)
+        {
+
+        }
     }
 }
