@@ -16,7 +16,7 @@ namespace GestionBDDApp
             InitializeComponent();
         }
 
-        private void importerToolStripMenuItem_Click(object sender, EventArgs e)
+        private void importerToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (ImporterMenu ImporterMenu = new ImporterMenu())
             {
@@ -25,7 +25,7 @@ namespace GestionBDDApp
             }
         }
         
-        private void exporterToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exporterToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (ExporterMenu ExporterMenu = new ExporterMenu())
             {
@@ -37,65 +37,74 @@ namespace GestionBDDApp
         private TreeNode AllArticles;
         private TreeNode AllFamilyNode;
         private TreeNode AllBrandNode;
+        
+        private TreeNode LastTreeNodeSelected = null;
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
         {
-            if(e.Action == TreeViewAction.ByMouse || e.Action == TreeViewAction.ByKeyboard)
+            if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
             {
-                Console.WriteLine("Charging: " + e.Node.Name + " " + e.Node.Text + " " + e.Node.Index);
+                var TreeNodeSelected = Event.Node;
+                if (LastTreeNodeSelected == TreeNodeSelected)
+                {
+                    return;
+                }
+                ResetSort();
                 MarquesChoosed = null;
                 SousFamillesChoosed = null;
                 SupprColonne();
-                if (e.Node.Equals(AllArticles))
+                listView1.Groups.Clear();
+                if (TreeNodeSelected.Equals(AllArticles))
                 {
-                    LoadModel();
+                    LoadArticles();
                     DisplayArticlesWithFilter();
                 }
                 else
                 {
-                    if (e.Node.Equals(AllBrandNode))
+                    if (TreeNodeSelected.Equals(AllBrandNode))
                     {
-                        loadMarques();
+                        LoadBrands();
                         DisplayBrandDescription();
                     }
-                    else if (e.Node.Equals(AllFamilyNode))
+                    else if (TreeNodeSelected.Equals(AllFamilyNode))
                     {
-                        loadFamilies();
+                        LoadFamilies();
                         DisplayFamilyDescription();
                     }
                     else
                     {
-                        var NodeParent = e.Node.Parent;
+                        var NodeParent = TreeNodeSelected.Parent;
                         if (NodeParent.Equals(AllBrandNode))
                         // Une marque est séléctionnée
                         {
-                            MarquesChoosed = (int?) e.Node.Tag;
+                            MarquesChoosed = (int?) TreeNodeSelected.Tag;
                             DisplayArticlesWithFilter();
                         } else 
                         if (NodeParent.Equals(AllFamilyNode))
                         // Une famille est séléctionnée
                         {
-                            var Id = ((int?) e.Node.Tag).Value;
-                            loadSubFamily(e.Node, Id);
+                            var Id = ((int?) TreeNodeSelected.Tag).Value;
+                            LoadSubFamily(TreeNodeSelected, Id);
                             DisplaySubFamilyDescription(Id);
                         }
                         else
                         // Une sous-famille est séléctionnée
                         {
-                            SousFamillesChoosed = (int?) e.Node.Tag;
+                            SousFamillesChoosed = (int?) TreeNodeSelected.Tag;
                             DisplayArticlesWithFilter();
                         }
                     }
                 }
             }
+            UpdateStatusBar();
         }
 
-        private void supprimerLaBaseToolStripMenuItem_Click(object sender, EventArgs e)
+        private void supprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             DaoRegistery.GetInstance.clearAll();
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
         {
             Settings.Default.Left = Left;
             Settings.Default.Top = Top;
@@ -105,7 +114,7 @@ namespace GestionBDDApp
             Settings.Default.Save();
         }
 
-        private void FormMain_Load(object sender, EventArgs e)
+        private void FormMain_Load(object Sender, EventArgs Event)
         {
             Left = Settings.Default.Left;
             Top = Settings.Default.Top;
@@ -120,23 +129,45 @@ namespace GestionBDDApp
             AllFamilyNode = new TreeNode("Familles");
             AllBrandNode = new TreeNode("Marques");
             treeView1.Nodes.AddRange(new [] {AllArticles, AllFamilyNode, AllBrandNode});
-            LoadModel();
+            LoadArticles();
         }
 
-        private List<Articles> ArticlesModel;
-        private Dictionary<int?, List<SousFamilles>> SousFamillesModel;
-        private List<Familles> FamillesModel;
-        private List<Marques> MarquesModel;
+        private List<Articles> ArticlesModel = new List<Articles>();
+        private Dictionary<int?, List<SousFamilles>> SubFamilyModel = new Dictionary<int?, List<SousFamilles>>();
+        private List<Familles> FamilyModel = new List<Familles>();
+        private List<Marques> MarquesModel = new List<Marques>();
+
+        public void UpdateStatusBar()
+        {
+            int CountSubFamily = 0;
+            foreach (var SubFamily in SubFamilyModel.Values)
+            {
+                CountSubFamily += SubFamily.Count;
+            }
+            StatusText.Text = ArticlesModel.Count + " articles, " + FamilyModel.Count + " familles, " + CountSubFamily + " sous-familles et " + MarquesModel.Count + " marques en base.";
+        }
 
         private int? SousFamillesChoosed = null;
         private int? MarquesChoosed = null;
 
         private List<string> DescriptionModel = null;
 
+        public void ClearModel()
+        {
+            SousFamillesChoosed = null;
+            MarquesChoosed = null;
+            DescriptionModel = null;
+            
+            ArticlesModel.Clear();
+            SubFamilyModel.Clear();
+            FamilyModel.Clear();
+            MarquesModel.Clear();
+        }
+        
         private void DisplayFamilyDescription()
         {
             listView1.Items.Clear();
-            foreach (var Family in FamillesModel)
+            foreach (var Family in FamilyModel)
             {
                 listView1.Items.Add(Family.Nom);
             }
@@ -154,7 +185,7 @@ namespace GestionBDDApp
         private void DisplaySubFamilyDescription(int Id)
         {
             listView1.Items.Clear();
-            foreach (var Family in SousFamillesModel[Id])
+            foreach (var Family in SubFamilyModel[Id])
             {
                 listView1.Items.Add(Family.Nom);
             }
@@ -181,68 +212,123 @@ namespace GestionBDDApp
             }
         }
 
-        public void LoadModel()
+        private void LoadArticles()
         {
             ArticlesModel = DaoRegistery.GetInstance.DaoArticle.getAll();
         }
 
-        public void loadMarques()
+        private void LoadBrands()
         {
             MarquesModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
             AllBrandNode.Nodes.Clear();
-            foreach (var Marque in MarquesModel)
+            foreach (var TreeNode in MarquesModel.Select(Marque => new TreeNode(Marque.Nom) { Tag = Marque.Id }))
             {
-                var TreeNode = new TreeNode(Marque.Nom);
-                TreeNode.Tag = Marque.Id;
                 AllBrandNode.Nodes.Add(TreeNode);
             }
         }
 
-        private void loadFamilies()
+        private void LoadFamilies()
         {
-            SousFamillesModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
-                .GroupBy(c => c.Famille.Id)
-                .ToDictionary(k => k.Key, v => v.Select(f => f).ToList());
-            FamillesModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
+            SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
+                .GroupBy(SousFamille => SousFamille.Famille.Id)
+                .ToDictionary(SousFamille => SousFamille.Key, v => v.Select(f => f).ToList());
+            FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
             AllFamilyNode.Nodes.Clear();//TODO clear les sous familles ? voulu ?
-            foreach (var Famille in FamillesModel)
+            foreach (var Famille in FamilyModel)
             {
-                var subNode = new TreeNode(Famille.Nom);
-                subNode.Tag = Famille.Id;
-                AllFamilyNode.Nodes.Add(subNode);
+                var SubNode = new TreeNode(Famille.Nom) { Tag = Famille.Id };
+                AllFamilyNode.Nodes.Add(SubNode);
             }
         }
 
-        private void loadSubFamily(TreeNode parent, int familyId)
+        private void LoadSubFamily(TreeNode ParentNode, int FamilyId)
         {
-            parent.Nodes.Clear();
-            foreach (var SousFamille in SousFamillesModel[familyId])
+            ParentNode.Nodes.Clear();
+            foreach (var SousFamille in SubFamilyModel[FamilyId])
             {
                 var TreeNode = new TreeNode(SousFamille.Nom);
                 TreeNode.Tag = SousFamille.Id;
-                parent.Nodes.Add(TreeNode);
+                ParentNode.Nodes.Add(TreeNode);
             }
         }
-        private int sortColumn = -1;
-        private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
+
+        private ColumnHeader LastSortedColumn;
+        private const int COLUMN_QUANTITY = 4;
+
+        private void ResetSort()
         {
-            if (e.Column != sortColumn)
+            if (LastSortedColumn != null)
             {
-                sortColumn = e.Column;
-                listView1.Sorting = SortOrder.Ascending;
+                LastSortedColumn.Text = LastSortedColumn.Text.Substring(2, LastSortedColumn.Text.Length - 2);
+                LastSortedColumn = null;
+            }
+        }
+        
+        private void listView1_ColumnClick(object Sender, ColumnClickEventArgs Event)
+        {
+            if (listView1.Sorting == SortOrder.Ascending)
+            {
+                listView1.Sorting = SortOrder.Descending;
             }
             else
             {
-                if (listView1.Sorting == SortOrder.Ascending)
-                {
-                    listView1.Sorting = SortOrder.Descending;
-                }
-                else
-                {
-                    listView1.Sorting = SortOrder.Ascending;
-                }
+                listView1.Sorting = SortOrder.Ascending;
             }
+            SortColumn(Event.Column);
+        }
+
+        private void SortColumn(int ColumnIndex)
+        {
+            if (ColumnIndex == COLUMN_QUANTITY)
+            {
+                return;
+            }
+
+            var SortedColumn = listView1.Columns[ColumnIndex];
+            if (LastSortedColumn != null)
+            {
+                LastSortedColumn.Text = LastSortedColumn.Text.Substring(2, LastSortedColumn.Text.Length - 2);
+            }
+
+            foreach (ListViewItem ListView1Item in listView1.Items)
+            {
+                string FirstLetter = ListView1Item.SubItems[ColumnIndex].Text.Substring(0, 1);
+                var ListView1Group = listView1.Groups[FirstLetter.ToLower()];
+                if (ListView1Group == null)
+                {
+                    listView1.Groups.Add(ListView1Group = new ListViewGroup(FirstLetter.ToLower(), FirstLetter));
+                }
+
+                ListView1Item.Group = ListView1Group;
+            }
+
+            ListViewGroup[] SortedGroup = new ListViewGroup[listView1.Groups.Count];
+            listView1.Groups.CopyTo(SortedGroup, 0);
+            listView1.Groups.Clear();
+            string SortIcon = "";
+            switch (listView1.Sorting)
+            {
+                case SortOrder.Ascending:
+                    listView1.Groups.AddRange(SortedGroup.OrderBy(Group => Group.Name).ToArray());
+                    SortIcon = "▲ ";
+                    break;
+                case SortOrder.Descending:
+                    listView1.Groups.AddRange(SortedGroup.OrderByDescending(Group => Group.Name).ToArray());
+                    SortIcon = "▼ ";
+                    break;
+            }
+
+            SortedColumn.Text = SortIcon + SortedColumn.Text;
             listView1.Sort();
+            LastSortedColumn = SortedColumn;
+        }
+
+        private void actualiserToolStripMenuItem_Click(object Sender, EventArgs Event)
+        {
+            listView1.Clear();
+            AllFamilyNode.Nodes.Clear();
+            AllBrandNode.Nodes.Clear();
+            ClearModel();
         }
     }
 }
