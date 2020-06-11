@@ -78,16 +78,16 @@ namespace GestionBDDApp
 
                 // On met la barre de chargement à 0 en mode pas à pas
                 ExportProgress.Style = ProgressBarStyle.Continuous;
-                ExportProgress.Maximum = DaoArticle.Count();
+                ExportProgress.Maximum = ArticleDao.Count();
                 ExportProgress.Minimum = 0;
                 ExportProgress.Value = 0;
 
-                var All = DaoArticle.GetAll();
-                foreach (var Articles in DaoArticle.GetAll())
+                var All = ArticleDao.GetAll();
+                foreach (var Articles in ArticleDao.GetAll())
                 {
                     Writer.WriteLine(
                         $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" +
-                        $"{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
+                        $"{Articles.SubFamily.Family.Name};{Articles.SubFamily.Name};{Articles.Price}");
                     // Progression de la barre de chargement
                     ExportProgress.Value += 1;
                 }
