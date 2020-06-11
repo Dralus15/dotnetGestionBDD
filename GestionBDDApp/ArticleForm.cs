@@ -58,6 +58,8 @@ namespace GestionBDDApp
             SetTitle("Formulaire de modification d'un article");
             DisplayItems();
             
+            ReferenceBox.Enabled = false;
+            
             // On rempli le formulaire avec les informations de l'article.
             ReferenceBox.Text = Article.RefArticle;
             DescriptionBox.Text = Article.Description;
@@ -142,8 +144,16 @@ namespace GestionBDDApp
         /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
-            // On vérifie que tous les champs sont remplis //TODO deduplication
+            // On vérifie que tous les champs sont remplis
             var ErrorBuilder = new StringBuilder();
+            var Ref = ReferenceBox.Text.Trim();
+
+            if (Ref.Length > 8 || Ref.Length < 5)
+            {
+                ErrorBuilder.AppendLine(
+                    "La référence doit faire entre 5 et 8 caractères (espace avant et après non-inclus)");
+            }
+            
             if (BrandComboBox.SelectedIndex == -1)
             {
                 ErrorBuilder.AppendLine("Il faut choisir une marque !");
@@ -185,13 +195,6 @@ namespace GestionBDDApp
                 ErrorBuilder.AppendLine(
                     "La description doit faire entre 1 et 150 caractères (espace avant et après non-inclus)");
             }
-            
-            var Ref = ReferenceBox.Text.Trim();
-            if (Ref.Length > 8 || Ref.Length < 5)
-            {
-                ErrorBuilder.AppendLine(
-                    "La référence doit faire entre 5 et 8 caractères (espace avant et après non-inclus)");
-            }
 
             var Error = ErrorBuilder.ToString();
             if (Error.Length == 0)
@@ -209,11 +212,21 @@ namespace GestionBDDApp
                 // Sinon on créer un article et on l'enregistre
                 else
                 {
-                    Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, 
-                        (SubFamily)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, 
-                        (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, 
-                        (float) PriceBox.Value, (int) QuantityBox.Value);
-                    DaoRegistry.GetInstance.ArticleDao.Create(Article);
+                    //on évite la création de doublons
+                    if (DaoRegistry.GetInstance.ArticleDao.GetArticleById(Ref) != null)
+                    {
+                        DialogResult = DialogResult.Cancel;
+                        MessageBox.Show("Cette référence est déja utilisé par un article", "Erreur", MessageBoxButtons.OK);
+                        return;
+                    }
+                    else
+                    {
+                        Article = new Articles(Ref, DescriptionBox.Text, 
+                            (SubFamily)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, 
+                            (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, 
+                            (float) PriceBox.Value, (int) QuantityBox.Value);
+                        DaoRegistry.GetInstance.ArticleDao.Create(Article);
+                    }
                 }
                 DialogResult = DialogResult.OK;
                 Close();
@@ -221,6 +234,7 @@ namespace GestionBDDApp
             // On affiche un message d'erreur s'il y a des erreurs
             else
             {
+                DialogResult = DialogResult.Cancel;
                 MessageBox.Show("Les champs suivants sont en erreur dans le formulaire : \n\n" + Error + 
                                 "\nCorriger ces erreurs avant de sauvegarder.", "Error", MessageBoxButtons.OK);
             }
