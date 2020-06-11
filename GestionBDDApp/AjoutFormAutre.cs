@@ -10,6 +10,7 @@ namespace GestionBDDApp
     /// </summary>
     public partial class AjoutFormAutre : Form
     {
+
         /// <summary>
         /// Id de l'objet
         /// </summary>
@@ -29,19 +30,23 @@ namespace GestionBDDApp
         /// <summary>
         /// Type de l'objet à modifier ou créer
         /// </summary>
-        private ActiveList Type;
-
+        private readonly ActiveList Type;
+        
         /// <summary>
         /// Créer la fenêtre de création d'une marque, d'une famille ou d'une sous-familles.
         /// </summary>
         public AjoutFormAutre(ActiveList Type) //TODO encapsulation
         {
             InitializeComponent();
-            Text = "Formulaire de création";
+            if (Type == ActiveList.Subfamily)
+            {
+                FamillyComboBox.Visible = true;
+                NameLabel.Visible = true;
+            }
             this.Type = Type;
             Id = null;
             // On Initialise les valeurs des champs du formulaire
-            Initialize();
+            Initialize("Formulaire de création");
         }
 
         /// <summary>
@@ -50,18 +55,18 @@ namespace GestionBDDApp
         public AjoutFormAutre(ActiveList Type, int? Id)
         {
             InitializeComponent();
-            Text = "Formulaire de modification";
             this.Type = Type;
             this.Id = Id;
             // On Initialise les valeurs des champs du formulaire
-            Initialize();
+            Initialize("Formulaire de modification");
         }
 
         /// <summary>
         /// Initialise les valeurs des champs de la fenêtre de modification
         /// </summary>
-        private void Initialize()
+        private void Initialize(string Title)
         {
+            Text = Title;
             switch (Type)
             {
                 case ActiveList.Brand:
@@ -89,9 +94,9 @@ namespace GestionBDDApp
                 case ActiveList.Subfamily:
                 {
                     // On récupère toutes les familles pour les metttre dans la ComboBox des familles
-                    foreach (var Family in DaoRegistery.GetInstance.DaoFamille.GetAllFamilles())
+                    foreach (var AFamily in DaoRegistery.GetInstance.DaoFamille.GetAllFamilles())
                     {
-                        FamillyComboBox.Items.Add(new ComboBoxItem(Family.Nom, Family));
+                        FamillyComboBox.Items.Add(new ComboBoxItem(AFamily.Nom, AFamily));
                     }
                     // Si l'id a une valeur, on récupère la sous-famille
                     if (Id.HasValue)
@@ -148,7 +153,6 @@ namespace GestionBDDApp
                                 Family = new Familles(Id, NameBox.Text);
                             }
 
-                            Console.WriteLine("Famille : " + Family.Nom + " " + Family.Id);
                             DaoRegistery.GetInstance.DaoFamille.Save(Family);
                             break;
                         }

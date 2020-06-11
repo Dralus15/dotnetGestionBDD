@@ -23,7 +23,7 @@ namespace GestionBDDApp.data.csv
                 {
                     if (! Reader.EndOfStream)
                     {
-                        //Definition des colones
+                        //Definition des colonnes
                         Reader.ReadLine();
                     }
 

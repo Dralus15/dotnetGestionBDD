@@ -12,43 +12,6 @@ namespace GestionBDDApp
     /// </summary>
     public partial class AjoutForm : Form//TODO rename ArticleForm
     {
-        /// <summary>
-        /// Créer la fênetre de création d'article.
-        /// </summary>
-        public AjoutForm()
-        {
-            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
-            InitializeComponent();
-            LoadItems();
-            DisplayItems();
-
-            Text = "Formulaire de création d'un article";
-        }
-
-        /// <summary>
-        /// Créer la fênetre de modification d'article.
-        /// </summary>
-        /// <param name="IdArticle">La <b>String</b> d'id de l'article</param>
-        public AjoutForm(string IdArticle)
-        {
-            // On récupère l'article
-            Article = DaoRegistery.GetInstance.DaoArticle.GetArticleById(IdArticle);
-
-            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
-            InitializeComponent();
-            LoadItems();
-            DisplayItems();
-            
-            // On rempli le formulaire avec les informations de l'article
-            ReferenceBox.Text = Article.RefArticle;
-            DescriptionBox.Text = Article.Description;
-            QuantityBox.Value = Article.Quantite;
-            PriceBox.Value = (decimal) Article.Prix;
-            BrandComboBox.Text = Article.Marque.Nom;
-            FamillyComboBox.Text = Article.SousFamille.Famille.Nom;
-            SubFamillyComboBox.Text = Article.SousFamille.Nom;
-            Text = "Formulaire de modification d'un article";
-        }
 
         /// <summary>
         /// Article à modifier ou créer
@@ -68,8 +31,47 @@ namespace GestionBDDApp
         private Dictionary<int, List<SousFamilles>> SubFamilyModel = new Dictionary<int, List<SousFamilles>>();
 
         /// <summary>
-        /// Charge les liste de marques, familles et sous-familles
+        /// Créer la fênetre de création d'article.
         /// </summary>
+        public AjoutForm()
+        {
+            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
+            InitializeComponent();
+            LoadItems();
+            SetTitle("Formulaire de création d'un article");
+            DisplayItems();
+        }
+
+        /// <summary>
+        /// Créer la fênetre de modification d'article.
+        /// </summary>
+        /// <param name="IdArticle">La <b>String</b> d'id de l'article</param>
+        public AjoutForm(string IdArticle)
+        {
+            // On récupère l'article
+            Article = DaoRegistery.GetInstance.DaoArticle.GetArticleById(IdArticle);
+
+            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
+            InitializeComponent();
+            LoadItems();
+            SetTitle("Formulaire de modification d'un article");
+            DisplayItems();
+            
+            // On rempli le formulaire avec les informations de l'article
+            ReferenceBox.Text = Article.RefArticle;
+            DescriptionBox.Text = Article.Description;
+            QuantityBox.Value = Article.Quantite;
+            PriceBox.Value = (decimal) Article.Prix;
+            BrandComboBox.Text = Article.Marque.Nom;
+            FamillyComboBox.Text = Article.SousFamille.Famille.Nom;
+            SubFamillyComboBox.Text = Article.SousFamille.Nom;
+        }
+
+        private void SetTitle(string Title)
+        {
+            Text = Title;
+        }
+        
         private void LoadItems()
         {
             BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
@@ -78,20 +80,7 @@ namespace GestionBDDApp
                 .GroupBy(SousFamille => SousFamille.Famille.Id.Value)
                 .ToDictionary(SousFamille => SousFamille.Key, V => V.Select(F => F).ToList());
         }
-
-        /// <summary>
-        /// Charge les sous-familles dans la <b>ComboBox</b> lorsque que l'on change l'état de la <b>ComboBox</b> des familles
-        /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
-        private void Familles_SelectedIndexChanged(object Sender, EventArgs Event)
-        {
-            DisplaySubFamilly(((Familles)((ComboBoxItem)((ComboBox)Sender).SelectedItem).Value).Id.Value);
-        }
-
-        /// <summary>
-        /// Charge les familles et marques dans les <b>ComboBox</b>.
-        /// </summary>
+        
         private void DisplayItems()
         {
             foreach (var Brand in BrandModel)
@@ -117,7 +106,20 @@ namespace GestionBDDApp
                 SubFamillyComboBox.Items.Add(new ComboBoxItem(SubFamilly.Nom, SubFamilly));
             }
         }
-
+        
+        
+        //************************************************** EVENT **************************************************//
+        
+        /// <summary>
+        /// Charge les sous-familles dans la <b>ComboBox</b> lorsque que l'on change l'état de la <b>ComboBox</b> des familles
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        private void Familles_SelectedIndexChanged(object Sender, EventArgs Event)
+        {
+            DisplaySubFamilly(((Familles)((ComboBoxItem)((ComboBox)Sender).SelectedItem).Value).Id.Value);
+        }
+        
         /// <summary>
         /// Annule la modification ou l'ajout en fermant la fenêtre. 
         /// </summary>
@@ -136,9 +138,10 @@ namespace GestionBDDApp
         /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
-            // On vérifie que tous les champs sont remplis
-
-            if (BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 && QuantityBox.Value >= 0)
+            // On vérifie que tous les champs sont remplis //TODO better verification + deduplication
+            if (BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 
+                    && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 
+                    && QuantityBox.Value >= 0)
             {
                 // Si il y a un article, on le modifie et l'enregistre
                 if (Article != null)

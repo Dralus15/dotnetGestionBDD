@@ -1,14 +1,38 @@
 ﻿namespace GestionBDDApp.data.dao
 {
+    /// <summary>
+    /// Point d'accès aux différents DAO, c'est un Singleton
+    /// </summary>
     public class DaoRegistery
     {
+        /// <summary>
+        /// Le DAO des sous-familles
+        /// </summary>
         public DaoSousFamille DaoSousFamille { get; }
+        
+        /// <summary>
+        /// Le DAO des articles
+        /// </summary>
         public DaoArticle DaoArticle { get; }
+        
+        /// <summary>
+        /// Le DAO des familles
+        /// </summary>
         public DaoFamille DaoFamille { get; }
+        
+        /// <summary>
+        /// Le DAO des marques
+        /// </summary>
         public DaoMarque DaoMarque { get; }
         
-        private static DaoRegistery _instance;
+        /// <summary>
+        /// Unique instance du registre (Singleton)
+        /// </summary>
+        private static DaoRegistery Instance;
 
+        /// <summary>
+        /// Constructeur privé du registre, instancie les DAOs
+        /// </summary>
         private DaoRegistery()
         {
             DaoMarque = new DaoMarque();
@@ -17,24 +41,29 @@
             DaoArticle = new DaoArticle(DaoSousFamille, DaoMarque);
         }
 
+        /// <summary>
+        /// Vide la base de donnée
+        /// </summary>
         public void ClearAll()
         {
-            //TODO metre les index d'auto increment a 0
             DaoArticle.Clear();
             DaoSousFamille.Clear();
             DaoMarque.Clear();
             DaoFamille.Clear();
         }
 
+        /// <summary>
+        /// Accesseur du singleton
+        /// </summary>
         public static DaoRegistery GetInstance
         {
             get
             {
-                if (_instance == null)
+                if (Instance == null)
                 {
-                    _instance = new DaoRegistery();
+                    Instance = new DaoRegistery();
                 }
-                return _instance;
+                return Instance;
             }
         }
         

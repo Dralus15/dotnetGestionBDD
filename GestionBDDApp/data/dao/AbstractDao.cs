@@ -9,7 +9,7 @@ namespace GestionBDDApp.data.dao
     public abstract class AbstractDao
     {
         /// <summary>
-        /// La chaine de connection pour accèder à la base SQLite, par défaut on créer une connection avec
+        /// La chaîne de connection pour accéder à la base SQLite, par défaut on créer une connection avec
         /// le fichier Bacchus.SQLite
         /// </summary>
         protected const string CONNECTION_STRING = "Data Source=Bacchus.SQLite";

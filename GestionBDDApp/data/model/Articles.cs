@@ -6,12 +6,12 @@
     public class Articles
     {
         /// <summary>
-        /// Une référence unique sous la forme d'une taille max de 8 caractère
+        /// Une référence unique (entre 5 et 8 caractères)
         /// </summary>
         public string RefArticle { get; }
 
         /// <summary>
-        /// Une description de l'article
+        /// Une description de l'article (entre 5 et 150 caractères)
         /// </summary>
         public string Description { get; set; }
 
@@ -38,12 +38,12 @@
         /// <summary>
         /// Créer un article avec les valeurs passées en paramètres
         /// </summary>
-        /// <param name="RefArticle"></param>
-        /// <param name="Description"></param>
-        /// <param name="SousFamille"></param>
-        /// <param name="Marque"></param>
-        /// <param name="Prix"></param>
-        /// <param name="Quantite"></param>
+        /// <param name="RefArticle">Une référence unique (entre 5 et 8 caractères)</param>
+        /// <param name="Description">Une description de l'article (entre 5 et 150 caractères)</param>
+        /// <param name="SousFamille">Une sous-famille</param>
+        /// <param name="Marque">La marque de l'article</param>
+        /// <param name="Prix">Le prix de l'article (>= 0)</param>
+        /// <param name="Quantite">Le prix de l'article (>= 0)</param>
         public Articles(string RefArticle, string Description, SousFamilles SousFamille, Marques Marque, float Prix,
             int Quantite)
         {
