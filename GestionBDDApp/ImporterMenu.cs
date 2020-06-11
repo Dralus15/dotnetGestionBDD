@@ -25,22 +25,22 @@ namespace GestionBDDApp
         /// <summary>
         /// Un dao pour accéder aux articles.
         /// </summary>
-        private DaoArticle DaoArticle;
+        private readonly ArticleDao ArticleDao;
         
         /// <summary>
         /// Un dao pour accéder aux familles.
         /// </summary>
-        private DaoFamille DaoFamille;
+        private readonly FamilyDao FamilyDao;
         
         /// <summary>
         /// Un dao pour accéder aux marques.
         /// </summary>
-        private DaoMarque DaoMarque;
+        private readonly BrandDao BrandDao;
         
         /// <summary>
         /// Un dao pour accéder aux sous-familles.
         /// </summary>
-        private DaoSousFamille DaoSousFamille;
+        private readonly SubFamilyDao SubFamilyDao;
 
         /// <summary>
         /// Instancie un nouveau menu d'import.
@@ -48,10 +48,10 @@ namespace GestionBDDApp
         public ImporterMenu()
         {
             InitializeComponent();
-            DaoArticle = DaoRegistery.GetInstance.DaoArticle;
-            DaoFamille = DaoRegistery.GetInstance.DaoFamille;
-            DaoMarque = DaoRegistery.GetInstance.DaoMarque;
-            DaoSousFamille = DaoRegistery.GetInstance.DaoSousFamille;
+            ArticleDao = DaoRegistry.GetInstance.ArticleDao;
+            FamilyDao = DaoRegistry.GetInstance.FamilyDao;
+            BrandDao = DaoRegistry.GetInstance.BrandDao;
+            SubFamilyDao = DaoRegistry.GetInstance.SubFamilyDao;
         }
 
         /// <summary>
@@ -61,11 +61,11 @@ namespace GestionBDDApp
         private async void Import(bool ShouldEraseBase)
         {
             SetBusy(true);
-            var ChoosedFilePath = PathChoosedFile.Text;
-            if (ChoosedFilePath.Length != 0) {
+            var ChosenFilePath = PathChoosedFile.Text;
+            if (ChosenFilePath.Length != 0) {
                 try
                 {
-                    var Annomalies = new Dictionary<int, string>();
+                    var Anomalies = new Dictionary<int, string>();
                     var ExistingArticlesCountByRef = new Dictionary<string, int>();
                     var ArticlesDtosRead = new List<ArticlesDto>();
                     
@@ -74,20 +74,20 @@ namespace GestionBDDApp
                     ImportProgress.MarqueeAnimationSpeed = 30;
                     ImportProgress.Maximum = 100;
                     StatusText.Text = "Lecture du fichier en cours...";
-                    ReadFile(ChoosedFilePath, ExistingArticlesCountByRef, Annomalies, ArticlesDtosRead);
+                    ReadFile(ChosenFilePath, ExistingArticlesCountByRef, Anomalies, ArticlesDtosRead);
                     
                     //Si des anomalies sont présentes dans le fichier on demande une confirmation.
-                    if (Annomalies.Count > 0)
+                    if (Anomalies.Count > 0)
                     {
-                        var AnnomaliesError = new StringBuilder();
-                        foreach (var Annomaly in Annomalies)
+                        var AnomaliesErrors = new StringBuilder();
+                        foreach (var Anomaly in Anomalies)
                         {
-                            AnnomaliesError.Append(String.Format(" - Line {0} : {1}\n", Annomaly.Key, Annomaly.Value));
+                            AnomaliesErrors.Append($" - Line {Anomaly.Key} : {Anomaly.Value}\n");
                         }
                         StatusText.Text = "Résolution des annomalies...";
-                        var ConfirmResult =  MessageBox.Show("Il y a " + Annomalies.Count + 
+                        var ConfirmResult =  MessageBox.Show("Il y a " + Anomalies.Count + 
                              " anomalies dans le fichier d'import, ces articles ne seront pas importés :\n" + 
-                             AnnomaliesError + "\n Voulez vous annuler l'opération ?",
+                             AnomaliesErrors + "\n Voulez vous annuler l'opération ?",
                             "Annomalies détéctées",
                             MessageBoxButtons.OKCancel);
                         if (ConfirmResult == DialogResult.Cancel)
@@ -107,8 +107,8 @@ namespace GestionBDDApp
 
                     //Les données à sauvegarder
                     var NewBrands = new Dictionary<string, Marques>();
-                    var NewFamilies = new Dictionary<string, Familles>();
-                    var NewSubFamilies = new Dictionary<string, SousFamilles>();
+                    var NewFamilies = new Dictionary<string, Family>();
+                    var NewSubFamilies = new Dictionary<string, SubFamily>();
                     
                     //les articles à sauvegarder sous la forme de couple <Nouvelle donnée, doublon>
                     var NewArticles = new Dictionary<Articles, Articles>();
@@ -134,11 +134,11 @@ namespace GestionBDDApp
                         
                         //résolution des dépendances des Familles
                         var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.FamilyName, 
-                            () => new Familles(null, ArticleDto.FamilyName));
+                            () => new Family(null, ArticleDto.FamilyName));
                         
                         //résolution des dépendances des Sous-Familles
                         var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SubFamilyName,
-                            () => new SousFamilles(null, Famille, ArticleDto.SubFamilyName));
+                            () => new SubFamily(null, Famille, ArticleDto.SubFamilyName));
 
                         Articles ArticleNameSake;
                         if (ShouldEraseBase)
@@ -147,7 +147,7 @@ namespace GestionBDDApp
                         }
                         else
                         {
-                            ArticleNameSake = DaoArticle.GetArticleById(ArticleDto.ArticleRef);
+                            ArticleNameSake = ArticleDao.GetArticleById(ArticleDto.ArticleRef);
                         }
                         if (ArticleNameSake != null)
                         {
@@ -157,11 +157,11 @@ namespace GestionBDDApp
                             ArticleDto.Price, 0), ArticleNameSake);
                     }
 
-                    var NamesakeStrategyChoosed = NamesakeStrategy.Ignore;
+                    var NamesakeStrategyChosen = NamesakeStrategy.Ignore;
                     
                     if (ShouldEraseBase)
                     {
-                        DaoRegistery.GetInstance.ClearAll();
+                        DaoRegistry.GetInstance.ClearAll();
                     }
                     else
                     {
@@ -170,12 +170,12 @@ namespace GestionBDDApp
                         {
                             //on choisie la stratégie de dédoublonnage, comme la base n'a pas été encore touché,
                             //c'est le dernier moment pour annuler
-                            if (ChooseNameSakeStategy(ArticleNameSakeCount, ref NamesakeStrategyChoosed)) return;
+                            if (ChooseNameSakeStrategy(ArticleNameSakeCount, ref NamesakeStrategyChosen)) return;
                         }
                     }
 
                     //On enregistre les données
-                    await SaveImportedData(NewBrands, NewFamilies, NewSubFamilies, NewArticles, NamesakeStrategyChoosed);
+                    await SaveImportedData(NewBrands, NewFamilies, NewSubFamilies, NewArticles, NamesakeStrategyChosen);
 
                     StatusText.Text = "Import terminé";
                     
@@ -207,23 +207,23 @@ namespace GestionBDDApp
         /// Demande à l'utilisateur la façon de gérer les doublons d'articles
         /// </summary>
         /// <param name="ArticleNameSakeCount">Le nombre d'articles en doublons</param>
-        /// <param name="NamesakeStrategyChoosed">La stratégie choisie</param>
+        /// <param name="ChosenNamesakeStrategy">La stratégie choisie</param>
         /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon</returns>
-        private bool ChooseNameSakeStategy(int ArticleNameSakeCount, ref NamesakeStrategy NamesakeStrategyChoosed)
+        private bool ChooseNameSakeStrategy(int ArticleNameSakeCount, ref NamesakeStrategy ChosenNamesakeStrategy)
         {
             var Result = MessageBox.Show(
-                String.Format("{0} doublons d'articles ont été détéctés : \n", ArticleNameSakeCount) +
+                $"{ArticleNameSakeCount} doublons d'articles ont été détéctés : \n" +
                 "Voulez-vous ignorer ces doublons ? (sinon les valeurs dans la base seront mise à jour)",
                 "Doublons détéctés", MessageBoxButtons.YesNoCancel);
-            switch (Result)
+            if (Result == DialogResult.Cancel)
             {
-                case DialogResult.Cancel:
-                    StatusText.Text = "Import annulé.";
-                    DialogResult = DialogResult.Cancel;
-                    return true;
-                case DialogResult.No:
-                    NamesakeStrategyChoosed = NamesakeStrategy.Replace;
-                    break;
+                StatusText.Text = "Import annulé.";
+                DialogResult = DialogResult.Cancel;
+                return true;
+            }
+            if (Result == DialogResult.No)
+            {
+                ChosenNamesakeStrategy = NamesakeStrategy.Replace;
             }
 
             return false;
@@ -236,11 +236,11 @@ namespace GestionBDDApp
         /// <param name="NewFamilies">Les familles à enregistrer</param>
         /// <param name="NewSubFamilies">Les sous-familles à enregistrer</param>
         /// <param name="NewArticles">Les articles à enregistrer</param>
-        /// <param name="NamesakeStrategyChoosed">La stratégie de dédoublonnage choisie</param>
+        /// <param name="NamesakeStrategyChosen">La stratégie de dédoublonnage choisie</param>
         /// <returns></returns>
         private async Task SaveImportedData(Dictionary<string, Marques> NewBrands, 
-            Dictionary<string, Familles> NewFamilies, Dictionary<string, SousFamilles> NewSubFamilies,
-            Dictionary<Articles, Articles> NewArticles, NamesakeStrategy NamesakeStrategyChoosed)
+            Dictionary<string, Family> NewFamilies, Dictionary<string, SubFamily> NewSubFamilies,
+            Dictionary<Articles, Articles> NewArticles, NamesakeStrategy NamesakeStrategyChosen)
         {
             StatusText.Text = "Import des données...";
 
@@ -250,7 +250,7 @@ namespace GestionBDDApp
             {
                 ImportProgress.Value++;
                 StatusText.Text = "Import des marques " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                await Task.Run(() => DaoMarque.Save(Marques));
+                await Task.Run(() => BrandDao.Save(Marques));
             }
 
             ImportProgress.Value = 0;
@@ -259,7 +259,7 @@ namespace GestionBDDApp
             {
                 ImportProgress.Value++;
                 StatusText.Text = "Import des familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                await Task.Run(() => DaoFamille.Save(Familles));
+                await Task.Run(() => FamilyDao.Save(Familles));
             }
 
             ImportProgress.Value = 0;
@@ -268,7 +268,7 @@ namespace GestionBDDApp
             {
                 ImportProgress.Value++;
                 StatusText.Text = "Import des sous-familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                await Task.Run(() => DaoSousFamille.Save(SousFamille));
+                await Task.Run(() => SubFamilyDao.Save(SousFamille));
             }
 
             ImportProgress.Value = 0;
@@ -280,13 +280,13 @@ namespace GestionBDDApp
                 //pas de doublons
                 if (ArticlePair.Value == null)
                 {
-                    await Task.Run(() => DaoArticle.Create(ArticlePair.Key));
+                    await Task.Run(() => ArticleDao.Create(ArticlePair.Key));
                 }
                 else
                 {
-                    if (NamesakeStrategyChoosed == NamesakeStrategy.Replace)
+                    if (NamesakeStrategyChosen == NamesakeStrategy.Replace)
                     {
-                        await Task.Run(() => DaoArticle.Update(ArticlePair.Key));
+                        await Task.Run(() => ArticleDao.Update(ArticlePair.Key));
                     }
                 }
             }
@@ -300,8 +300,8 @@ namespace GestionBDDApp
         /// <param name="NewBrands">Les doublons des marques</param>
         /// <param name="NewSubFamilies">Les doublons des sous-familles</param>
         /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon</returns>
-        private bool FindDuplicates(List<ArticlesDto> ArticlesDtosRead, Dictionary<string, Familles> NewFamilies, 
-            Dictionary<string, Marques> NewBrands, Dictionary<string, SousFamilles> NewSubFamilies)
+        private bool FindDuplicates(List<ArticlesDto> ArticlesDtosRead, Dictionary<string, Family> NewFamilies, 
+            Dictionary<string, Marques> NewBrands, Dictionary<string, SubFamily> NewSubFamilies)
         {
             var NameSakeErrorBuilder = new StringBuilder();
             int DuplicateFamilyCount = 0, DuplicateBrandCount = 0, DuplicateSubFamilyCount = 0;
@@ -315,7 +315,7 @@ namespace GestionBDDApp
                 var FamilyName = ArticlesDto.FamilyName;
                 if (!NewFamilies.ContainsKey(FamilyName))
                 {
-                    var FamilyNameSake = DaoFamille.GetFamilleByName(FamilyName);
+                    var FamilyNameSake = FamilyDao.GetFamilleByName(FamilyName);
                     if (FamilyNameSake.Count > 0)
                     {
                         DuplicateFamilyCount += FamilyNameSake.Count;
@@ -326,7 +326,7 @@ namespace GestionBDDApp
                 var BrandName = ArticlesDto.BrandName;
                 if (!NewBrands.ContainsKey(BrandName))
                 {
-                    var BrandNameSake = DaoMarque.GetBrandByName(BrandName);
+                    var BrandNameSake = BrandDao.GetBrandByName(BrandName);
                     if (BrandNameSake.Count > 0)
                     {
                         DuplicateBrandCount += BrandNameSake.Count;
@@ -337,7 +337,7 @@ namespace GestionBDDApp
                 var SubFamilyName = ArticlesDto.FamilyName;
                 if (!NewSubFamilies.ContainsKey(SubFamilyName))
                 {
-                    var SubFamilyNameSake = DaoSousFamille.GetSubFamiliesByName(SubFamilyName);
+                    var SubFamilyNameSake = SubFamilyDao.GetSubFamiliesByName(SubFamilyName);
                     if (SubFamilyNameSake.Count > 0)
                     {
                         DuplicateSubFamilyCount += SubFamilyNameSake.Count;
@@ -371,24 +371,22 @@ namespace GestionBDDApp
         /// Lit le fichier dont le chemin est passé en paramètres et sort les annomalies du fichiers, les doublons dans
         /// le fichier et le resultats. Les lignes avec des annomalies ne sont pas envoyés dans le resultat.
         /// </summary>
-        /// <param name="ChoosedFilePath">Le chemin du fichier</param>
+        /// <param name="ChosenFilePath">Le chemin du fichier</param>
         /// <param name="ExistingArticlesCountByRef">Dictionnaire des doublons</param>
-        /// <param name="Annomalies">Les annomalies du fichier</param>
+        /// <param name="Anomalies">Les annomalies du fichier</param>
         /// <param name="Result">Les lignes du fichiers</param>
-        private static void ReadFile(string ChoosedFilePath, Dictionary<string, int> ExistingArticlesCountByRef, 
-            Dictionary<int, string> Annomalies, List<ArticlesDto> Result)
+        private static void ReadFile(string ChosenFilePath, Dictionary<string, int> ExistingArticlesCountByRef, 
+            Dictionary<int, string> Anomalies, List<ArticlesDto> Result)
         {
-            CsvReader.ReadFile(ChoosedFilePath, (Strings, LineNumber) =>
+            CsvReader.ReadFile(ChosenFilePath, (Strings, LineNumber) =>
             {
                 try
                 {
                     var RefArticle = Strings[1];
-                    int PreviousLineDefinition;
-                    if (ExistingArticlesCountByRef.TryGetValue(RefArticle, out PreviousLineDefinition))
+                    if (ExistingArticlesCountByRef.TryGetValue(RefArticle, out var PreviousLineDefinition))
                     {
-                        Annomalies.Add(LineNumber,
-                            String.Format("Réference d'article en doublon (précédement défini à la ligne {0})",
-                                PreviousLineDefinition));
+                        Anomalies.Add(LineNumber,
+                            $"Réference d'article en doublon (précédement défini à la ligne {PreviousLineDefinition})");
                     }
                     else
                     {
@@ -400,7 +398,7 @@ namespace GestionBDDApp
                 }
                 catch (ParsingException ParsingException)
                 {
-                    Annomalies.Add(LineNumber, ParsingException.Message);
+                    Anomalies.Add(LineNumber, ParsingException.Message);
                 }
             });
         }
@@ -412,7 +410,7 @@ namespace GestionBDDApp
         /// <param name="IsBusy">Si <c>true</c> le mode attente est activé, sinon il est retiré</param>
         private void SetBusy(bool IsBusy)
         {
-            bool IsNotBusy = ! IsBusy;
+            var IsNotBusy = ! IsBusy;
             //Désactivation / Activation du bouton 'X' pour fermer la fenêtre
             ControlBox = IsNotBusy;
             AppendModeButton.Enabled = IsNotBusy;
@@ -440,7 +438,7 @@ namespace GestionBDDApp
         /// </summary>
         /// <param name="Sender">Non utilisé</param>
         /// <param name="Event">Non utilisé</param>
-        private void EreaseModeButton_Click(object Sender, EventArgs Event)
+        private void EraseModeButton_Click(object Sender, EventArgs Event)
         {
             var ConfirmResult =  MessageBox.Show("Cette action va écraser la base, êtes-vous sur de continuer ?",
                 "Confirmation",

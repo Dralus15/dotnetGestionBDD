@@ -25,11 +25,11 @@ namespace GestionBDDApp
         /// <summary>
         /// La liste des familles.
         /// </summary>
-        private List<Familles> FamilyModel = new List<Familles>();
+        private List<Family> FamilyModel = new List<Family>();
         /// <summary>
         /// L'ensemble de toutes les sous-familles.
         /// </summary>
-        private Dictionary<int, List<SousFamilles>> SubFamilyModel = new Dictionary<int, List<SousFamilles>>();
+        private Dictionary<int, List<SubFamily>> SubFamilyModel = new Dictionary<int, List<SubFamily>>();
 
         /// <summary>
         /// Crée la fênetre de création d'article.
@@ -50,7 +50,7 @@ namespace GestionBDDApp
         public ArticleForm(string IdArticle)
         {
             // On récupère l'article.
-            Article = DaoRegistery.GetInstance.DaoArticle.GetArticleById(IdArticle);
+            Article = DaoRegistry.GetInstance.ArticleDao.GetArticleById(IdArticle);
 
             // On récupère les données des listes et les affiche dans les <b>ComboBox</b>.
             InitializeComponent();
@@ -61,11 +61,11 @@ namespace GestionBDDApp
             // On rempli le formulaire avec les informations de l'article.
             ReferenceBox.Text = Article.RefArticle;
             DescriptionBox.Text = Article.Description;
-            QuantityBox.Value = Article.Quantite;
-            PriceBox.Value = (decimal) Article.Prix;
+            QuantityBox.Value = Article.Quantity;
+            PriceBox.Value = (decimal) Article.Price;
             BrandComboBox.Text = Article.Marque.Nom;
-            FamillyComboBox.Text = Article.SousFamille.Famille.Nom;
-            SubFamillyComboBox.Text = Article.SousFamille.Nom;
+            FamillyComboBox.Text = Article.SubFamily.Family.Name;
+            SubFamillyComboBox.Text = Article.SubFamily.Name;
         }
 
         private void SetTitle(string Title)
@@ -75,10 +75,10 @@ namespace GestionBDDApp
         
         private void LoadItems()
         {
-            BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
-            FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
-            SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
-                .GroupBy(SousFamille => SousFamille.Famille.Id.Value)
+            BrandModel = DaoRegistry.GetInstance.BrandDao.GetAllMarques();
+            FamilyModel = DaoRegistry.GetInstance.FamilyDao.GetAllFamilles();
+            SubFamilyModel = DaoRegistry.GetInstance.SubFamilyDao.GetAllSousFamilles()
+                .GroupBy(SousFamille => SousFamille.Family.Id.Value)
                 .ToDictionary(
                     SousFamille => SousFamille.Key, 
                     V => V.Select(F => F).ToList());
@@ -90,24 +90,24 @@ namespace GestionBDDApp
             {
                 BrandComboBox.Items.Add(new ComboBoxItem(Brand.Nom, Brand));
             }
-            foreach (var Familly in FamilyModel)
+            foreach (var Family in FamilyModel)
             {
-                FamillyComboBox.Items.Add(new ComboBoxItem(Familly.Nom, Familly));
+                FamillyComboBox.Items.Add(new ComboBoxItem(Family.Name, Family));
             }
         }
 
         /// <summary>
         /// Charge les sous-familles dans la <b>ComboBox</b> en fonction de la clé de la famille sélectionnée.
         /// </summary>
-        /// <param name="SubFamillyKey">La clé de la famille selectionnée.</param>
-        private void DisplaySubFamilly(int SubFamillyKey)
+        /// <param name="SubFamilyKey">La clé de la famille selectionnée.</param>
+        private void DisplaySubFamily(int SubFamilyKey)
         {
             // On nettoie la liste des sous-familles dans la <b>ComboBox</b> et on la re-rempli avec les sous-familles
             // de la famille selectionnée.
             SubFamillyComboBox.Items.Clear();
-            foreach (var SubFamilly in SubFamilyModel[SubFamillyKey])
+            foreach (var SubFamily in SubFamilyModel[SubFamilyKey])
             {
-                SubFamillyComboBox.Items.Add(new ComboBoxItem(SubFamilly.Nom, SubFamilly));
+                SubFamillyComboBox.Items.Add(new ComboBoxItem(SubFamily.Name, SubFamily));
             }
         }
         
@@ -121,7 +121,7 @@ namespace GestionBDDApp
         /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void Familles_SelectedIndexChanged(object Sender, EventArgs Event)
         {
-            DisplaySubFamilly(((Familles)((ComboBoxItem)((ComboBox)Sender).SelectedItem).Value).Id.Value);
+            DisplaySubFamily(((Family)((ComboBoxItem)((ComboBox)Sender).SelectedItem).Value).Id.Value);
         }
         
         /// <summary>
@@ -200,20 +200,20 @@ namespace GestionBDDApp
                 if (Article != null)
                 {
                     Article.Description = DescriptionBox.Text;
-                    Article.Quantite = (int) QuantityBox.Value;
-                    Article.Prix = (float) PriceBox.Value;
+                    Article.Quantity = (int) QuantityBox.Value;
+                    Article.Price = (float) PriceBox.Value;
                     Article.Marque = (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value;
-                    Article.SousFamille = (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value;
-                    DaoRegistery.GetInstance.DaoArticle.Update(Article);
+                    Article.SubFamily = (SubFamily)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value;
+                    DaoRegistry.GetInstance.ArticleDao.Update(Article);
                 }
                 // Sinon on créer un article et on l'enregistre
                 else
                 {
                     Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, 
-                        (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, 
+                        (SubFamily)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, 
                         (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, 
                         (float) PriceBox.Value, (int) QuantityBox.Value);
-                    DaoRegistery.GetInstance.DaoArticle.Create(Article);
+                    DaoRegistry.GetInstance.ArticleDao.Create(Article);
                 }
                 DialogResult = DialogResult.OK;
                 Close();
@@ -235,7 +235,7 @@ namespace GestionBDDApp
         /// <summary>
         /// Texte à affiche dans la <b>ComboBox</b>. 
         /// </summary>
-        public string Text { get; }
+        private string Text { get; }
         /// <summary>
         /// Objet à sauvegarder dans la <b>ComboBox</b>. 
         /// </summary>

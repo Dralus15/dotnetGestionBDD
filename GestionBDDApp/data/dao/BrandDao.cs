@@ -8,15 +8,15 @@ namespace GestionBDDApp.data.dao
     /// <summary>
     /// Classe du Dao pour les marques, elle permet de faire des traitements sur la table Marques
     /// </summary>
-    public class DaoMarque : AbstractDao
+    public class BrandDao : AbstractDao
     {
         /// <summary>
         /// Instancie le Dao des marques
         /// </summary>
-        public DaoMarque() : base("Marques", true) { }
+        public BrandDao() : base("Marques", true) { }
 
         /// <summary>
-        /// Récupère toutes les marques dans la base et les retourne dans une <b>List'<'Marques'>'</b>
+        /// Récupère toutes les marques dans la base et les retourne dans une <b>List'&lt;'Marques'&gt;'</b>
         /// </summary>
         public List<Marques> GetAllMarques()
         {
@@ -42,7 +42,7 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'Marques'>'</b>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'&lt;'Marques'&gt;'</b>
         /// </summary>
         /// <param name="DataReader">Le réultat de la requête SQL</param>
         private static List<Marques> ParseQueryResult(SQLiteDataReader DataReader)
@@ -125,7 +125,7 @@ namespace GestionBDDApp.data.dao
         /// <param name="Id">Id de la marque à supprimer</param>
         public void Delete(int Id)
         {
-            var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfBrand(Id);
+            var UseCount = DaoRegistry.GetInstance.ArticleDao.CountArticleOfBrand(Id);
 
             // Vérifie si la marque est utilisée par un article, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
@@ -138,9 +138,9 @@ namespace GestionBDDApp.data.dao
                 }
                 else
                 {
-                    Error = String.Format(
-                        "Cette marque est utilisée par {0} articles, veuilliez supprimer les articles utilisant "
-                        + "cette marque avant de la supprimer.", UseCount);
+                    Error =
+                        $"Cette marque est utilisée par {UseCount} articles, veuilliez supprimer les articles utilisant " +
+                        "cette marque avant de la supprimer.";
                 }
                 throw new ArgumentException(Error);
             }

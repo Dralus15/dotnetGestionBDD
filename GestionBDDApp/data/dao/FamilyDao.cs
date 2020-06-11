@@ -8,19 +8,19 @@ namespace GestionBDDApp.data.dao
     /// <summary>
     /// Classe du Dao pour les familles, elle permet de faire des traitements sur la table Familles
     /// </summary>
-    public class DaoFamille : AbstractDao
+    public class FamilyDao : AbstractDao
     {
         /// <summary>
         /// Instancie le Dao des familles
         /// </summary>
-        public DaoFamille() : base("Familles", true) { }
+        public FamilyDao() : base("Familles", true) { }
 
         /// <summary>
-        /// Récupère toutes les familles dans la base et les retourne dans une <b>List'<'Familles'>'</b>
+        /// Récupère toutes les familles dans la base et les retourne dans une <b>List'&lt;'Familles'>'</b>
         /// </summary>
-        public List<Familles> GetAllFamilles()
+        public List<Family> GetAllFamilles()
         {
-            List<Familles> Familles;
+            List<Family> Familles;
 
             // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -42,16 +42,16 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'Familles'>'</b>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'&lt;'Familles'&gt;'</b>
         /// </summary>
         /// <param name="DataReader">Le réultat de la requête SQL</param>
-        private static List<Familles> ParseQueryResult(SQLiteDataReader DataReader)
+        private static List<Family> ParseQueryResult(SQLiteDataReader DataReader)
         {
-            var Familles = new List<Familles>();
+            var Familles = new List<Family>();
             if (!DataReader.HasRows) return Familles;
             while (DataReader.Read())
             {
-                Familles.Add(new Familles(DataReader.GetInt32(0), DataReader.GetString(1)));
+                Familles.Add(new Family(DataReader.GetInt32(0), DataReader.GetString(1)));
             }
 
             return Familles;
@@ -61,9 +61,9 @@ namespace GestionBDDApp.data.dao
         /// Cherche la famille par id et la retourne
         /// </summary>
         /// <param name="Id">id de la famille recherchée</param>
-        public Familles GetFamilleById(int Id)
+        public Family GetFamilleById(int Id)
         {
-            Familles Famille = null;
+            Family Family = null;
 
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
@@ -78,22 +78,22 @@ namespace GestionBDDApp.data.dao
                         if (Reader.HasRows)
                         {
                             Reader.Read();
-                            Famille = new Familles(Reader.GetInt32(0), Reader.GetString(1));
+                            Family = new Family(Reader.GetInt32(0), Reader.GetString(1));
                         }
                     }
                 }
             }
 
-            return Famille;
+            return Family;
         }
 
         /// <summary>
         /// Cherche la marque par id et le retourne
         /// </summary>
         /// <param name="FamilleName">Nom de la marque</param>
-        public List<Familles> GetFamilleByName(string FamilleName)
+        public List<Family> GetFamilleByName(string FamilleName)
         {
-            List<Familles> Familles;
+            List<Family> Familles;
 
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
@@ -114,28 +114,28 @@ namespace GestionBDDApp.data.dao
         /// <summary>
         /// Sauvegarde la famille dans la base (si elle existe déjà, alors elle est mise à jour)
         /// </summary>
-        /// <param name="Famille">La famille à sauvegarder</param>
-        public void Save(Familles Famille)
+        /// <param name="Family">La famille à sauvegarder</param>
+        public void Save(Family Family)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(Connection))
                 {
-                    if (Famille.Id == null)
+                    if (Family.Id == null)
                     {
                         Command.CommandText = "INSERT INTO Familles(Nom) VALUES (@name)";
                     }
                     else
                     {
                         Command.CommandText = @"UPDATE Familles SET Nom = @name WHERE RefFamille = @refFamille";
-                        Command.Parameters.AddWithValue("@refFamille", Famille.Id);
+                        Command.Parameters.AddWithValue("@refFamille", Family.Id);
                     }
-                    Command.Parameters.AddWithValue("@name", Famille.Nom);
+                    Command.Parameters.AddWithValue("@name", Family.Name);
                     Command.ExecuteNonQuery();
-                    if (Famille.Id == null)
+                    if (Family.Id == null)
                     {
-                        Famille.Id = (int) Connection.LastInsertRowId;
+                        Family.Id = (int) Connection.LastInsertRowId;
                     }
                 }
             }
@@ -148,7 +148,7 @@ namespace GestionBDDApp.data.dao
         /// <param name="Id">Id de la famille à supprimer</param>
         public void Delete(int Id)
         {
-            var UseCount = DaoRegistery.GetInstance.DaoSousFamille.CountSubFamilyOfFamily(Id);
+            var UseCount = DaoRegistry.GetInstance.SubFamilyDao.CountSubFamilyOfFamily(Id);
 
             // Vérifie si la famille est utilisée par une sous-famille, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
@@ -161,10 +161,9 @@ namespace GestionBDDApp.data.dao
                 }
                 else
                 {
-                    Error = String.Format(
-                        "Cette famille est utilisée par {0} sous-familles, veuilliez supprimer les sous-familles " 
-                        + "utilisant cette famille avant de la supprimer.",
-                        UseCount);
+                    Error =
+                        $"Cette famille est utilisée par {UseCount} sous-familles, veuilliez supprimer les sous-familles " +
+                        "utilisant cette famille avant de la supprimer.";
                 }
                 throw new ArgumentException(Error);
             }

@@ -31,14 +31,26 @@ namespace GestionBDDApp
         /// <summary>
         /// Dernier noeud séléctionné par l'utilisateur.
         /// </summary>
-        private TreeNode LastTreeNodeSelected;//Todo commenter ca.
+        private TreeNode LastTreeNodeSelected;
+        
+        /// <summary>
+        /// Modèle contenant les sous familles chargés, regroupées par id de famille. 
+        /// </summary>
+        private readonly Dictionary<int?, List<SubFamily>> SubFamilyModel = new Dictionary<int?, List<SubFamily>>();
 
+        /// <summary>
+        /// Modèle contenant les articles chargés.
+        /// </summary>
         private List<Articles> ArticlesModel = new List<Articles>();
+        
+        /// <summary>
+        /// Modèle contenant les familles chargées.
+        /// </summary>
+        private List<Family> FamilyModel = new List<Family>();
 
-        private Dictionary<int?, List<SousFamilles>> SubFamilyModel = new Dictionary<int?, List<SousFamilles>>();
-
-        private List<Familles> FamilyModel = new List<Familles>();
-
+        /// <summary>
+        /// Modèle contenant les marques chargées.
+        /// </summary>
         private List<Marques> BrandModel = new List<Marques>();
 
         /// <summary>
@@ -164,10 +176,10 @@ namespace GestionBDDApp
         /// </summary>
         private void UpdateStatusBar()
         {
-            var CountArticle = DaoRegistery.GetInstance.DaoArticle.Count();
-            var CountFamily = DaoRegistery.GetInstance.DaoFamille.Count();
-            var CountBrand = DaoRegistery.GetInstance.DaoMarque.Count();
-            var CountSubFamily = DaoRegistery.GetInstance.DaoSousFamille.Count();
+            var CountArticle = DaoRegistry.GetInstance.ArticleDao.Count();
+            var CountFamily = DaoRegistry.GetInstance.FamilyDao.Count();
+            var CountBrand = DaoRegistry.GetInstance.BrandDao.Count();
+            var CountSubFamily = DaoRegistry.GetInstance.SubFamilyDao.Count();
             StatusText.Text = CountArticle + " articles, " + CountFamily + " familles, " + CountSubFamily + 
                               " sous-familles et " + CountBrand + " marques en base.";
         }
@@ -181,7 +193,7 @@ namespace GestionBDDApp
             ArticleViewOn = ActiveList.Family;
             foreach (var Family in FamilyModel)
             {
-                listView1.Items.Add(new ListViewItem(Family.Nom) { Tag =  Family.Id });
+                listView1.Items.Add(new ListViewItem(Family.Name) { Tag =  Family.Id });
             }
         }
         
@@ -207,7 +219,7 @@ namespace GestionBDDApp
             ArticleViewOn = ActiveList.Subfamily;
             foreach (var SubFamily in SubFamilyModel[Id])
             {
-                listView1.Items.Add(new ListViewItem(SubFamily.Nom) { Tag =  SubFamily.Id });
+                listView1.Items.Add(new ListViewItem(SubFamily.Name) { Tag =  SubFamily.Id });
             }
         }
         
@@ -228,16 +240,16 @@ namespace GestionBDDApp
                 if (! BrandFilter.HasValue || BrandFilter.Equals(Article.Marque.Id))
                 {
                     //On test le filtre de la sous-famille.
-                    if (! SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SousFamille.Id))
+                    if (! SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SubFamily.Id))
                     {
                         //Les filtres sont passés, on affiche l'article.
                         listView1.Items.Add(
                             new ListViewItem(new [] {
                                 Article.Description, 
-                                Article.SousFamille.Famille.Nom,
-                                Article.SousFamille.Nom, 
+                                Article.SubFamily.Family.Name,
+                                Article.SubFamily.Name, 
                                 Article.Marque.Nom, 
-                                Article.Quantite.ToString()
+                                Article.Quantity.ToString()
                             }) { Tag = Article.RefArticle });
                     }
                 }
@@ -249,7 +261,7 @@ namespace GestionBDDApp
         /// </summary>
         private void LoadArticles()
         {
-            ArticlesModel = DaoRegistery.GetInstance.DaoArticle.GetAll();
+            ArticlesModel = DaoRegistry.GetInstance.ArticleDao.GetAll();
         }
         
         /// <summary>
@@ -257,7 +269,7 @@ namespace GestionBDDApp
         /// </summary>
         private void LoadBrands()
         {
-            BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
+            BrandModel = DaoRegistry.GetInstance.BrandDao.GetAllMarques();
             // On charge les noeuds des marques.
             AllBrandNode.Nodes.Clear();
             foreach (var TreeNode in BrandModel.Select(Marque => new TreeNode(Marque.Nom) { Tag = Marque.Id }))
@@ -272,7 +284,7 @@ namespace GestionBDDApp
         /// </summary>
         private void LoadFamilies()
         {
-            FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
+            FamilyModel = DaoRegistry.GetInstance.FamilyDao.GetAllFamilles();
             // On sauvegarde les sous-familles déjà chargées.
             var SubFamiliesToLoad = new List<int>();
             foreach (TreeNode Node in AllFamilyNode.Nodes)
@@ -287,7 +299,7 @@ namespace GestionBDDApp
             {
                 if (! Family.Id.HasValue) return;
                 
-                var SubNode = new TreeNode(Family.Nom) { Tag = Family.Id.Value };
+                var SubNode = new TreeNode(Family.Name) { Tag = Family.Id.Value };
                 AllFamilyNode.Nodes.Add(SubNode);
                 // Si la sous-famille était précédement chargée, on la recharge.
                 if (SubFamiliesToLoad.Contains(Family.Id.Value))
@@ -308,11 +320,11 @@ namespace GestionBDDApp
             {
                 SubFamilyModel.Remove(FamilyId);
             }
-            SubFamilyModel.Add(FamilyId, DaoRegistery.GetInstance.DaoSousFamille.GetSubFamilyOfFamily(FamilyId));
+            SubFamilyModel.Add(FamilyId, DaoRegistry.GetInstance.SubFamilyDao.GetSubFamilyOfFamily(FamilyId));
             foreach (var SubFamily in SubFamilyModel[FamilyId])
             {
                 if (! SubFamily.Id.HasValue) return;
-                ParentNode.Nodes.Add(new TreeNode(SubFamily.Nom) { Tag = SubFamily.Id });
+                ParentNode.Nodes.Add(new TreeNode(SubFamily.Name) { Tag = SubFamily.Id });
             }
             ParentNode.Expand();
         }
@@ -451,7 +463,7 @@ namespace GestionBDDApp
                     if (ActiveList.Article == ArticleViewOn)
                     {
                         var ArticleId = (string) ItemToDelete.Tag;
-                        DaoRegistery.GetInstance.DaoArticle.Delete(ArticleId);
+                        DaoRegistry.GetInstance.ArticleDao.Delete(ArticleId);
                         // Sur la suppression d'un article, on ne rafraîchi que la liste
                         var RemoveIndex = -1;
                         for (var Index = 0; Index < ArticlesModel.Count; Index++)
@@ -475,19 +487,19 @@ namespace GestionBDDApp
                             case ActiveList.Brand:
                             {
                                 LastTreeNodeSelected = AllBrandNode;
-                                DaoRegistery.GetInstance.DaoMarque.Delete(Id);
+                                DaoRegistry.GetInstance.BrandDao.Delete(Id);
                                 break;
                             }
                             case ActiveList.Family:
                             {
                                 LastTreeNodeSelected = AllFamilyNode;
-                                DaoRegistery.GetInstance.DaoFamille.Delete(Id);
+                                DaoRegistry.GetInstance.FamilyDao.Delete(Id);
                                 break;
                             }
                             case ActiveList.Subfamily:
                             {
                                 LastTreeNodeSelected = AllFamilyNode;
-                                DaoRegistery.GetInstance.DaoSousFamille.Delete(Id);
+                                DaoRegistry.GetInstance.SubFamilyDao.Delete(Id);
                                 break;
                             }
                         }
@@ -562,7 +574,7 @@ namespace GestionBDDApp
                 listView1.Items.Clear();
                 AllBrandNode.Nodes.Clear();
                 AllFamilyNode.Nodes.Clear();
-                DaoRegistery.GetInstance.ClearAll();
+                DaoRegistry.GetInstance.ClearAll();
                 ReloadList();
             }
         }

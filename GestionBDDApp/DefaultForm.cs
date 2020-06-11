@@ -23,11 +23,11 @@ namespace GestionBDDApp
         /// <summary>
         /// L'objet Familles.
         /// </summary>
-        private Familles Family;
+        private Family Family;
         /// <summary>
         /// L'objet SousFamilles.
         /// </summary>
-        private SousFamilles SubFamily;
+        private SubFamily SubFamily;
         /// <summary>
         /// Type de l'objet à modifier ou créer.
         /// </summary>
@@ -75,7 +75,7 @@ namespace GestionBDDApp
                     // Si l'id a une valeur, on récupère la marque correspondante.
                     if (Id.HasValue)
                     {
-                        Brand = DaoRegistery.GetInstance.DaoMarque.GetMarqueById(Id.Value);
+                        Brand = DaoRegistry.GetInstance.BrandDao.GetMarqueById(Id.Value);
                         NameBox.Text = Brand.Nom;
                     }
 
@@ -86,8 +86,8 @@ namespace GestionBDDApp
                     // Si l'id a une valeur, on récupère la famille correspondante.
                     if (Id.HasValue)
                     {
-                        Family = DaoRegistery.GetInstance.DaoFamille.GetFamilleById(Id.Value);
-                        NameBox.Text = Family.Nom;
+                        Family = DaoRegistry.GetInstance.FamilyDao.GetFamilleById(Id.Value);
+                        NameBox.Text = Family.Name;
                     }
 
                     break;
@@ -95,16 +95,16 @@ namespace GestionBDDApp
                 case ActiveList.Subfamily:
                 {
                     // On récupère toutes les familles pour les metttre dans la ComboBox des familles.
-                    foreach (var AFamily in DaoRegistery.GetInstance.DaoFamille.GetAllFamilles())
+                    foreach (var AFamily in DaoRegistry.GetInstance.FamilyDao.GetAllFamilles())
                     {
-                        FamillyComboBox.Items.Add(new ComboBoxItem(AFamily.Nom, AFamily));
+                        FamillyComboBox.Items.Add(new ComboBoxItem(AFamily.Name, AFamily));
                     }
                     // Si l'id a une valeur, on récupère la sous-famille correspondante.
                     if (Id.HasValue)
                     {
-                        SubFamily = DaoRegistery.GetInstance.DaoSousFamille.GetSousFamilleById(Id.Value);
-                        NameBox.Text = SubFamily.Nom;
-                        FamillyComboBox.Text = SubFamily.Famille.Nom;
+                        SubFamily = DaoRegistry.GetInstance.SubFamilyDao.GetSousFamilleById(Id.Value);
+                        NameBox.Text = SubFamily.Name;
+                        FamillyComboBox.Text = SubFamily.Family.Name;
                     }
                     // On affiche la ComboBox des familles.
                     FamillyComboBox.Visible = true;
@@ -146,7 +146,7 @@ namespace GestionBDDApp
                         {
                             Brand = new Marques(null, NameBox.Text);
                         }
-                        DaoRegistery.GetInstance.DaoMarque.Save(Brand);
+                        DaoRegistry.GetInstance.BrandDao.Save(Brand);
                         break;
                     }
                     case ActiveList.Family:
@@ -154,15 +154,15 @@ namespace GestionBDDApp
                         // Si l'id a une valeur, on modifie le nom de la famille.
                         if (Id.HasValue)
                         {
-                            Family.Nom = NameBox.Text;
+                            Family.Name = NameBox.Text;
                         }
                         // Sinon, on crée la famille.
                         else
                         {
-                            Family = new Familles(Id, NameBox.Text);
+                            Family = new Family(Id, NameBox.Text);
                         }
 
-                        DaoRegistery.GetInstance.DaoFamille.Save(Family);
+                        DaoRegistry.GetInstance.FamilyDao.Save(Family);
                         break;
                     }
                     case ActiveList.Subfamily:
@@ -170,16 +170,16 @@ namespace GestionBDDApp
                         // Si l'id a une valeur, on modifie le nom de la sous-famille et la famille.
                         if (Id.HasValue)
                         {
-                            SubFamily.Nom = NameBox.Text;
-                            SubFamily.Famille = (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value;
+                            SubFamily.Name = NameBox.Text;
+                            SubFamily.Family = (Family)((ComboBoxItem)FamillyComboBox.SelectedItem).Value;
                         }
                         // Sinon, on crée la sous-famille.
                         else
                         {
-                            SubFamily = new SousFamilles(Id, (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value,
+                            SubFamily = new SubFamily(Id, (Family)((ComboBoxItem)FamillyComboBox.SelectedItem).Value,
                             NameBox.Text);
                         }
-                        DaoRegistery.GetInstance.DaoSousFamille.Save(SubFamily);
+                        DaoRegistry.GetInstance.SubFamilyDao.Save(SubFamily);
                         break;
                     }
                 }

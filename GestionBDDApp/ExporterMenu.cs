@@ -14,7 +14,7 @@ namespace GestionBDDApp
         /// <summary>
         /// Le Dao des articles pour récupérer les données de la base à exporter.
         /// </summary>
-        private DaoArticle DaoArticle;
+        private readonly ArticleDao ArticleDao;
 
         /// <summary>
         /// Crée la fenêtre pour exporter le menu.
@@ -22,7 +22,7 @@ namespace GestionBDDApp
         public ExporterMenu()
         {
             InitializeComponent();
-            DaoArticle = DaoRegistery.GetInstance.DaoArticle;
+            ArticleDao = DaoRegistry.GetInstance.ArticleDao;
         }
 
         /// <summary>
@@ -75,13 +75,13 @@ namespace GestionBDDApp
             using (var Writer = new StreamWriter(FileChoosedBox.Text, false, Encoding.Default))
             {
                 Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T."); //TODO barre de chargement
-                var All = DaoArticle.GetAll();
+                var All = ArticleDao.GetAll();
                 for (var Index = 0; Index < All.Count; Index++)
                 {
                     var Articles = All[Index];
                     Writer.WriteLine(
                         $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" +
-                        $"{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
+                        $"{Articles.SubFamily.Family.Name};{Articles.SubFamily.Name};{Articles.Price}");
                 }
             }
             // On confirme à l'utilisateur que l'export est terminé.

@@ -3,42 +3,42 @@
     /// <summary>
     /// Point d'accès aux différents DAO, c'est un Singleton.
     /// </summary>
-    public class DaoRegistery
+    public class DaoRegistry
     {
         /// <summary>
         /// Le DAO des sous-familles.
         /// </summary>
-        public DaoSousFamille DaoSousFamille { get; }
+        public SubFamilyDao SubFamilyDao { get; }
         
         /// <summary>
         /// Le DAO des articles.
         /// </summary>
-        public DaoArticle DaoArticle { get; }
+        public ArticleDao ArticleDao { get; }
         
         /// <summary>
         /// Le DAO des familles.
         /// </summary>
-        public DaoFamille DaoFamille { get; }
+        public FamilyDao FamilyDao { get; }
         
         /// <summary>
         /// Le DAO des marques.
         /// </summary>
-        public DaoMarque DaoMarque { get; }
+        public BrandDao BrandDao { get; }
         
         /// <summary>
         /// Unique instance du registre (Singleton).
         /// </summary>
-        private static DaoRegistery Instance;
+        private static DaoRegistry Instance;
 
         /// <summary>
         /// Constructeur privé du registre, instancie les DAOs.
         /// </summary>
-        private DaoRegistery()
+        private DaoRegistry()
         {
-            DaoMarque = new DaoMarque();
-            DaoFamille = new DaoFamille();
-            DaoSousFamille = new DaoSousFamille(DaoFamille);
-            DaoArticle = new DaoArticle(DaoSousFamille, DaoMarque);
+            BrandDao = new BrandDao();
+            FamilyDao = new FamilyDao();
+            SubFamilyDao = new SubFamilyDao(FamilyDao);
+            ArticleDao = new ArticleDao(SubFamilyDao, BrandDao);
         }
 
         /// <summary>
@@ -46,26 +46,15 @@
         /// </summary>
         public void ClearAll()
         {
-            DaoArticle.Clear();
-            DaoSousFamille.Clear();
-            DaoMarque.Clear();
-            DaoFamille.Clear();
+            ArticleDao.Clear();
+            SubFamilyDao.Clear();
+            BrandDao.Clear();
+            FamilyDao.Clear();
         }
 
         /// <summary>
         /// Accesseur du singleton.
         /// </summary>
-        public static DaoRegistery GetInstance
-        {
-            get
-            {
-                if (Instance == null)
-                {
-                    Instance = new DaoRegistery();
-                }
-                return Instance;
-            }
-        }
-        
+        public static DaoRegistry GetInstance => Instance ?? (Instance = new DaoRegistry());
     }
 }

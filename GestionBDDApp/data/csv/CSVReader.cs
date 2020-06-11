@@ -7,7 +7,7 @@ namespace GestionBDDApp.data.csv
     /// <summary>
     /// Permet de lire un fichier CSV simplement.
     /// </summary>
-    class CsvReader
+    public static class CsvReader
     {
         /// <summary>
         /// Lit le fichier CSV dont le chemin est passé en paramètre (<paramref name="Path"/>),

@@ -6,7 +6,7 @@ namespace GestionBDDApp.data.utils
     /// <summary>
     /// Classe utilitaire pour manipuler des collections.
     /// </summary>
-    public class CollectionsUtils
+    public static class CollectionsUtils
     {
         /// <summary>
         /// Retourne la valeur correspondant à la clé <paramref name="Key"/> dans le dictionnaire

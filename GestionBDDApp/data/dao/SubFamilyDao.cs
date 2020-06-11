@@ -9,28 +9,28 @@ namespace GestionBDDApp.data.dao
     /// <summary>
     /// Classe du Dao pour les sous-familles, elle permet de faire des traitements sur la table SousFamilles
     /// </summary>
-    public class DaoSousFamille : AbstractDao
+    public class SubFamilyDao : AbstractDao
     {
         /// <summary>
         /// Le Dao de la famille parent des sous-familles
         /// </summary>
-        private readonly DaoFamille DaoFamille;
+        private readonly FamilyDao FamilyDao;
 
         /// <summary>
         /// Instancie le Dao des sous-familles, il faut le Dao de la famille parent
         /// </summary>
-        /// <param name="DaoFamille">Dao de la famille</param>
-        public DaoSousFamille(DaoFamille DaoFamille) : base("SousFamilles", true)
+        /// <param name="FamilyDao">Dao de la famille</param>
+        public SubFamilyDao(FamilyDao FamilyDao) : base("SousFamilles", true)
         {
-            this.DaoFamille = DaoFamille;
+            this.FamilyDao = FamilyDao;
         }
 
         /// <summary>
-        /// Récupère toutes les sous-familles dans la base et les retourne dans une <b>List'<'SousFamilles'>'</b>
+        /// Récupère toutes les sous-familles dans la base et les retourne dans une <b>List'&lt;'SousFamilles'&gt;'</b>
         /// </summary>
-        public List<SousFamilles> GetAllSousFamilles()
+        public List<SubFamily> GetAllSousFamilles()
         {
-            List<SousFamilles> SousFamilles;
+            List<SubFamily> SousFamilles;
 
             // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -52,18 +52,18 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'SousFamilles'>'</b>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'&lt;'SousFamilles'&gt;'</b>
         /// </summary>
         /// <param name="DataReader">Le réultat de la requête SQL</param>
-        private List<SousFamilles> ParseQueryResult(DbDataReader DataReader)
+        private List<SubFamily> ParseQueryResult(DbDataReader DataReader)
         {
-            var SubFamilyRed = new List<SousFamilles>();
+            var SubFamilyRed = new List<SubFamily>();
             if (DataReader.HasRows)
             {
                 while (DataReader.Read())
                 {
-                    var Family = DaoFamille.GetFamilleById(DataReader.GetInt32(1));
-                    SubFamilyRed.Add(new SousFamilles(DataReader.GetInt32(0), Family, 
+                    var Family = FamilyDao.GetFamilleById(DataReader.GetInt32(1));
+                    SubFamilyRed.Add(new SubFamily(DataReader.GetInt32(0), Family, 
                         DataReader.GetString(2)));
                 }
             }
@@ -75,9 +75,9 @@ namespace GestionBDDApp.data.dao
         /// Cherche la sous-famille par id et la retourne
         /// </summary>
         /// <param name="Id">id de la sous-famille recherchée</param>
-        public SousFamilles GetSousFamilleById(int Id)
+        public SubFamily GetSousFamilleById(int Id)
         {
-            SousFamilles SubFamilyFound = null;
+            SubFamily SubFamilyFound = null;
 
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
@@ -91,8 +91,8 @@ namespace GestionBDDApp.data.dao
                         if (Reader.HasRows)
                         {
                             Reader.Read();
-                            var Famille = DaoFamille.GetFamilleById(Reader.GetInt32(1));
-                            SubFamilyFound = new SousFamilles(Reader.GetInt32(0), Famille, 
+                            var Famille = FamilyDao.GetFamilleById(Reader.GetInt32(1));
+                            SubFamilyFound = new SubFamily(Reader.GetInt32(0), Famille, 
                                 Reader.GetString(2));
                         }
                     }
@@ -105,15 +105,15 @@ namespace GestionBDDApp.data.dao
         /// <summary>
         /// Sauvegarde la sous-famille dans la base (si elle existe déjà, alors elle est mise à jour)
         /// </summary>
-        /// <param name="SousFamille">Sous-famille à sauvegarder</param>
-        public void Save(SousFamilles SousFamille)
+        /// <param name="SubFamily">Sous-famille à sauvegarder</param>
+        public void Save(SubFamily SubFamily)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(Connection))
                 {
-                    if (SousFamille.Id == null)
+                    if (SubFamily.Id == null)
                     {
                         Command.CommandText = "INSERT INTO SousFamilles(RefFamille, Nom) VALUES (@refFamille, @name)";
                     }
@@ -121,15 +121,15 @@ namespace GestionBDDApp.data.dao
                     {
                         Command.CommandText = "UPDATE SousFamilles SET RefFamille=@refFamille, Nom=@name WHERE " + 
                                               "RefSousFamille = @refSousFamille";
-                        Command.Parameters.AddWithValue("@refSousFamille", SousFamille.Id);
+                        Command.Parameters.AddWithValue("@refSousFamille", SubFamily.Id);
                     }
         
-                    Command.Parameters.AddWithValue("@refFamille", SousFamille.Famille.Id);
-                    Command.Parameters.AddWithValue("@name", SousFamille.Nom);
+                    Command.Parameters.AddWithValue("@refFamille", SubFamily.Family.Id);
+                    Command.Parameters.AddWithValue("@name", SubFamily.Name);
                     Command.ExecuteNonQuery();
-                    if (SousFamille.Id == null)
+                    if (SubFamily.Id == null)
                     {
-                        SousFamille.Id = (int) Connection.LastInsertRowId;
+                        SubFamily.Id = (int) Connection.LastInsertRowId;
                     }
                 }
             }
@@ -170,7 +170,7 @@ namespace GestionBDDApp.data.dao
         /// <param name="Id">Id de la sous-famille à supprimer</param>
         public void Delete(int Id)
         {
-            var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfSubFamily(Id);
+            var UseCount = DaoRegistry.GetInstance.ArticleDao.CountArticleOfSubFamily(Id);
 
             // Vérifie si la sousfamille est utilisée par un article, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
@@ -183,9 +183,9 @@ namespace GestionBDDApp.data.dao
                 }
                 else
                 {
-                    Error = String.Format(
-                        "Cette sous-famille est utilisée par {0} articles, veuilliez supprimer les articles utilisant" 
-                        + " cette sous-famille avant de la supprimer.", UseCount);
+                    Error =
+                        $"Cette sous-famille est utilisée par {UseCount} articles, veuilliez supprimer les articles " 
+                        + "utilisant cette sous-famille avant de la supprimer.";
                 }
                 throw new ArgumentException(Error);
             }
@@ -206,9 +206,9 @@ namespace GestionBDDApp.data.dao
         /// Cherche les sous-familles d'une famille parent en utilisant le nom de la famille
         /// </summary>
         /// <param name="SubFamilyName">Id de la marque à supprimer</param>
-        public List<SousFamilles> GetSubFamiliesByName(string SubFamilyName)
+        public List<SubFamily> GetSubFamiliesByName(string SubFamilyName)
         {
-            List<SousFamilles> SubFamilies;
+            List<SubFamily> SubFamilies;
 
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
@@ -226,9 +226,9 @@ namespace GestionBDDApp.data.dao
             return SubFamilies;
         }
 
-        public List<SousFamilles> GetSubFamilyOfFamily(int FamilyId)
+        public List<SubFamily> GetSubFamilyOfFamily(int FamilyId)
         {
-            List<SousFamilles> SubFamilies;
+            List<SubFamily> SubFamilies;
 
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
