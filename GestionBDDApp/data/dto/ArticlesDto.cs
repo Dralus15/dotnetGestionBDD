@@ -70,8 +70,8 @@ namespace GestionBDDApp.data.dto
         /// <returns>Un nouvel <code>ArticleDto</code> initialisé</returns>
         /// <exception cref="ParsingException">Si le prix n'est pas correcte, ou que les paramètres ne satisfont pas les
         /// conditions métiers</exception>
-        public static ArticlesDto FromRawData(string ArticleRef, string Description, string FamilyName, string SubFamilyName,
-            string BrandName, string PriceAsString)
+        public static ArticlesDto FromRawData(string ArticleRef, string Description, string FamilyName, 
+            string SubFamilyName, string BrandName, string PriceAsString)
         {
             float ParsedPrice;
 

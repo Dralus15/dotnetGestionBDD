@@ -24,7 +24,8 @@ namespace GestionBDDApp.data.dao
         /// </summary>
         /// <param name="DaoSousFamille">Dao de la sous-famille</param>
         /// <param name="DaoMarque">Dao de la marque</param>
-        public DaoArticle(DaoSousFamille DaoSousFamille, DaoMarque DaoMarque): base("Articles", false)
+        public DaoArticle(DaoSousFamille DaoSousFamille, DaoMarque DaoMarque)
+            : base("Articles", false)
         {
             this.DaoSousFamille = DaoSousFamille;
             this.DaoMarque = DaoMarque;
@@ -37,7 +38,7 @@ namespace GestionBDDApp.data.dao
         {
             var Articles = new List<Articles>();
 
-            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Articles'>'</b>
+            // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
@@ -82,7 +83,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefSousFamille = @refSubFamily", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT count(*) FROM Articles WHERE RefSousFamille = @refSubFamily", Connection))
                 {
                     Command.Parameters.AddWithValue("@refSubFamily", SubFamilyId);
                     using (var Reader = Command.ExecuteReader())
@@ -110,7 +112,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefMarque = @refBrand", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT count(*) FROM Articles WHERE RefMarque = @refBrand", Connection))
                 {
                     Command.Parameters.AddWithValue("@refBrand", BrandId);
                     using (var Reader = Command.ExecuteReader())
@@ -138,7 +141,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Articles WHERE RefArticle = @refArticle", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT * FROM Articles WHERE RefArticle = @refArticle", Connection))
                 {
                     Command.Parameters.AddWithValue("@refArticle", Id);
                     using (var Reader = Command.ExecuteReader())
@@ -172,7 +176,8 @@ namespace GestionBDDApp.data.dao
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(
-                    @"INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES (@ref,@desc, @refSousFamille, @refMarque, @prix, @quantity)"
+                    @"INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES" 
+                    + @" (@ref,@desc, @refSousFamille, @refMarque, @prix, @quantity)"
                     , Connection)
                 )
                 {
@@ -197,7 +202,8 @@ namespace GestionBDDApp.data.dao
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(
-                    @"UPDATE Articles SET Description = @desc, RefSousFamille = @refSousFamille, RefMarque = @refMarque, PrixHT = @prix, Quantite = @quantity WHERE RefArticle = @ref"
+                    "UPDATE Articles SET Description = @desc, RefSousFamille = @refSousFamille, RefMarque = @refMarque" 
+                    + ", PrixHT = @prix, Quantite = @quantity WHERE RefArticle = @ref"
                     , Connection)
                 )
                 {

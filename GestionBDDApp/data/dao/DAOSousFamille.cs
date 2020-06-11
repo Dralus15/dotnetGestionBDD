@@ -32,7 +32,7 @@ namespace GestionBDDApp.data.dao
         {
             List<SousFamilles> SousFamilles;
 
-            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
+            // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
@@ -63,7 +63,8 @@ namespace GestionBDDApp.data.dao
                 while (DataReader.Read())
                 {
                     var Family = DaoFamille.GetFamilleById(DataReader.GetInt32(1));
-                    SubFamilyRed.Add(new SousFamilles(DataReader.GetInt32(0), Family, DataReader.GetString(2)));
+                    SubFamilyRed.Add(new SousFamilles(DataReader.GetInt32(0), Family, 
+                        DataReader.GetString(2)));
                 }
             }
 
@@ -81,7 +82,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand( "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille", Connection))
                 { 
                     Command.Parameters.AddWithValue("@refSousFamille", Id);
                     using (var Reader = Command.ExecuteReader())
@@ -90,7 +92,8 @@ namespace GestionBDDApp.data.dao
                         {
                             Reader.Read();
                             var Famille = DaoFamille.GetFamilleById(Reader.GetInt32(1));
-                            SubFamilyFound = new SousFamilles(Reader.GetInt32(0), Famille, Reader.GetString(2));
+                            SubFamilyFound = new SousFamilles(Reader.GetInt32(0), Famille, 
+                                Reader.GetString(2));
                         }
                     }
                 }
@@ -116,7 +119,8 @@ namespace GestionBDDApp.data.dao
                     }
                     else
                     {
-                        Command.CommandText = @"UPDATE SousFamilles SET RefFamille='@refFamille', Nom='@name' WHERE RefSousFamille = @refSousFamille";
+                        Command.CommandText = "UPDATE SousFamilles SET RefFamille=@refFamille, Nom=@name WHERE " + 
+                                              "RefSousFamille = @refSousFamille";
                         Command.Parameters.AddWithValue("@refSousFamille", SousFamille.Id);
                     }
         
@@ -141,7 +145,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT count(*) FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT count(*) FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
                 {
                     Command.Parameters.AddWithValue("@refFamily", FamilyId);
                     using (var Reader = Command.ExecuteReader())
@@ -173,20 +178,22 @@ namespace GestionBDDApp.data.dao
                 string Error;
                 if (UseCount == 1)
                 {
-                    Error = "Cette sous-famille est utilisée par 1 article, veuilliez supprimer l'article utilisant cette sous-famille avant de la supprimer.";
+                    Error = "Cette sous-famille est utilisée par 1 article, veuilliez supprimer l'article utilisant" 
+                            + " cette sous-famille avant de la supprimer.";
                 }
                 else
                 {
                     Error = String.Format(
-                        "Cette sous-famille est utilisée par {0} articles, veuilliez supprimer les articles utilisant cette sous-famille avant de la supprimer.",
-                        UseCount);
+                        "Cette sous-famille est utilisée par {0} articles, veuilliez supprimer les articles utilisant" 
+                        + " cette sous-famille avant de la supprimer.", UseCount);
                 }
                 throw new ArgumentException(Error);
             }
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("DELETE FROM SousFamilles WHERE RefSousFamille = @ref", Connection) )
+                using (var Command = new SQLiteCommand(
+                    "DELETE FROM SousFamilles WHERE RefSousFamille = @ref", Connection))
                 {
                     Command.Parameters.AddWithValue("@ref", Id);
                     Command.ExecuteNonQuery();
@@ -226,7 +233,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT * FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
                 {
                     Command.Parameters.AddWithValue("@refFamily", FamilyId);
                     using (var Reader = Command.ExecuteReader())

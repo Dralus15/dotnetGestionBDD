@@ -22,7 +22,7 @@ namespace GestionBDDApp.data.dao
         {
             List<Marques> Marques;
 
-            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
+            // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
@@ -70,7 +70,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE RefMarque = @refMarque", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT * FROM Marques WHERE RefMarque = @refMarque", Connection))
                 {
                     Command.Parameters.AddWithValue("@refMarque", Id);
                     using (var Reader = Command.ExecuteReader())
@@ -132,13 +133,14 @@ namespace GestionBDDApp.data.dao
                 string Error;
                 if (UseCount == 1)
                 {
-                    Error = "Cette marque est utilisée par 1 article, veuilliez supprimer l'article utilisant cette marque avant de la supprimer.";
+                    Error = "Cette marque est utilisée par 1 article, veuilliez supprimer l'article utilisant " 
+                            + "cette marque avant de la supprimer.";
                 }
                 else
                 {
                     Error = String.Format(
-                        "Cette marque est utilisée par {0} articles, veuilliez supprimer les articles utilisant cette marque avant de la supprimer.",
-                        UseCount);
+                        "Cette marque est utilisée par {0} articles, veuilliez supprimer les articles utilisant "
+                        + "cette marque avant de la supprimer.", UseCount);
                 }
                 throw new ArgumentException(Error);
             }

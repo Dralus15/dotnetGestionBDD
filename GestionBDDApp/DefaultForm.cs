@@ -176,7 +176,8 @@ namespace GestionBDDApp
                         // Sinon, on crée la sous-famille
                         else
                         {
-                            SubFamily = new SousFamilles(Id, (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value, NameBox.Text);
+                            SubFamily = new SousFamilles(Id, (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value,
+                            NameBox.Text);
                         }
                         DaoRegistery.GetInstance.DaoSousFamille.Save(SubFamily);
                         break;

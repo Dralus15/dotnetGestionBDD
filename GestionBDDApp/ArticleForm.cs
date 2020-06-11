@@ -79,7 +79,9 @@ namespace GestionBDDApp
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
             SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
                 .GroupBy(SousFamille => SousFamille.Famille.Id.Value)
-                .ToDictionary(SousFamille => SousFamille.Key, V => V.Select(F => F).ToList());
+                .ToDictionary(
+                    SousFamille => SousFamille.Key, 
+                    V => V.Select(F => F).ToList());
         }
         
         private void DisplayItems()
@@ -100,7 +102,8 @@ namespace GestionBDDApp
         /// <param name="SubFamillyKey">La clé de la famille selectionnée</param>
         private void DisplaySubFamilly(int SubFamillyKey)
         {
-            // On nettoye la liste des sous-famille dans la <b>ComboBox</b> et on la re-rempli avec les sous-familles de la famille selectionné
+            // On nettoye la liste des sous-famille dans la <b>ComboBox</b>
+            // et on la re-rempli avec les sous-familles de la famille selectionné
             SubFamillyComboBox.Items.Clear();
             foreach (var SubFamilly in SubFamilyModel[SubFamillyKey])
             {
@@ -206,7 +209,10 @@ namespace GestionBDDApp
                 // Sinon on créer un article et on l'enregistre
                 else
                 {
-                    Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, (float) PriceBox.Value, (int) QuantityBox.Value);
+                    Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, 
+                        (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, 
+                        (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, 
+                        (float) PriceBox.Value, (int) QuantityBox.Value);
                     DaoRegistery.GetInstance.DaoArticle.Create(Article);
                 }
                 DialogResult = DialogResult.OK;

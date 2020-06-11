@@ -168,7 +168,8 @@ namespace GestionBDDApp
             var CountFamily = DaoRegistery.GetInstance.DaoFamille.Count();
             var CountBrand = DaoRegistery.GetInstance.DaoMarque.Count();
             var CountSubFamily = DaoRegistery.GetInstance.DaoSousFamille.Count();
-            StatusText.Text = CountArticle + " articles, " + CountFamily + " familles, " + CountSubFamily + " sous-familles et " + CountBrand + " marques en base.";
+            StatusText.Text = CountArticle + " articles, " + CountFamily + " familles, " + CountSubFamily + 
+                              " sous-familles et " + CountBrand + " marques en base.";
         }
 
         /// <summary>

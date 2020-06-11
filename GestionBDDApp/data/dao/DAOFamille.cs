@@ -22,7 +22,7 @@ namespace GestionBDDApp.data.dao
         {
             List<Familles> Familles;
 
-            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
+            // On se connecte à la base de donnée pour envoyer la requête
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
@@ -68,7 +68,8 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE RefFamille = @refFamille", Connection))
+                using (var Command = new SQLiteCommand(
+                    "SELECT * FROM Familles WHERE RefFamille = @refFamille", Connection))
                 {
                     
                     Command.Parameters.AddWithValue("@refFamille", Id);
@@ -155,12 +156,14 @@ namespace GestionBDDApp.data.dao
                 string Error;
                 if (UseCount == 1)
                 {
-                    Error = "Cette famille est utilisée par 1 sous-famille, veuilliez supprimer la sous-famille utilisant cette famille avant de la supprimer.";
+                    Error = "Cette famille est utilisée par 1 sous-famille, veuilliez supprimer la sous-famille " 
+                            + "utilisant cette famille avant de la supprimer.";
                 }
                 else
                 {
                     Error = String.Format(
-                        "Cette famille est utilisée par {0} sous-familles, veuilliez supprimer les sous-familles utilisant cette famille avant de la supprimer.",
+                        "Cette famille est utilisée par {0} sous-familles, veuilliez supprimer les sous-familles " 
+                        + "utilisant cette famille avant de la supprimer.",
                         UseCount);
                 }
                 throw new ArgumentException(Error);
