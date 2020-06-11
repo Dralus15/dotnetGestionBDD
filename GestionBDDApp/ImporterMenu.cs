@@ -120,8 +120,8 @@ namespace GestionBDDApp
                     var NewFamilies = new Dictionary<string, Family>();
                     var NewSubFamilies = new Dictionary<string, SubFamily>();
                     
-                    //les articles à sauvegarder sous la forme de couple <Nouvelle donnée, doublon>.
-                    var NewArticles = new Dictionary<Articles, Articles>();
+                    //les articles à sauvegarder sous la forme de couple <reference, <Nouvelle donnée, doublon>>.
+                    var NewArticles = new Dictionary<string, Pair<Articles, Articles>>();
                     
                     //dédoublonnage étape 1 : doublon de familles / sous-familles et marques.
                     if (! ShouldEraseBase)
@@ -132,23 +132,11 @@ namespace GestionBDDApp
                     
                     var ArticleNameSakeCount = 0;
 
-                    //calculer les autres tables crées.
+                    //calcul des doublons d'articles
                     foreach (var ArticleDto in ArticlesDtosRead)
                     {
                         //barre de chargement.
                         ImportProgress.Value += 1;
-                        
-                        //résolution des dépendances des Marques.
-                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticleDto.BrandName, 
-                            () => new Marques(null, ArticleDto.BrandName));
-                        
-                        //résolution des dépendances des Familles.
-                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.FamilyName, 
-                            () => new Family(null, ArticleDto.FamilyName));
-                        
-                        //résolution des dépendances des Sous-Familles.
-                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SubFamilyName,
-                            () => new SubFamily(null, Famille, ArticleDto.SubFamilyName));
 
                         Articles ArticleNameSake;
                         if (ShouldEraseBase)
@@ -163,8 +151,7 @@ namespace GestionBDDApp
                         {
                             ArticleNameSakeCount++;
                         }
-                        NewArticles.Add(new Articles(ArticleDto.ArticleRef, ArticleDto.Description, SousFamille, Marque, 
-                            ArticleDto.Price, 0), ArticleNameSake);
+                        NewArticles.Add(ArticleDto.ArticleRef, new Pair<Articles, Articles>(null, ArticleNameSake));
                     }
 
                     var NamesakeStrategyChosen = NamesakeStrategy.Ignore;
@@ -181,6 +168,50 @@ namespace GestionBDDApp
                             //on choisi la stratégie de dédoublonnage, comme la base n'a pas été encore touchée,
                             //c'est le dernier moment pour annuler.
                             if (ChooseNameSakeStategy(ArticleNameSakeCount, ref NamesakeStrategyChosen)) return;
+                            
+                            // on onleve les doublons de la liste des articles à sauvegarder
+                            if (NamesakeStrategyChosen == NamesakeStrategy.Ignore)
+                            {
+                                foreach (var Articles in NewArticles)
+                                {
+                                    if (Articles.Key != null)
+                                    {
+                                        var KeysToRemove = new List<string>();
+                                        foreach (var ArticleNameSakePair in NewArticles)
+                                        {
+                                            if (ArticleNameSakePair.Value.Second != null)
+                                            {
+                                                KeysToRemove.Add(ArticleNameSakePair.Key);
+                                            }
+                                        }
+                                        foreach (var Key in KeysToRemove)
+                                        {
+                                            NewArticles.Remove(Key);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    foreach (var NewArticleRef in new List<string>(NewArticles.Keys))
+                    {
+                        var ArticlesDto = ArticlesDtosRead.Find(ArticleDto => ArticleDto.ArticleRef.Equals(NewArticleRef));
+                        //résolution des dépendances des Marques.
+                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticlesDto.BrandName, 
+                            () => new Marques(null, ArticlesDto.BrandName));
+                        
+                        //résolution des dépendances des Familles.
+                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticlesDto.FamilyName, 
+                            () => new Family(null, ArticlesDto.FamilyName));
+                        
+                        //résolution des dépendances des Sous-Familles.
+                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticlesDto.SubFamilyName,
+                            () => new SubFamily(null, Famille, ArticlesDto.SubFamilyName));
+                        if (NewArticles.TryGetValue(NewArticleRef, out var ArticleNameSakePair))
+                        {
+                            ArticleNameSakePair.First = new Articles(ArticlesDto.ArticleRef, ArticlesDto.Description,
+                                SousFamille, Marque, ArticlesDto.Price, 0);
                         }
                     }
 
@@ -234,7 +265,7 @@ namespace GestionBDDApp
             {
                 ChosenNamesakeStrategy = NamesakeStrategy.Replace;
             }
-
+            
             return false;
         }
 
@@ -249,7 +280,7 @@ namespace GestionBDDApp
         /// <returns></returns>
         private async Task SaveImportedData(Dictionary<string, Marques> NewBrands, 
             Dictionary<string, Family> NewFamilies, Dictionary<string, SubFamily> NewSubFamilies,
-            Dictionary<Articles, Articles> NewArticles, NamesakeStrategy ChosenNamesakeStrategy)
+            Dictionary<string, Pair<Articles, Articles>> NewArticles, NamesakeStrategy ChosenNamesakeStrategy)
         {
             StatusText.Text = "Import des données...";
 
@@ -287,15 +318,15 @@ namespace GestionBDDApp
                 ImportProgress.Value++;
                 StatusText.Text = "Import des articles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
                 //pas de doublons
-                if (ArticlePair.Value == null)
+                if (ArticlePair.Value.Second == null)
                 {
-                    await Task.Run(() => ArticleDao.Create(ArticlePair.Key));
+                    await Task.Run(() => ArticleDao.Create(ArticlePair.Value.First));
                 }
                 else
                 {
                     if (ChosenNamesakeStrategy == NamesakeStrategy.Replace)
                     {
-                        await Task.Run(() => ArticleDao.Update(ArticlePair.Key));
+                        await Task.Run(() => ArticleDao.Update(ArticlePair.Value.First));
                     }
                 }
             }
@@ -493,5 +524,17 @@ namespace GestionBDDApp
         Replace,
         //Les doublons ne sont pas importés.
         Ignore
+    }
+    
+    internal class Pair<T1, T2>
+    {
+        public T1 First { get; set; }
+        public T2 Second { get; set; }
+
+        public Pair(T1 First, T2 Second)
+        {
+            this.First = First;
+            this.Second = Second;
+        }
     }
 }
