@@ -16,14 +16,25 @@ namespace GestionBDDApp
         Subfamily,
         Unknown
     }
+
+    /// <summary>
+    /// Fenêtre principale de l'application.
+    /// </summary>
     public partial class FormMain : Form
     {
-        
+        /// <summary>
+        /// Créer la fênetre principale de l'application.
+        /// </summary>
         public FormMain()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Ouvre la fenêtre d'import de base.
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void importerToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (var ImporterMenu = new ImporterMenu())
@@ -36,7 +47,12 @@ namespace GestionBDDApp
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Ouvre la fenêtre d'import de base.
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void exporterToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (var ExporterMenu = new ExporterMenu())
@@ -91,6 +107,11 @@ namespace GestionBDDApp
             }
         }
 
+        /// <summary>
+        /// Charge dans la <b>ListView</b> la liste des articles, marques, familles ou sous-familles en fonction de l'objet selectioné dans la <b>TreeView</b>
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>TreeViewEventArgs</b> contient l'événement</param>
         private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
         {
             if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
@@ -159,6 +180,11 @@ namespace GestionBDDApp
             UpdateStatusBar();
         }
 
+        /// <summary>
+        /// Ouvre la fenêtre de suppression de base.
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void SupprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             var Result = MessageBox.Show("Cette action est irreversible, êtes vous certain de continuer ?",
@@ -173,6 +199,11 @@ namespace GestionBDDApp
             }
         }
 
+        /// <summary>
+        /// Sauvegarde la position de la fenêtre principale à la fermeture.
+        /// </summary>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
+        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement</param>
         private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
         {
             Settings.Default.Left = Left;
@@ -182,6 +213,7 @@ namespace GestionBDDApp
             Settings.Default.Maximized = WindowState == FormWindowState.Maximized;
             Settings.Default.Save();
         }
+
 
         private void FormMain_Load(object Sender, EventArgs Event)
         {

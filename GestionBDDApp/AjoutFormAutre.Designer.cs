@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.DescriptionBox = new System.Windows.Forms.TextBox();
+            this.NameBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.NotValidateButton = new System.Windows.Forms.Button();
             this.ValidateButton = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.NameLabel = new System.Windows.Forms.Label();
             this.FamillyComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // DescriptionBox
             // 
-            this.DescriptionBox.Location = new System.Drawing.Point(162, 59);
-            this.DescriptionBox.Multiline = true;
-            this.DescriptionBox.Name = "DescriptionBox";
-            this.DescriptionBox.Size = new System.Drawing.Size(137, 54);
-            this.DescriptionBox.TabIndex = 12;
+            this.NameBox.Location = new System.Drawing.Point(162, 59);
+            this.NameBox.Multiline = true;
+            this.NameBox.Name = "DescriptionBox";
+            this.NameBox.Size = new System.Drawing.Size(137, 54);
+            this.NameBox.TabIndex = 12;
             // 
             // label4
             // 
@@ -75,13 +75,13 @@
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(81, 147);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 13);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "Familles";
-            this.label2.Visible = false;
+            this.NameLabel.AutoSize = true;
+            this.NameLabel.Location = new System.Drawing.Point(81, 147);
+            this.NameLabel.Name = "label2";
+            this.NameLabel.Size = new System.Drawing.Size(44, 13);
+            this.NameLabel.TabIndex = 19;
+            this.NameLabel.Text = "Familles";
+            this.NameLabel.Visible = false;
             // 
             // FamillyComboBox
             // 
@@ -98,9 +98,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(330, 264);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.NameLabel);
             this.Controls.Add(this.FamillyComboBox);
-            this.Controls.Add(this.DescriptionBox);
+            this.Controls.Add(this.NameBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.NotValidateButton);
             this.Controls.Add(this.ValidateButton);
@@ -109,9 +109,9 @@
             this.PerformLayout();
         }
 
-        private System.Windows.Forms.TextBox DescriptionBox;
+        private System.Windows.Forms.TextBox NameBox;
         private System.Windows.Forms.ComboBox FamillyComboBox;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button NotValidateButton;
         private System.Windows.Forms.Button ValidateButton;
