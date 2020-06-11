@@ -4,8 +4,17 @@ using System.Text;
 
 namespace GestionBDDApp.data.csv
 {
+    /// <summary>
+    /// Permet de lire un fichier CSV simplement
+    /// </summary>
     class CsvReader
     {
+        /// <summary>
+        /// Lit le fichier CSV dont le chemin est passé en paramètre (<paramref name="Path"/>),
+        /// chaque ligne est séparé par ses points virgules et envoyé dans la fonction de retour <paramref name="WhatToDo"/>
+        /// </summary>
+        /// <param name="Path">Le chemin vers le fichier à lire</param>
+        /// <param name="WhatToDo">Fonction définissant le traitement à faire sur chaque ligne lue</param>
         public static void ReadFile(string Path, Action<string[], int> WhatToDo)
         {
             try

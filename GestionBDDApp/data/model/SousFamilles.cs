@@ -1,12 +1,24 @@
 ﻿namespace GestionBDDApp.data.model
 {
+    /// <summary>
+    /// Représente une sous-famille d'articles en base
+    /// </summary>
     public class SousFamilles
     {
-        //auto-increment
+        /// <summary>
+        /// Un identifiant auto-incrémenté;
+        /// s'il est nul, l'article n'est pas encore sauvegardé en base
+        /// </summary>
         public int? Id { get; set; }
 
+        /// <summary>
+        /// La famille à laquelle appartient cette sous-famille
+        /// </summary>
         public Familles Famille { get; }
 
+        /// <summary>
+        /// Le nom de cette sous-famille
+        /// </summary>
         public string Nom { get; }
 
 

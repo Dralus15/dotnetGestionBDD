@@ -2,6 +2,9 @@
 
 namespace GestionBDDApp.data.dto
 {
+    /// <summary>
+    /// Représente une ligne dans le fichier d'import
+    /// </summary>
     public class ArticlesDto
     {
         public string ArticleRef { get; }
