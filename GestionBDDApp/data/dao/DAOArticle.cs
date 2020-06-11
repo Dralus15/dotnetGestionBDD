@@ -6,24 +6,24 @@ using GestionBDDApp.data.model;
 namespace GestionBDDApp.data.dao
 {
     /// <summary>
-    /// Classe du Dao pour les articles, elle permet de faire des traitements sur la table Articles
+    /// Classe du Dao pour les articles, elle permet de faire des traitements sur la table Articles.
     /// </summary>
     public class DaoArticle : AbstractDao
     {
         /// <summary>
-        /// Dao des sous-familles pour la référence des familles/sous-familles dans l'article
+        /// Dao des sous-familles pour la référence des familles/sous-familles dans l'article.
         /// </summary>
         private readonly DaoSousFamille DaoSousFamille;
         /// <summary>
-        /// Dao des marques pour la référence des marques dans l'article
+        /// Dao des marques pour la référence des marques dans l'article.
         /// </summary>
         private readonly DaoMarque DaoMarque;
 
         /// <summary>
-        /// Instancie le Dao des articles
+        /// Instancie le Dao des articles.
         /// </summary>
-        /// <param name="DaoSousFamille">Dao de la sous-famille</param>
-        /// <param name="DaoMarque">Dao de la marque</param>
+        /// <param name="DaoSousFamille">Dao de la sous-famille.</param>
+        /// <param name="DaoMarque">Dao de la marque.</param>
         public DaoArticle(DaoSousFamille DaoSousFamille, DaoMarque DaoMarque)
             : base("Articles", false)
         {
@@ -32,21 +32,21 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Récupère tout les articles dans la base et les retourne dans une <b>List'<'Articles'>'</b>
+        /// Récupère tous les articles dans la base et les retourne dans une <b>List'<'Articles'>'</b>.
         /// </summary>
         public List<Articles> GetAll()
         {
             var Articles = new List<Articles>();
 
-            // On se connecte à la base de donnée pour envoyer la requête
+            // On se connecte à la base de données pour envoyer la requête.
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
 
-                // Création de la requête
+                // Création de la requête.
                 using (var Command = new SQLiteCommand("SELECT * FROM Articles;", Connection))
                 {
-                    // On récupère la requête et on la parse pour obtenir une liste des articles 
+                    // On récupère la requête et on la parse pour obtenir une liste des articles .
                     using (var Reader = Command.ExecuteReader())
                     {
                         if (!Reader.HasRows) return Articles;
@@ -73,9 +73,9 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Compte le nombre de d'article d'une sous-famille
+        /// Compte le nombre d'article d'une sous-famille.
         /// </summary>
-        /// <param name="SubFamilyId">id de la sous-famille</param>
+        /// <param name="SubFamilyId">id de la sous-famille.</param>
         public int CountArticleOfSubFamily(int SubFamilyId)
         {
             var Result = 0;
@@ -102,9 +102,9 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Compte le nombre de d'article d'une marque
+        /// Compte le nombre d'article d'une marque.
         /// </summary>
-        /// <param name="BrandId">id de la marque</param>
+        /// <param name="BrandId">id de la marque.</param>
         public int CountArticleOfBrand(int BrandId)
         {
             var Result = 0;
@@ -131,9 +131,9 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Cherche l'article par id et le retourne
+        /// Cherche un article par son id et le retourne.
         /// </summary>
-        /// <param name="Id">id de l'article recherché</param>
+        /// <param name="Id">id de l'article recherché.</param>
         public Articles GetArticleById(string Id)
         {
             Articles Article = null;
@@ -167,9 +167,9 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Crée un article dans la base
+        /// Crée un article dans la base.
         /// </summary>
-        /// <param name="Article">article à créer</param>
+        /// <param name="Article">article à créer.</param>
         public void Create(Articles Article)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -193,9 +193,9 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Modifie un article dans la base
+        /// Modifie un article dans la base.
         /// </summary>
-        /// <param name="Article">article à modifier</param>
+        /// <param name="Article">article à modifier.</param>
         public void Update(Articles Article)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -221,7 +221,7 @@ namespace GestionBDDApp.data.dao
         /// <summary>
         /// Supprime un article dans la base.
         /// </summary>
-        /// <param name="Article">article à supprimer</param>
+        /// <param name="Article">article à supprimer.</param>
         public void Delete(string Id)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))

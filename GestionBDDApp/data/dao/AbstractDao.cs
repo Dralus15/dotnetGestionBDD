@@ -51,7 +51,7 @@ namespace GestionBDDApp.data.dao
                 {
                     Command.ExecuteNonQuery();
                 }
-                //On reset l'auto-incrémentation si la table a une clé primaire auto-incrémentée
+                //On reset l'auto-incrémentation si la table a une clé primaire auto-incrémentée.
                 if (IsAutoIncrement)
                 {
                     using (var Command = new SQLiteCommand(
