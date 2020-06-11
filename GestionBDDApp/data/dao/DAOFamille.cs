@@ -99,7 +99,7 @@ namespace GestionBDDApp.data.dao
                     }
                     else
                     {
-                        Command.CommandText = @"UPDATE Familles SET Nom='@name' WHERE RefFamille = @refFamille";
+                        Command.CommandText = @"UPDATE Familles SET Nom = @name WHERE RefFamille = @refFamille";
                         Command.Parameters.AddWithValue("@refFamille", Famille.Id);
                     }
                     Command.Parameters.AddWithValue("@name", Famille.Nom);

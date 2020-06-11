@@ -42,15 +42,47 @@ namespace GestionBDDApp
             }
         }
 
+        /// <summary>
+        /// Noeud racine des articles
+        /// </summary>
         private TreeNode AllArticles;
+        
+        /// <summary>
+        /// Noeud racine des familles
+        /// </summary>
         private TreeNode AllFamilyNode;
+        
+        /// <summary>
+        /// Noeud racine des marques
+        /// </summary>
         private TreeNode AllBrandNode;
+        
+        /// <summary>
+        /// Dernier noeud séléctionné par l'utilisateur
+        /// </summary>
         private TreeNode LastTreeNodeSelected;
 
+        /// <summary>
+        /// Ouvre le menu contextuelle au clique droit
+        /// Si aucun élément n'est séléctionné, on ne peut que ajouter un nouvel élément
+        /// sinon on peut ajouter un nouvel élément, modifier l'élément séléctionné ou le supprimer
+        /// </summary>
+        /// <param name="Sender">Non utilisé</param>
+        /// <param name="Event">Les données de l'événement de clique</param>
         private void View_MouseDown(object Sender, MouseEventArgs Event)
         {
-            if(Event.Button == MouseButtons.Right)
+            if (Event.Button == MouseButtons.Right)
             {
+                if (listView1.SelectedItems.Count == 0)
+                {
+                    contextMenu.Items[1].Enabled = false;
+                    contextMenu.Items[2].Enabled = false;
+                }
+                else
+                {
+                    contextMenu.Items[1].Enabled = true;
+                    contextMenu.Items[2].Enabled = true;
+                }
                 contextMenu.Show(MousePosition);
             }
         }
@@ -71,6 +103,7 @@ namespace GestionBDDApp
             SubFamilyFilter = null;
             SupprColonne();
             listView1.Groups.Clear();
+            listView1.SelectedItems.Clear();
             if (TreeNodeSelected.Equals(AllArticles))
             {
                 LoadArticles();

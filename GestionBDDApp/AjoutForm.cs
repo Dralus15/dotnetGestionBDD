@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace GestionBDDApp
 {
-    public partial class AjoutForm : Form
+    public partial class AjoutForm : Form//TODO rename ArticleForm
     {
         public AjoutForm()
         {
@@ -34,19 +34,19 @@ namespace GestionBDDApp
         private Articles Article;
         private List<Marques> BrandModel = new List<Marques>();
         private List<Familles> FamilyModel = new List<Familles>();
-        private Dictionary<int?, List<SousFamilles>> SubFamilyModel = new Dictionary<int?, List<SousFamilles>>();
+        private Dictionary<int, List<SousFamilles>> SubFamilyModel = new Dictionary<int, List<SousFamilles>>();
         private void LoadItems()
         {
             BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
             SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
-                .GroupBy(SousFamille => SousFamille.Famille.Id)
+                .GroupBy(SousFamille => SousFamille.Famille.Id.Value)
                 .ToDictionary(SousFamille => SousFamille.Key, V => V.Select(F => F).ToList());
         }
 
         private void Familles_SelectedIndexChanged(object Sender, EventArgs Event)
         {
-            DisplaySubFamilly(((ComboBox)Sender).SelectedIndex + 1);
+            DisplaySubFamilly(((Familles)((ComboBoxItem)((ComboBox)Sender).SelectedItem).Value).Id.Value);
         }
 
         private void DisplayItems()
@@ -77,7 +77,7 @@ namespace GestionBDDApp
 
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
-            if(BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 && QuantityBox.Value >= 0)
+            if (BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 && QuantityBox.Value >= 0)
             {
                 if (Article != null)
                 {
@@ -91,7 +91,6 @@ namespace GestionBDDApp
                 }
                 else
                 {
-
                     Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, (float) PriceBox.Value, (int) QuantityBox.Value);
                     DaoRegistery.GetInstance.DaoArticle.Create(Article);
                     Console.WriteLine("Création de : " + Article.Description);
