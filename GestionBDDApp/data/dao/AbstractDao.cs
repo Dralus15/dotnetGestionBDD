@@ -4,24 +4,24 @@ namespace GestionBDDApp.data.dao
 {
     /// <summary>
     /// Classe abstraite regroupant les traitements communs pour accéder aux données via une base SQLite,
-    /// chaque classe étendant <c>AbstactDao</c> correspond à un moyen d'accéder à une table de la base
+    /// chaque classe étendant <c>AbstactDao</c> correspond à un moyen d'accéder à une table de la base.
     /// </summary>
     public abstract class AbstractDao
     {
         /// <summary>
         /// La chaîne de connection pour accéder à la base SQLite, par défaut on crée une connection avec
-        /// le fichier Bacchus.SQLite
+        /// le fichier Bacchus.SQLite.
         /// </summary>
         protected const string CONNECTION_STRING = "Data Source=Bacchus.SQLite";
         
         
         /// <summary>
-        /// Le nom de la table pour ce Dao
+        /// Le nom de la table pour ce Dao.
         /// </summary>
         private readonly string TableName;
         
         /// <summary>
-        /// Indique si la clé primaire de cette table est auto-incrémentée
+        /// Indique si la clé primaire de cette table est auto-incrémentée.
         /// </summary>
         private readonly bool IsAutoIncrement;
 
