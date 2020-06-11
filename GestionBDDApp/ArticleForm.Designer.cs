@@ -195,7 +195,7 @@ namespace GestionBDDApp
             this.label7.TabIndex = 10;
             this.label7.Text = "Référence";
             // 
-            // AjoutForm
+            // ArticleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

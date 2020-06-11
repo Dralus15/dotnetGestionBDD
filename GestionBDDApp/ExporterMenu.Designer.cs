@@ -86,15 +86,13 @@ namespace GestionBDDApp
             this.Text = "ExporterMenu";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         private System.Windows.Forms.Button BrowseButton;
         private System.Windows.Forms.Button ExportCsvButton;
+        private System.Windows.Forms.ProgressBar ExportProgress;
         private System.Windows.Forms.TextBox FileChoosedBox;
 
         #endregion
-
-        private System.Windows.Forms.ProgressBar ExportProgress;
     }
 }

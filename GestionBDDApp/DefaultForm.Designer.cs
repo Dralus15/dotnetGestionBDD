@@ -93,7 +93,7 @@
             this.FamillyComboBox.TabIndex = 18;
             this.FamillyComboBox.Visible = false;
             // 
-            // AjoutFormAutre
+            // DefaultForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -104,7 +104,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.NotValidateButton);
             this.Controls.Add(this.ValidateButton);
-            this.Name = "AjoutFormAutre";
+            this.Name = "DefaultForm";
             this.ResumeLayout(false);
             this.PerformLayout();
         }

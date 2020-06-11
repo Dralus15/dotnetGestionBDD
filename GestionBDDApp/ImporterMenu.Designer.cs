@@ -65,7 +65,7 @@
             this.EreaseModeButton.TabIndex = 2;
             this.EreaseModeButton.Text = "Importer en mode écrasement";
             this.EreaseModeButton.UseVisualStyleBackColor = true;
-            this.EreaseModeButton.Click += new System.EventHandler(this.EreaseModeButton_Click);
+            this.EreaseModeButton.Click += new System.EventHandler(this.EraseModeButton_Click);
             // 
             // AppendModeButton
             // 
