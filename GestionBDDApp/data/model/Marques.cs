@@ -14,7 +14,7 @@
         /// <summary>
         /// Le nom de cette marque
         /// </summary>
-        public string Nom { get; }
+        public string Nom { get; set; }
 
         public Marques(int? Id, string Nom)
         {

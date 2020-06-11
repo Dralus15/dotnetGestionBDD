@@ -13,27 +13,27 @@
         /// <summary>
         /// Une description de l'article
         /// </summary>
-        public string Description { get; }
+        public string Description { get; set; }
 
         /// <summary>
         /// La Sous-Famille à laquelle appartient cet article
         /// </summary>
-        public SousFamilles SousFamille { get; }
+        public SousFamilles SousFamille { get; set; }
 
         /// <summary>
         /// La marque de cet article
         /// </summary>
-        public Marques Marque { get; }
+        public Marques Marque { get; set; }
 
         /// <summary>
         /// Le prix de cet article
         /// </summary>
-        public float Prix { get; }
+        public float Prix { get; set; }
 
         /// <summary>
         /// La quantité en stock de cet article
         /// </summary>
-        public int Quantite { get; }
+        public int Quantite { get; set; }
 
         /// <summary>
         /// Créer un article avec les valeurs passées en paramètres

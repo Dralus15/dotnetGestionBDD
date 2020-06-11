@@ -8,7 +8,7 @@ using GestionBDDApp.Properties;
 
 namespace GestionBDDApp
 {
-    internal enum ActiveList
+    public enum ActiveList
     {
         Article,
         Brand,
@@ -378,24 +378,52 @@ namespace GestionBDDApp
 
         private void contextMenu_Click(object Sender, ToolStripItemClickedEventArgs Event)
         {
+            string ArticleId;
+            int Id;
             switch (Event.ClickedItem.Text)
             {
                 case "Ajout":
-                    using (var AjoutFormulaire = new AjoutForm())
+                    if (ActiveList.Article == ArticleViewOn)
+                        using (AjoutForm AjoutFormulaire = new AjoutForm())
+                        {
+                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                            AjoutFormulaire.ShowDialog(this);
+                        }
+                    else
                     {
-                        AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                        AjoutFormulaire.ShowDialog(this);
+                        using (AjoutFormAutre AjoutFormulaire = new AjoutFormAutre(ArticleViewOn))
+                        {
+                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                            AjoutFormulaire.ShowDialog(this);
+                        }
                     }
                     break;
                 case "Modification":
-                    var ArticleId = (string)listView1.FocusedItem.Tag;
-                    using (var AjoutFormulaire = new AjoutForm(ArticleId))
+                    if (ActiveList.Article == ArticleViewOn)
                     {
-                        AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                        AjoutFormulaire.ShowDialog(this);
+                        ArticleId = (string)listView1.FocusedItem.Tag;
+                        using (AjoutForm AjoutFormulaire = new AjoutForm(ArticleId))
+                            {
+                                AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                                AjoutFormulaire.ShowDialog(this);
+                            }
+                    }
+                        
+                    else
+                    {
+                        Id = (int)listView1.FocusedItem.Tag;
+                        using (AjoutFormAutre AjoutFormulaire = new AjoutFormAutre(ArticleViewOn, Id))
+                        {
+                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                            AjoutFormulaire.ShowDialog(this);
+                        }
                     }
                     break;
-                case "Supprimer":
+                case "Suppression":
+                    DialogResult result = MessageBox.Show("Voulez vous supprimer cet article ?", "Confirmation", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                        Delete(listView1.FocusedItem);
+                    break;
                 case null: break;
             }
         }

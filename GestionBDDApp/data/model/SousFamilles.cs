@@ -14,12 +14,12 @@
         /// <summary>
         /// La famille à laquelle appartient cette sous-famille
         /// </summary>
-        public Familles Famille { get; }
+        public Familles Famille { get; set; }
 
         /// <summary>
         /// Le nom de cette sous-famille
         /// </summary>
-        public string Nom { get; }
+        public string Nom { get; set; }
 
 
         public SousFamilles(int? Id, Familles Famille, string Nom)

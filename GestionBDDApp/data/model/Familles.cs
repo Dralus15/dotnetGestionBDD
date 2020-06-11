@@ -14,7 +14,7 @@
         /// <summary>
         /// Le nom de cette famille
         /// </summary>
-        public string Nom { get; }
+        public string Nom { get; set; }
         
         public Familles(int? Id, string Nom)
         {
