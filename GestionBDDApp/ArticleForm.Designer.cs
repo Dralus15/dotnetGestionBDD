@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GestionBDDApp
 {
-    partial class AjoutForm
+    partial class ArticleForm
     {
         /// <summary>
         /// Required designer variable.
@@ -216,7 +216,7 @@ namespace GestionBDDApp
             this.Controls.Add(this.SubFamillyComboBox);
             this.Controls.Add(this.FamillyComboBox);
             this.Controls.Add(this.BrandComboBox);
-            this.Name = "AjoutForm";
+            this.Name = "ArticleForm";
             ((System.ComponentModel.ISupportInitialize) (this.PriceBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize) (this.QuantityBox)).EndInit();
             this.ResumeLayout(false);

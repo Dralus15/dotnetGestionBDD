@@ -1,6 +1,6 @@
 ﻿namespace GestionBDDApp
 {
-    partial class AjoutFormAutre
+    partial class DefaultForm
     {
         /// <summary>
         /// Required designer variable.
@@ -36,11 +36,11 @@
             this.FamillyComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
-            // DescriptionBox
+            // NameBox
             // 
             this.NameBox.Location = new System.Drawing.Point(162, 59);
             this.NameBox.Multiline = true;
-            this.NameBox.Name = "DescriptionBox";
+            this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(137, 54);
             this.NameBox.TabIndex = 12;
             // 
@@ -73,11 +73,11 @@
             this.ValidateButton.UseVisualStyleBackColor = true;
             this.ValidateButton.Click += new System.EventHandler(this.ValidateButton_Click);
             // 
-            // label2
+            // NameLabel
             // 
             this.NameLabel.AutoSize = true;
             this.NameLabel.Location = new System.Drawing.Point(81, 147);
-            this.NameLabel.Name = "label2";
+            this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 13);
             this.NameLabel.TabIndex = 19;
             this.NameLabel.Text = "Familles";
@@ -104,15 +104,15 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.NotValidateButton);
             this.Controls.Add(this.ValidateButton);
-            this.Name = "AjoutFormAutre";
+            this.Name = "DefaultForm";
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
-        private System.Windows.Forms.TextBox NameBox;
         private System.Windows.Forms.ComboBox FamillyComboBox;
-        private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox NameBox;
+        private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.Button NotValidateButton;
         private System.Windows.Forms.Button ValidateButton;
 

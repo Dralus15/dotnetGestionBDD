@@ -8,7 +8,7 @@ namespace GestionBDDApp
     /// <summary>
     /// Fenêtre du formulaire d'ajout ou de modification pour une marque, une famille ou une sous-famille. 
     /// </summary>
-    public partial class AjoutFormAutre : Form
+    public partial class DefaultForm : Form
     {
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace GestionBDDApp
         /// <summary>
         /// Créer la fenêtre de création d'une marque, d'une famille ou d'une sous-familles.
         /// </summary>
-        public AjoutFormAutre(ActiveList Type) //TODO encapsulation
+        public DefaultForm(ActiveList Type)
         {
             InitializeComponent();
             if (Type == ActiveList.Subfamily)
@@ -52,7 +52,7 @@ namespace GestionBDDApp
         /// <summary>
         /// Créer la fenêtre de modification d'une marque, d'une famille ou d'une sous-familles.
         /// </summary>
-        public AjoutFormAutre(ActiveList Type, int? Id)
+        public DefaultForm(ActiveList Type, int? Id)
         {
             InitializeComponent();
             this.Type = Type;

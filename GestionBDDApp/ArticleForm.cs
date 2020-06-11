@@ -10,7 +10,7 @@ namespace GestionBDDApp
     /// <summary>
     /// Fenêtre du formulaire d'ajout ou de modification pour un article.
     /// </summary>
-    public partial class AjoutForm : Form//TODO rename ArticleForm
+    public partial class ArticleForm : Form
     {
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace GestionBDDApp
         /// <summary>
         /// Créer la fênetre de création d'article.
         /// </summary>
-        public AjoutForm()
+        public ArticleForm()
         {
             // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
             InitializeComponent();
@@ -46,7 +46,7 @@ namespace GestionBDDApp
         /// Créer la fênetre de modification d'article.
         /// </summary>
         /// <param name="IdArticle">La <b>String</b> d'id de l'article</param>
-        public AjoutForm(string IdArticle)
+        public ArticleForm(string IdArticle)
         {
             // On récupère l'article
             Article = DaoRegistery.GetInstance.DaoArticle.GetArticleById(IdArticle);

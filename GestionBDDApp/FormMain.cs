@@ -393,7 +393,7 @@ namespace GestionBDDApp
             if (ActiveList.Article == ArticleViewOn)
             {
                 var ArticleId = (string) listView1.FocusedItem.Tag;
-                using (var AjoutFormulaire = new AjoutForm(ArticleId))
+                using (var AjoutFormulaire = new ArticleForm(ArticleId))
                 {
                     AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                     Result = AjoutFormulaire.ShowDialog(this);
@@ -402,7 +402,7 @@ namespace GestionBDDApp
             else
             {
                 var Id = (int) listView1.FocusedItem.Tag;
-                using (var AjoutFormulaire = new AjoutFormAutre(ArticleViewOn, Id))
+                using (var AjoutFormulaire = new DefaultForm(ArticleViewOn, Id))
                 {
                     AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                     Result = AjoutFormulaire.ShowDialog(this);
@@ -417,7 +417,7 @@ namespace GestionBDDApp
             DialogResult Result;
             if (ActiveList.Article == ArticleViewOn)
             {
-                using (var AjoutFormulaire = new AjoutForm())
+                using (var AjoutFormulaire = new ArticleForm())
                 {
                     AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                     Result = AjoutFormulaire.ShowDialog(this);
@@ -425,7 +425,7 @@ namespace GestionBDDApp
             }
             else
             {
-                using (var AjoutFormulaire = new AjoutFormAutre(ArticleViewOn))
+                using (var AjoutFormulaire = new DefaultForm(ArticleViewOn))
                 {
                     AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                     Result = AjoutFormulaire.ShowDialog(this);
