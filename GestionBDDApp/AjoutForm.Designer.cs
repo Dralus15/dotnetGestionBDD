@@ -62,7 +62,7 @@ namespace GestionBDDApp
             this.BrandComboBox.Location = new System.Drawing.Point(199, 151);
             this.BrandComboBox.Name = "BrandComboBox";
             this.BrandComboBox.Size = new System.Drawing.Size(137, 21);
-            this.BrandComboBox.TabIndex = 0;
+            this.BrandComboBox.TabIndex = 2;
             // 
             // SubFamillyComboBox
             // 
@@ -71,7 +71,7 @@ namespace GestionBDDApp
             this.SubFamillyComboBox.Location = new System.Drawing.Point(199, 255);
             this.SubFamillyComboBox.Name = "SubFamillyComboBox";
             this.SubFamillyComboBox.Size = new System.Drawing.Size(137, 21);
-            this.SubFamillyComboBox.TabIndex = 2;
+            this.SubFamillyComboBox.TabIndex = 4;
             // 
             // FamillyComboBox
             // 
@@ -80,7 +80,7 @@ namespace GestionBDDApp
             this.FamillyComboBox.Location = new System.Drawing.Point(199, 203);
             this.FamillyComboBox.Name = "FamillyComboBox";
             this.FamillyComboBox.Size = new System.Drawing.Size(137, 21);
-            this.FamillyComboBox.TabIndex = 1;
+            this.FamillyComboBox.TabIndex = 3;
             this.FamillyComboBox.SelectedIndexChanged += new System.EventHandler(this.Familles_SelectedIndexChanged);
             // 
             // label1
@@ -89,7 +89,7 @@ namespace GestionBDDApp
             this.label1.Location = new System.Drawing.Point(118, 154);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(48, 13);
-            this.label1.TabIndex = 3;
+            this.label1.TabIndex = 12;
             this.label1.Text = "Marques";
             // 
             // label2
@@ -98,7 +98,7 @@ namespace GestionBDDApp
             this.label2.Location = new System.Drawing.Point(118, 206);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
-            this.label2.TabIndex = 4;
+            this.label2.TabIndex = 13;
             this.label2.Text = "Familles";
             // 
             // label3
@@ -107,7 +107,7 @@ namespace GestionBDDApp
             this.label3.Location = new System.Drawing.Point(95, 258);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(71, 13);
-            this.label3.TabIndex = 5;
+            this.label3.TabIndex = 14;
             this.label3.Text = "Sous-Familles";
             // 
             // ValidateButton
@@ -115,7 +115,7 @@ namespace GestionBDDApp
             this.ValidateButton.Location = new System.Drawing.Point(79, 410);
             this.ValidateButton.Name = "ValidateButton";
             this.ValidateButton.Size = new System.Drawing.Size(99, 23);
-            this.ValidateButton.TabIndex = 6;
+            this.ValidateButton.TabIndex = 7;
             this.ValidateButton.Text = "Valider";
             this.ValidateButton.UseVisualStyleBackColor = true;
             this.ValidateButton.Click += new System.EventHandler(this.ValidateButton_Click);
@@ -125,7 +125,7 @@ namespace GestionBDDApp
             this.NotValidateButton.Location = new System.Drawing.Point(257, 410);
             this.NotValidateButton.Name = "NotValidateButton";
             this.NotValidateButton.Size = new System.Drawing.Size(99, 23);
-            this.NotValidateButton.TabIndex = 7;
+            this.NotValidateButton.TabIndex = 8;
             this.NotValidateButton.Text = "Anuler";
             this.NotValidateButton.UseVisualStyleBackColor = true;
             this.NotValidateButton.Click += new System.EventHandler(this.CancelButton_Click);
@@ -133,10 +133,10 @@ namespace GestionBDDApp
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(106, 104);
+            this.label4.Location = new System.Drawing.Point(106, 98);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(60, 13);
-            this.label4.TabIndex = 9;
+            this.label4.TabIndex = 11;
             this.label4.Text = "Description";
             // 
             // DescriptionBox
@@ -145,7 +145,7 @@ namespace GestionBDDApp
             this.DescriptionBox.Multiline = true;
             this.DescriptionBox.Name = "DescriptionBox";
             this.DescriptionBox.Size = new System.Drawing.Size(137, 54);
-            this.DescriptionBox.TabIndex = 10;
+            this.DescriptionBox.TabIndex = 1;
             // 
             // label5
             // 
@@ -153,7 +153,7 @@ namespace GestionBDDApp
             this.label5.Location = new System.Drawing.Point(115, 356);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(47, 13);
-            this.label5.TabIndex = 14;
+            this.label5.TabIndex = 16;
             this.label5.Text = "Quantité";
             // 
             // label6
@@ -162,7 +162,7 @@ namespace GestionBDDApp
             this.label6.Location = new System.Drawing.Point(138, 304);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(24, 13);
-            this.label6.TabIndex = 13;
+            this.label6.TabIndex = 15;
             this.label6.Text = "Prix";
             // 
             // PriceBox
@@ -170,29 +170,29 @@ namespace GestionBDDApp
             this.PriceBox.Location = new System.Drawing.Point(199, 302);
             this.PriceBox.Name = "PriceBox";
             this.PriceBox.Size = new System.Drawing.Size(137, 20);
-            this.PriceBox.TabIndex = 17;
+            this.PriceBox.TabIndex = 5;
             // 
             // QuantityBox
             // 
             this.QuantityBox.Location = new System.Drawing.Point(199, 354);
             this.QuantityBox.Name = "QuantityBox";
             this.QuantityBox.Size = new System.Drawing.Size(137, 20);
-            this.QuantityBox.TabIndex = 18;
+            this.QuantityBox.TabIndex = 6;
             // 
             // ReferenceBox
             // 
             this.ReferenceBox.Location = new System.Drawing.Point(199, 36);
             this.ReferenceBox.Name = "ReferenceBox";
             this.ReferenceBox.Size = new System.Drawing.Size(137, 20);
-            this.ReferenceBox.TabIndex = 20;
+            this.ReferenceBox.TabIndex = 0;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(106, 36);
+            this.label7.Location = new System.Drawing.Point(109, 39);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(57, 13);
-            this.label7.TabIndex = 19;
+            this.label7.TabIndex = 10;
             this.label7.Text = "Référence";
             // 
             // AjoutForm

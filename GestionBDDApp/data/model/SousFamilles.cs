@@ -5,9 +5,9 @@
         //auto-increment
         public int? Id { get; set; }
 
-        public Familles Famille { get; }
+        public Familles Famille { get; set; }
 
-        public string Nom { get; }
+        public string Nom { get; set;  }
 
 
         public SousFamilles(int? Id, Familles Famille, string Nom)

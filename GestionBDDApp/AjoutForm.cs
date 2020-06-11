@@ -82,7 +82,12 @@ namespace GestionBDDApp
             {
                 if (Article != null)
                 {
-                    //TODO
+                    Article.Description = DescriptionBox.Text;
+                    Article.Quantite = (int) QuantityBox.Value;
+                    Article.Prix = (float) PriceBox.Value;
+                    Article.Marque = (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value;
+                    Article.SousFamille = (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value;
+                    DaoRegistery.GetInstance.DaoArticle.Update(Article);
                     Console.WriteLine("Modifcation de : " + Article.Description);
                 }
                 else
@@ -98,6 +103,7 @@ namespace GestionBDDApp
                 MessageBox.Show("Veillez remplir tous les champs", "Error", MessageBoxButtons.OK);
         }
     }
+
     public class ComboBoxItem
     {
         public string Text { get; }

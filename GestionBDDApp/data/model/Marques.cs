@@ -5,7 +5,7 @@
         //auto-increment
         public int? Id { get; set; }
 
-        public string Nom { get; }
+        public string Nom { get; set; }
 
         public Marques(int? Id, string Nom)
         {
