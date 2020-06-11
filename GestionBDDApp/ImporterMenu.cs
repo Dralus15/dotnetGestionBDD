@@ -98,45 +98,45 @@ namespace GestionBDDApp
                         }
                     }
 
-                    //On remet la barre de chargement à 0 en mode pas à pas
+                    //On remet la barre de chargement à 0 en mode pas à pas.
                     StatusText.Text = "Calcul des données à créer...";
                     ImportProgress.Style = ProgressBarStyle.Continuous;
                     ImportProgress.Maximum = ArticlesDtosRead.Count;
                     ImportProgress.Minimum = 0;
                     ImportProgress.Value = 0;
 
-                    //Les données à sauvegarder
+                    //Les données à sauvegarder.
                     var NewBrands = new Dictionary<string, Marques>();
                     var NewFamilies = new Dictionary<string, Family>();
                     var NewSubFamilies = new Dictionary<string, SubFamily>();
                     
-                    //les articles à sauvegarder sous la forme de couple <Nouvelle donnée, doublon>
+                    //les articles à sauvegarder sous la forme de couple <Nouvelle donnée, doublon>.
                     var NewArticles = new Dictionary<Articles, Articles>();
                     
-                    //dédoublonnage étape 1 : doublon de familles / sous-familles et marques
+                    //dédoublonnage étape 1 : doublon de familles / sous-familles et marques.
                     if (! ShouldEraseBase)
                     {    
-                        //comme la base n'a pas été encore touché, on peut encore annuler
+                        //comme la base n'a pas été encore touchée, on peut encore annuler.
                         if (FindDuplicates(ArticlesDtosRead, NewFamilies, NewBrands, NewSubFamilies)) return;
                     }
                     
                     var ArticleNameSakeCount = 0;
 
-                    //calculer les autres tables crées
+                    //calculer les autres tables crées.
                     foreach (var ArticleDto in ArticlesDtosRead)
                     {
-                        //barre de chargement
+                        //barre de chargement.
                         ImportProgress.Value += 1;
                         
-                        //résolution des dépendances des marques
+                        //résolution des dépendances des Marques.
                         var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticleDto.BrandName, 
                             () => new Marques(null, ArticleDto.BrandName));
                         
-                        //résolution des dépendances des Familles
+                        //résolution des dépendances des Familles.
                         var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.FamilyName, 
                             () => new Family(null, ArticleDto.FamilyName));
                         
-                        //résolution des dépendances des Sous-Familles
+                        //résolution des dépendances des Sous-Familles.
                         var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SubFamilyName,
                             () => new SubFamily(null, Famille, ArticleDto.SubFamilyName));
 
@@ -165,21 +165,21 @@ namespace GestionBDDApp
                     }
                     else
                     {
-                        //Si il y a des doublons
+                        //S'il y a des doublons.
                         if (ArticleNameSakeCount > 0)
                         {
-                            //on choisie la stratégie de dédoublonnage, comme la base n'a pas été encore touché,
-                            //c'est le dernier moment pour annuler
-                            if (ChooseNameSakeStrategy(ArticleNameSakeCount, ref NamesakeStrategyChosen)) return;
+                            //on choisi la stratégie de dédoublonnage, comme la base n'a pas été encore touchée,
+                            //c'est le dernier moment pour annuler.
+                            if (ChooseNameSakeStategy(ArticleNameSakeCount, ref NamesakeStrategyChosen)) return;
                         }
                     }
 
-                    //On enregistre les données
+                    //On enregistre les données.
                     await SaveImportedData(NewBrands, NewFamilies, NewSubFamilies, NewArticles, NamesakeStrategyChosen);
 
                     StatusText.Text = "Import terminé";
                     
-                    //On affiche le rapport d'import
+                    //On affiche le rapport d'import.
                     MessageBox.Show("Import terminé :\n" + 
                             NewBrands.Values.Count + " nouvelles marques \n" +
                             NewFamilies.Values.Count + " nouvelles familles \n" +
@@ -204,12 +204,12 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Demande à l'utilisateur la façon de gérer les doublons d'articles
+        /// Demande à l'utilisateur la façon de gérer les doublons d'articles.
         /// </summary>
-        /// <param name="ArticleNameSakeCount">Le nombre d'articles en doublons</param>
-        /// <param name="ChosenNamesakeStrategy">La stratégie choisie</param>
-        /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon</returns>
-        private bool ChooseNameSakeStrategy(int ArticleNameSakeCount, ref NamesakeStrategy ChosenNamesakeStrategy)
+        /// <param name="ArticleNameSakeCount">Le nombre d'articles en doublons.</param>
+        /// <param name="ChosenNamesakeStrategy">La stratégie choisie.</param>
+        /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon.</returns>
+        private bool ChooseNameSakeStategy(int ArticleNameSakeCount, ref NamesakeStrategy ChosenNamesakeStrategy)
         {
             var Result = MessageBox.Show(
                 $"{ArticleNameSakeCount} doublons d'articles ont été détéctés : \n" +
@@ -230,17 +230,17 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Enregistre les nouvelles données en bases
+        /// Enregistre les nouvelles données en bases.
         /// </summary>
-        /// <param name="NewBrands">Les marques à enregistrer</param>
-        /// <param name="NewFamilies">Les familles à enregistrer</param>
-        /// <param name="NewSubFamilies">Les sous-familles à enregistrer</param>
-        /// <param name="NewArticles">Les articles à enregistrer</param>
-        /// <param name="NamesakeStrategyChosen">La stratégie de dédoublonnage choisie</param>
+        /// <param name="NewBrands">Les marques à enregistrer.</param>
+        /// <param name="NewFamilies">Les familles à enregistrer.</param>
+        /// <param name="NewSubFamilies">Les sous-familles à enregistrer.</param>
+        /// <param name="NewArticles">Les articles à enregistrer.</param>
+        /// <param name="ChosenNamesakeStrategy">La stratégie de dédoublonnage choisie.</param>
         /// <returns></returns>
         private async Task SaveImportedData(Dictionary<string, Marques> NewBrands, 
             Dictionary<string, Family> NewFamilies, Dictionary<string, SubFamily> NewSubFamilies,
-            Dictionary<Articles, Articles> NewArticles, NamesakeStrategy NamesakeStrategyChosen)
+            Dictionary<Articles, Articles> NewArticles, NamesakeStrategy ChosenNamesakeStrategy)
         {
             StatusText.Text = "Import des données...";
 
@@ -284,7 +284,7 @@ namespace GestionBDDApp
                 }
                 else
                 {
-                    if (NamesakeStrategyChosen == NamesakeStrategy.Replace)
+                    if (ChosenNamesakeStrategy == NamesakeStrategy.Replace)
                     {
                         await Task.Run(() => ArticleDao.Update(ArticlePair.Key));
                     }
@@ -293,13 +293,13 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Trouve les doublons entre les données à importer et la base
+        /// Trouve les doublons entre les données à importer et la base.
         /// </summary>
-        /// <param name="ArticlesDtosRead">Les données à importer</param>
-        /// <param name="NewFamilies">Les doublons des familles</param>
-        /// <param name="NewBrands">Les doublons des marques</param>
-        /// <param name="NewSubFamilies">Les doublons des sous-familles</param>
-        /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon</returns>
+        /// <param name="ArticlesDtosRead">Les données à importer.</param>
+        /// <param name="NewFamilies">Les doublons des familles.</param>
+        /// <param name="NewBrands">Les doublons des marques.</param>
+        /// <param name="NewSubFamilies">Les doublons des sous-familles.</param>
+        /// <returns><c>true</c> si l'import est annulé, <c>false</c> sinon.</returns>
         private bool FindDuplicates(List<ArticlesDto> ArticlesDtosRead, Dictionary<string, Family> NewFamilies, 
             Dictionary<string, Marques> NewBrands, Dictionary<string, SubFamily> NewSubFamilies)
         {
@@ -346,16 +346,16 @@ namespace GestionBDDApp
                 }
             }
 
-            NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés\n", DuplicateFamilyCount);
-            NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés\n", DuplicateSubFamilyCount);
-            NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés\n", DuplicateBrandCount);
+            NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés.\n", DuplicateFamilyCount);
+            NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés.\n", DuplicateSubFamilyCount);
+            NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés.\n", DuplicateBrandCount);
 
             var Error = NameSakeErrorBuilder.ToString();
             if (Error.Length > 0)
             {
                 var Result = MessageBox.Show(
                     "Des doublons ont été détéctés : \n" + Error +
-                    "Si vous continuer, les doublons ne serons pas importés",
+                    "Si vous continuez, les doublons ne seront pas importés",
                     "Doublons détéctés", MessageBoxButtons.OKCancel);
                 if (Result == DialogResult.Cancel)
                 {
@@ -368,13 +368,13 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Lit le fichier dont le chemin est passé en paramètres et sort les annomalies du fichiers, les doublons dans
-        /// le fichier et le resultats. Les lignes avec des annomalies ne sont pas envoyés dans le resultat.
+        /// Lit le fichier dont le chemin est passé en paramètre et sort les anomalies du fichiers, les doublons dans
+        /// le fichier et le resultat. Les lignes avec des anomalies ne sont pas envoyés dans le resultat.
         /// </summary>
-        /// <param name="ChosenFilePath">Le chemin du fichier</param>
-        /// <param name="ExistingArticlesCountByRef">Dictionnaire des doublons</param>
-        /// <param name="Anomalies">Les annomalies du fichier</param>
-        /// <param name="Result">Les lignes du fichiers</param>
+        /// <param name="ChosenFilePath">Le chemin du fichier.</param>
+        /// <param name="ExistingArticlesCountByRef">Dictionnaire des doublons.</param>
+        /// <param name="Anomalies">Les annomalies du fichier.</param>
+        /// <param name="Result">Les lignes du fichiers.</param>
         private static void ReadFile(string ChosenFilePath, Dictionary<string, int> ExistingArticlesCountByRef, 
             Dictionary<int, string> Anomalies, List<ArticlesDto> Result)
         {
@@ -405,13 +405,13 @@ namespace GestionBDDApp
 
         /// <summary>
         /// Met la fenêtre en mode 'chargement' pour notifier l'utilisateur qu'une opération est en cours,
-        /// le curseur est changé et les boutons du formulaires sont grisés
+        /// le curseur est changé et les boutons du formulaires sont grisés.
         /// </summary>
-        /// <param name="IsBusy">Si <c>true</c> le mode attente est activé, sinon il est retiré</param>
+        /// <param name="IsBusy">Si <c>true</c> le mode attente est activé, sinon il est retiré.</param>
         private void SetBusy(bool IsBusy)
         {
             var IsNotBusy = ! IsBusy;
-            //Désactivation / Activation du bouton 'X' pour fermer la fenêtre
+            //Désactivation / Activation du bouton 'X' pour fermer la fenêtre.
             ControlBox = IsNotBusy;
             AppendModeButton.Enabled = IsNotBusy;
             EreaseModeButton.Enabled = IsNotBusy;
@@ -422,25 +422,25 @@ namespace GestionBDDApp
         //************************************************** EVENT **************************************************//
         
         /// <summary>
-        /// Appelé au clique du bouton 'Importer en mode en mode ajout', lance l'importation en mode ajout
+        /// Fonction appelée au clique du bouton 'Importer en mode ajout', lance l'importation en mode ajout
         /// (sans suppression de données).
         /// </summary>
-        /// <param name="Sender">Non utilisé</param>
-        /// <param name="Event">Non utilisé</param>
+        /// <param name="Sender">Non utilisé.</param>
+        /// <param name="Event">Non utilisé.</param>
         private void AppendModeButton_Click(object Sender, EventArgs Event)
         {
             Import(false);
         }
 
         /// <summary>
-        /// Appelé au clique du bouton 'Importer en mode écrasement', ce mode nécessite la remise à 0 de la base,
-        /// un avertissement est donc affiché avant de lancer l'import.
+        /// Fonction appelée au clique du bouton 'Importer en mode écrasement', ce mode nécessite la remise à 0 de la base,
+        /// un avertissement est donc affiché avant de lancer l'import pour confirmer la suppression de la base déjà présente.
         /// </summary>
-        /// <param name="Sender">Non utilisé</param>
-        /// <param name="Event">Non utilisé</param>
+        /// <param name="Sender">Non utilisé.</param>
+        /// <param name="Event">Non utilisé.</param>
         private void EraseModeButton_Click(object Sender, EventArgs Event)
         {
-            var ConfirmResult =  MessageBox.Show("Cette action va écraser la base, êtes-vous sur de continuer ?",
+            var ConfirmResult =  MessageBox.Show("Cette action va écraser la base, êtes-vous sûr de vouloir continuer ?",
                 "Confirmation",
                 MessageBoxButtons.YesNo);
             if (ConfirmResult == DialogResult.Yes)
@@ -450,10 +450,10 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Appelé au clique du bouton 'Parcourir', ouvre une fenêtre pour sélectionner le fichier CSV à importer.
+        /// Fonction appelée au clique du bouton 'Parcourir', ouvre une fenêtre pour sélectionner le fichier CSV à importer.
         /// </summary>
-        /// <param name="Sender">Non utilisé</param>
-        /// <param name="Event">Non utilisé</param>
+        /// <param name="Sender">Non utilisé.</param>
+        /// <param name="Event">Non utilisé.</param>
         private void SelectCsvButton_Click(object Sender, EventArgs Event)
         {
             var OpenFileDialog = new OpenFileDialog
@@ -476,13 +476,13 @@ namespace GestionBDDApp
     }
 
     /// <summary>
-    /// Enumération interne représentant la stratégie de dédoublonnage choisie
+    /// Enumération interne représentant la stratégie de dédoublonnage choisie.
     /// </summary>
     internal enum NamesakeStrategy
     {
-        //Les doublons existants sont remplacés
+        //Les doublons existants sont remplacés.
         Replace,
-        //Les doublons ne sont pas importés
+        //Les doublons ne sont pas importés.
         Ignore
     }
 }
