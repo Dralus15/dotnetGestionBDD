@@ -360,7 +360,7 @@ namespace GestionBDDApp
             NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés.\n", DuplicateBrandCount);
 
             var Error = NameSakeErrorBuilder.ToString();
-            if (Error.Length > 0)
+            if (DuplicateFamilyCount + DuplicateSubFamilyCount + DuplicateBrandCount > 0)
             {
                 var Result = MessageBox.Show(
                     "Des doublons ont été détéctés : \n" + Error +
