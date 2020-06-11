@@ -12,7 +12,8 @@ namespace GestionBDDApp
         private Marques Brand;
         private Familles Family;
         private SousFamilles SubFamily;
-        private ActiveList type;
+        private ActiveList Type;
+        
         public AjoutFormAutre(ActiveList Type) //TODO encapsulation
         {
             InitializeComponent();
@@ -22,57 +23,70 @@ namespace GestionBDDApp
                 FamillyComboBox.Visible = true;
                 label2.Visible = true;
             }
-            type = Type;
+            this.Type = Type;
             Id = null;
+            Initialize();
         }
 
         public AjoutFormAutre(ActiveList Type, int? Id)
         {
             InitializeComponent();
             Text = "Formulaire de modification";
-            type = Type;
+            this.Type = Type;
             this.Id = Id;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
             switch (Type)
             {
                 case ActiveList.Brand:
+                {
+                    if (Id.HasValue)
                     {
-                        if (Id.HasValue)
-                        {
-                            Brand = DaoRegistery.GetInstance.DaoMarque.GetMarqueById(Id.Value);
-                            DescriptionBox.Text = Brand.Nom;
-                        }
-                        break;
+                        Brand = DaoRegistery.GetInstance.DaoMarque.GetMarqueById(Id.Value);
+                        DescriptionBox.Text = Brand.Nom;
                     }
+
+                    break;
+                }
                 case ActiveList.Family:
+                {
+                    if (Id.HasValue)
                     {
-                        if (Id.HasValue)
-                        {
-                            Family = DaoRegistery.GetInstance.DaoFamille.GetFamilleById(Id.Value);
-                            DescriptionBox.Text = Family.Nom;
-                        }
-                        break;
+                        Family = DaoRegistery.GetInstance.DaoFamille.GetFamilleById(Id.Value);
+                        DescriptionBox.Text = Family.Nom;
                     }
+
+                    break;
+                }
                 case ActiveList.Subfamily:
+                {
                     foreach (var Family in DaoRegistery.GetInstance.DaoFamille.GetAllFamilles())
                     {
                         FamillyComboBox.Items.Add(new ComboBoxItem(Family.Nom, Family));
                     }
+
                     if (Id.HasValue)
                     {
                         SubFamily = DaoRegistery.GetInstance.DaoSousFamille.GetSousFamilleById(Id.Value);
                         DescriptionBox.Text = SubFamily.Nom;
                         FamillyComboBox.Text = SubFamily.Famille.Nom;
                     }
+
                     FamillyComboBox.Visible = true;
                     label2.Visible = true;
                     break;
+                }
             }
         }
+
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
             if ( DescriptionBox.TextLength > 0 )
             {
-                switch (type)
+                switch (Type)
                 {
                     case ActiveList.Brand:
                         {
