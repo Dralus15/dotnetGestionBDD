@@ -14,24 +14,24 @@ namespace GestionBDDApp
     public partial class FormMain : Form
     {
         /// <summary>
-        /// Noeud racine des articles
+        /// Noeud racine des articles.
         /// </summary>
         private TreeNode AllArticles;
 
         /// <summary>
-        /// Noeud racine des familles
+        /// Noeud racine des familles.
         /// </summary>
         private TreeNode AllFamilyNode;
 
         /// <summary>
-        /// Noeud racine des marques
+        /// Noeud racine des marques.
         /// </summary>
         private TreeNode AllBrandNode;
 
         /// <summary>
-        /// Dernier noeud séléctionné par l'utilisateur
+        /// Dernier noeud séléctionné par l'utilisateur.
         /// </summary>
-        private TreeNode LastTreeNodeSelected;
+        private TreeNode LastTreeNodeSelected;//Todo commenter ca.
 
         private List<Articles> ArticlesModel = new List<Articles>();
 
@@ -42,35 +42,35 @@ namespace GestionBDDApp
         private List<Marques> BrandModel = new List<Marques>();
 
         /// <summary>
-        /// Un filtre potentiellement nul définissant l'id de sous-famille que doivent avoir les articles pour
-        /// être affiché
+        /// Un filtre potentiellement null définissant l'id de sous-famille que doivent avoir les articles pour
+        /// être affichés.
         /// </summary>
         private int? SubFamilyFilter;
         
         /// <summary>
-        /// Un filtre potentiellement nul définissant l'id de la marque que doivent avoir les articles pour
-        /// être affiché
+        /// Un filtre potentiellement null définissant l'id de la marque que doivent avoir les articles pour
+        /// être affichés.
         /// </summary>
         private int? BrandFilter;
 
         /// <summary>
-        /// Le type de donnée affiché dans la partie droite de l'écran
+        /// Le type de donnée affichée dans la partie droite de l'écran.
         /// </summary>
         private ActiveList ArticleViewOn = ActiveList.Unknown;
 
         /// <summary>
-        /// La dernière colonne à avoir été trié
+        /// La dernière colonne à avoir été triée.
         /// </summary>
         private ColumnHeader LastSortedColumn;
 
         /// <summary>
-        /// Index de la colonne contenant la quantité d'article
-        /// (on la garde car c'est la seul qui n'est pas triable)
+        /// Index de la colonne contenant la quantité d'article.
+        /// (on la garde car c'est la seule qui n'est pas triable)
         /// </summary>
         private const int COLUMN_QUANTITY = 4;
         
         /// <summary>
-        /// Créer la fênetre principale de l'application.
+        /// Crée la fênetre principale de l'application.
         /// </summary>
         public FormMain()
         {
@@ -78,7 +78,7 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Charge la liste correspondant au noeud passé en paramètre
+        /// Charge la liste correspondant au noeud passé en paramètre.
         /// </summary>
         /// <param name="TreeNodeSelected"></param>
         private void LoadCorrespondingList(TreeNode TreeNodeSelected)
@@ -86,57 +86,57 @@ namespace GestionBDDApp
             listView1.BeginUpdate();
             BrandFilter = null;
             SubFamilyFilter = null;
-            // si la liste est identique à la dernière, on ne change pas les colonnes
+            // si la liste est identique à la dernière, on ne change pas les colonnes.
             if (LastTreeNodeSelected != TreeNodeSelected)
             {
                 SupprColonne();
             }
             LastTreeNodeSelected = TreeNodeSelected;
-            // on reset la liste
+            // on reset la liste.
             listView1.Groups.Clear();
             listView1.SelectedItems.Clear();
             listView1.Items.Clear();
             
-            // Si aucun noeud n'est séléctioné on ne fait rien
+            // Si aucun noeud n'est séléctionné on ne fait rien.
             if (LastTreeNodeSelected == null) { }
-            // Si le noeud des articles est séléctioné
+            // Si le noeud des articles est séléctionné.
             if (TreeNodeSelected.Equals(AllArticles))
             {
-                // on charge les articles
+                // on charge les articles.
                 LoadArticles();
-                // on les affiches
+                // on les affiche.
                 DisplayArticlesWithFilter();
             }
             else
             {
-                // si le noeud parent des marques est séléctioné
+                // si le noeud parent des marques est séléctionné.
                 if (TreeNodeSelected.Equals(AllBrandNode))
                 {
-                    // on charge les marques
+                    // on charge les marques.
                     LoadBrands();
-                    // on les affiches
+                    // on les affiches.
                     DisplayBrandDescription();
                 }
-                // si le noeud parent des familles est séléctionné
+                // si le noeud parent des familles est séléctionné.
                 else if (TreeNodeSelected.Equals(AllFamilyNode))
                 {
-                    // on chage les familles
+                    // on charge les familles.
                     LoadFamilies();
-                    // on affiche les sous-familles
+                    // on affiche les sous-familles.
                     DisplayFamilyDescription();
                 }
                 else
                 {
                     var NodeParent = TreeNodeSelected.Parent;
                     if (NodeParent.Equals(AllBrandNode))
-                        // Une marque est séléctionnée
+                        // Une marque est séléctionnée.
                     {
-                        // on met à jour le filtre et on réaffiche les données
+                        // on met à jour le filtre et on réaffiche les données.
                         BrandFilter = (int?) TreeNodeSelected.Tag;
                         DisplayArticlesWithFilter();
                     }
                     else if (NodeParent.Equals(AllFamilyNode))
-                        // Une famille est séléctionnée
+                        // Une famille est séléctionnée.
                     {
                         // On charge les données de ses sous-familles et on affiches les données.
                         var FamilyId = ((int?) TreeNodeSelected.Tag).Value;
@@ -144,23 +144,23 @@ namespace GestionBDDApp
                         DisplaySubFamilyDescription(FamilyId);
                     }
                     else
-                        // Une sous-famille est séléctionnée
+                        // Une sous-famille est séléctionnée.
                     {
-                        // on met à jour le filtre et on réaffiche les données
+                        // on met à jour le filtre et on réaffiche les données.
                         SubFamilyFilter = (int?) TreeNodeSelected.Tag;
                         DisplayArticlesWithFilter();
                     }
                 }
             }
-            // On trie sur la première colonne
+            // On trie sur la première colonne.
             SortColumn(0);
             listView1.EndUpdate();
-            // On met à jour la barre de status
+            // On met à jour la barre de status.
             UpdateStatusBar();
         }
         
         /// <summary>
-        /// Met à jour la bare de status avec le nombre de ligne dans les différentes tables de la base
+        /// Met à jour la barre de status avec le nombre de ligne dans les différentes tables de la base.
         /// </summary>
         private void UpdateStatusBar()
         {
@@ -173,11 +173,11 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Affiches les familles chargées dans le modèle
+        /// Affiche les familles chargées dans le modèle.
         /// </summary>
         private void DisplayFamilyDescription()
         {
-            // On met à jour ce drapeau pour indiquer que l'on affiche des familles sur la droite de l'écran
+            // On met à jour ce drapeau pour indiquer que l'on affiche des familles sur la droite de l'écran.
             ArticleViewOn = ActiveList.Family;
             foreach (var Family in FamilyModel)
             {
@@ -186,11 +186,11 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Affiches les marques chargées dans le modèle
+        /// Affiche les marques chargées dans le modèle.
         /// </summary>
         private void DisplayBrandDescription()
         {
-            // On met à jour ce drapeau pour indiquer que l'on affiche des marques sur la droite de l'écran
+            // On met à jour ce drapeau pour indiquer que l'on affiche des marques sur la droite de l'écran.
             ArticleViewOn = ActiveList.Brand;
             foreach (var Brand in BrandModel)
             {
@@ -199,11 +199,11 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Affiches les sous-familles chargées dans le modèle
+        /// Affiche les sous-familles chargées dans le modèle.
         /// </summary>
         private void DisplaySubFamilyDescription(int Id)
         {
-            // On met à jour ce drapeau pour indiquer que l'on affiche des sous-familles sur la droite de l'écran
+            // On met à jour ce drapeau pour indiquer que l'on affiche des sous-familles sur la droite de l'écran.
             ArticleViewOn = ActiveList.Subfamily;
             foreach (var SubFamily in SubFamilyModel[Id])
             {
@@ -212,25 +212,25 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Affiches les articles chargés dans le modèle, si les filtres
+        /// Affiche les articles chargés dans le modèle, si les filtres
         /// (<see cref="BrandFilter"/>, <see cref="SubFamilyFilter"/>) ne sont pas null, les articles doivent les passer
         /// pour être affichés.
         /// </summary>
         private void DisplayArticlesWithFilter()
         {
-            // On met à jour ce drapeau pour indiquer que l'on affiche des articles sur la droite de l'écran
+            // On met à jour ce drapeau pour indiquer que l'on affiche des articles sur la droite de l'écran.
             ArticleViewOn = ActiveList.Article;
-            // On s'assure que les colonnes sont bien présentes
+            // On s'assure que les colonnes sont bien présentes.
             InserColonne();
             foreach (var Article in ArticlesModel)
             {
-                //On test le filtre de la marque
+                //On test le filtre de la marque.
                 if (! BrandFilter.HasValue || BrandFilter.Equals(Article.Marque.Id))
                 {
-                    //On test le filtre de la sous-famille
+                    //On test le filtre de la sous-famille.
                     if (! SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SousFamille.Id))
                     {
-                        //Les filtres sont passés, on affiche l'article
+                        //Les filtres sont passés, on affiche l'article.
                         listView1.Items.Add(
                             new ListViewItem(new [] {
                                 Article.Description, 
@@ -245,7 +245,7 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Charge les articles de la base dans le modèle
+        /// Charge les articles de la base dans le modèle.
         /// </summary>
         private void LoadArticles()
         {
@@ -253,12 +253,12 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Charge les marques de la base dans le modèle
+        /// Charge les marques de la base dans le modèle.
         /// </summary>
         private void LoadBrands()
         {
             BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
-            // On charge les noeuds des marques
+            // On charge les noeuds des marques.
             AllBrandNode.Nodes.Clear();
             foreach (var TreeNode in BrandModel.Select(Marque => new TreeNode(Marque.Nom) { Tag = Marque.Id }))
             {
@@ -268,12 +268,12 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Charge les Familles dans le modèle
+        /// Charge les Familles dans le modèle.
         /// </summary>
         private void LoadFamilies()
         {
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
-            // On sauvegarde les sous-familles déjà chargées
+            // On sauvegarde les sous-familles déjà chargées.
             var SubFamiliesToLoad = new List<int>();
             foreach (TreeNode Node in AllFamilyNode.Nodes)
             {
@@ -289,7 +289,7 @@ namespace GestionBDDApp
                 
                 var SubNode = new TreeNode(Family.Nom) { Tag = Family.Id.Value };
                 AllFamilyNode.Nodes.Add(SubNode);
-                // Si la sous-famille était précédement chargé, on la recharge
+                // Si la sous-famille était précédement chargée, on la recharge.
                 if (SubFamiliesToLoad.Contains(Family.Id.Value))
                 {
                     LoadSubFamily(SubNode, Family.Id.Value);
@@ -299,7 +299,7 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Charge les sous-amilles dans le modèle
+        /// Charge les sous-familles dans le modèle.
         /// </summary>
         private void LoadSubFamily(TreeNode ParentNode, int FamilyId)
         {
@@ -318,26 +318,26 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Tri la liste en fonction de la column d'index <paramref name="ColumnIndex"/>. Si la colonne est celle de la
-        /// quantité, rien ne se passe
+        /// Tri la liste en fonction de l'index de colonne <paramref name="ColumnIndex"/>. Si la colonne est la colonne
+        /// quantité, rien ne se passe.
         /// </summary>
-        /// <param name="ColumnIndex">Le numéro de la colonne sur laquelle trier</param>
+        /// <param name="ColumnIndex">Le numéro de la colonne sur laquelle trier.</param>
         private void SortColumn(int ColumnIndex)
         {
-            // si c'est la quantité on annule le tri
+            // si c'est la quantité on annule le tri.
             if (ColumnIndex == COLUMN_QUANTITY)
             {
                 return;
             }
 
-            // On enlève le symbole ▼ de la dernière colonne trié (si elle existe)
+            // On enlève le symbole ▼ de la dernière colonne trié (si elle existe).
             var SortedColumn = listView1.Columns[ColumnIndex];
             if (LastSortedColumn != null)
             {
                 LastSortedColumn.Text = LastSortedColumn.Text.Substring(2, LastSortedColumn.Text.Length - 2);
             }
 
-            // On créer des groupe alphabéthique en fonction de la colonne
+            // On créer des groupes alphabéthique en fonction de la colonne.
             foreach (ListViewItem ListView1Item in listView1.Items)
             {
                 var FirstLetter = ListView1Item.SubItems[ColumnIndex].Text.Substring(0, 1);
@@ -350,7 +350,7 @@ namespace GestionBDDApp
                 ListView1Item.Group = ListView1Group;
             }
 
-            // On tri les groupe et on ajoute à la colonne le triangle indiquant le sens du tri
+            // On tri les groupes et on ajoute à la colonne le triangle indiquant le sens du tri.
             var SortedGroup = new ListViewGroup[listView1.Groups.Count];
             listView1.Groups.CopyTo(SortedGroup, 0);
             listView1.Groups.Clear();
@@ -373,7 +373,7 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Recharge la liste en utilisant le dernier noeud séléctionné
+        /// Recharge la liste en utilisant le dernier noeud séléctionné.
         /// </summary>
         private void ReloadList()
         {
@@ -384,9 +384,9 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Ouvre le formulaire d'ajout d'un objet dans une nouvelle fenêtre
+        /// Ouvre le formulaire d'ajout d'un objet dans une nouvelle fenêtre.
         /// </summary>
-        /// <returns><code>DialogResult</code> le resultat de la fenêtre</returns>
+        /// <returns><code>DialogResult</code> le resultat de la fenêtre.</returns>
         private DialogResult OpenEditForm()
         {
             DialogResult Result;
@@ -436,10 +436,10 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Supprime l'élément passé en paramètre, après avoir validé une fenêtre de confirmation
+        /// Supprime l'élément passé en paramètre, après avoir validé une fenêtre de confirmation.
         /// </summary>
-        /// <param name="ItemToDelete">L'élément à supprimer</param>
-        /// <returns><code>DialogResult</code> le resultat de la fenêtre de confirmation</returns>
+        /// <param name="ItemToDelete">L'élément à supprimer.</param>
+        /// <returns><code>DialogResult</code> le resultat de la fenêtre de confirmation.</returns>
         private DialogResult Delete(ListViewItem ItemToDelete)
         {
             var Result = MessageBox.Show("Voulez vous supprimer cet article ?", "Confirmation", 
@@ -509,12 +509,12 @@ namespace GestionBDDApp
         //************************************************** EVENT **************************************************//
         
         /// <summary>
-        /// Ouvre le menu contextuelle au clique droit
-        /// Si aucun élément n'est séléctionné, on ne peut que ajouter un nouvel élément
-        /// sinon on peut ajouter un nouvel élément, modifier l'élément séléctionné ou le supprimer
+        /// Ouvre le menu contextuel au clique droit.
+        /// Si aucun élément n'est séléctionné, on ne peut que ajouter un nouvel élément.
+        /// Sinon on peut ajouter un nouvel élément, modifier l'élément séléctionné ou le supprimer.
         /// </summary>
-        /// <param name="Sender">Non utilisé</param>
-        /// <param name="Event">Les données de l'événement de clique</param>
+        /// <param name="Sender">Non utilisé.</param>
+        /// <param name="Event">Les données de l'événement de clique.</param>
         private void View_MouseDown(object Sender, MouseEventArgs Event)
         {
             if (Event.Button == MouseButtons.Right)
@@ -535,10 +535,10 @@ namespace GestionBDDApp
         
         /// <summary>
         /// Charge dans la <b>ListView</b> la liste des articles, marques, familles ou sous-familles en
-        /// fonction de l'objet selectioné dans la <b>TreeView</b>
+        /// fonction de l'objet selectionné dans la <b>TreeView</b>.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>TreeViewEventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>TreeViewEventArgs</b> contient l'événement.</param>
         private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
         {
             if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
@@ -551,8 +551,8 @@ namespace GestionBDDApp
         /// <summary>
         /// Ouvre la fenêtre de suppression de base.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void SupprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             var Result = MessageBox.Show("Cette action est irreversible, êtes vous certain de continuer ?",
@@ -570,8 +570,8 @@ namespace GestionBDDApp
         /// <summary>
         /// Sauvegarde la position de la fenêtre principale à la fermeture.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement.</param>
         private void FormMain_FormClosing(object Sender, FormClosingEventArgs Event)
         {
             Settings.Default.Left = Left;
@@ -583,14 +583,14 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Apellé au chargement du formulaire, récupère les dernières dimensions de l'application, initialiser les vues
-        /// et affiche toutes les articles
+        /// Fonction appelée au chargement du formulaire, récupère les dernières dimensions de l'application,
+        /// initialise les vues et affiche tous les articles.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement.</param>
         private void FormMain_Load(object Sender, EventArgs Event)
         {
-            // On récupère les dernière dimensions de l'application
+            // On récupère les dernières dimensions de l'application.
             Left = Settings.Default.Left;
             Top = Settings.Default.Top;
             Height = Settings.Default.Height;
@@ -610,10 +610,10 @@ namespace GestionBDDApp
         }
         
         /// <summary>
-        /// Apellé au clique sur une colonnes de la liste, lance un tri sur cette colonne
+        /// Fonction appelée au clique sur une colonne de la liste, lance un tri sur cette colonne.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>FormClosingEventArgs</b> contient l'événement.</param>
         private void listView1_ColumnClick(object Sender, ColumnClickEventArgs Event)
         {
             if (listView1.Sorting == SortOrder.Ascending)
@@ -628,11 +628,11 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Écoute les entrée clavier de l'utilisateur pour rafraichir la liste s'il appuie sur F5
+        /// Écoute les entrées clavier de l'utilisateur pour rafraichir la liste s'il appuie sur F5.
         /// </summary>
-        /// <param name="Message"><b>Message</b> inutilisé</param>
-        /// <param name="KeyData"><b>Keys</b> contient la touche qui viens d'être actionné</param>
-        /// <returns><c>true</c> si l'événement est consommé</returns>
+        /// <param name="Message"><b>Message</b> inutilisé.</param>
+        /// <param name="KeyData"><b>Keys</b> contient la touche qui vient d'être actionnée.</param>
+        /// <returns><c>true</c> si l'événement est consommé.</returns>
         protected override bool ProcessCmdKey(ref Message Message, Keys KeyData)
         {
             if (KeyData == Keys.F5)
@@ -644,11 +644,11 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Apellé au clique sur une des actions du menu contextuel, selon l'élément cliqué cette fonction va
-        /// ouvrir la fenetre d'ajout, celle d'édition, ou lancer la suppression de l'élément séléctionné.
+        /// Fonction appelée au clique sur une des actions du menu contextuel, selon l'élément cliqué cette
+        /// fonction va ouvrir la fenetre d'ajout, d'édition, ou lancer la suppression de l'élément séléctionné.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void contextMenu_Click(object Sender, ToolStripItemClickedEventArgs Event)
         {
             DialogResult Result;
@@ -673,10 +673,10 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Apellée quand l'utilisateur clique sur le bouton actualiser du menu fichier, actualise la vue
+        /// Fonction apelée quand l'utilisateur clique sur le bouton actualiser du menu fichier, actualise la vue.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void ActualiserToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             ReloadList();
@@ -685,8 +685,8 @@ namespace GestionBDDApp
         /// <summary>
         /// Ouvre la fenêtre d'import de base.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void importerToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (var ImporterMenu = new ImporterMenu())
@@ -703,8 +703,8 @@ namespace GestionBDDApp
         /// <summary>
         /// Ouvre la fenêtre d'export de base.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void exporterToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             using (var ExporterMenu = new ExporterMenu())
@@ -713,13 +713,13 @@ namespace GestionBDDApp
                 ExporterMenu.ShowDialog(this);
             }
         }
-        
+       
         /// <summary>
-        /// Apellé quand une touche clavier est appuyé avec alors que la liste a le focus, si la touche est 'Entrée' on
-        /// édite l'élément séléctionné, si c'est 'Suppr' on le supprime.
+        /// Fonction appelée quand une touche clavier est appuyée alors que le focus est sur la list,
+        /// si la touche est 'Entrée' on édite l'élément séléctionné, si c'est 'Suppr' on le supprime.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void listView1_KeyDown(object Sender, KeyEventArgs Event)
         {
             if (listView1.SelectedItems.Count > 0)
@@ -734,10 +734,10 @@ namespace GestionBDDApp
             }
         }
         /// <summary>
-        /// Apellé une élément de la liste est double-cliqué, on ouvre alors le menu d'édition
+        /// Fonction appelée quand un élément de la liste est double-cliqué, ouvre le menu d'édition.
         /// </summary>
-        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement</param>
-        /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
+        /// <param name="Sender"><b>Object</b> est l'objet qui a causé l'événement.</param>
+        /// <param name="Event"><b>EventArgs</b> contient l'événement.</param>
         private void OnListDoubleClick(object Sender, EventArgs Event)
         {
             OpenEditForm();
@@ -745,19 +745,19 @@ namespace GestionBDDApp
     }
     
     /// <summary>
-    /// Le type de liste pouvant être affichée sur le coté droit de la fenêtre
+    /// Le type de liste pouvant être affichée sur le coté droit de la fenêtre.
     /// </summary>
     public enum ActiveList
     {
-        //La liste des articles
+        //La liste des articles.
         Article,
-        //La liste des marques
+        //La liste des marques.
         Brand,
-        //La liste des familles
+        //La liste des familles.
         Family,
-        //La liste des sous-familles
+        //La liste des sous-familles.
         Subfamily,
-        //Etat de la liste inconnu
+        //Etat de la liste inconnu.
         Unknown
     }
 }
