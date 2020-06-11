@@ -8,22 +8,22 @@ namespace GestionBDDApp.data.dto
     public class ArticlesDto
     {
         /// <summary>
-        /// Référence unique de l'article (entre 5 et 8 caractères)
+        /// Référence unique de l'article (entre 3 et 8 caractères)
         /// </summary>
         public string ArticleRef { get; }
 
         /// <summary>
-        /// Description de l'article (entre 5 et 150 caractères)
+        /// Description de l'article (entre 3 et 150 caractères)
         /// </summary>
         public string Description { get; }
 
         /// <summary>
-        /// Nom de la sous famille de l'article
+        /// Nom de la sous famille de l'article (entre 3 et 50 caractères)
         /// </summary>
         public string SubFamilyName { get; }
 
         /// <summary>
-        /// Nom de la marque de l'article
+        /// Nom de la marque de l'article (entre 3 et 50 caractères)
         /// </summary>
         public string BrandName { get; }
 
@@ -33,7 +33,7 @@ namespace GestionBDDApp.data.dto
         public float Price { get; }
 
         /// <summary>
-        /// Nom de la famille de l'article
+        /// Nom de la famille de l'article (entre 3 et 50 caractères)
         /// </summary>
         public string FamilyName { get; }
 
@@ -61,11 +61,11 @@ namespace GestionBDDApp.data.dto
         /// Créer un nouvel <code>ArticleDto</code> à partir de paramètre sous la forme de chaîne de caractères.
         /// C'est ici que les condition métiers et techniques sur les Articles sont testées (longueurs des champs).
         /// </summary>
-        /// <param name="ArticleRef">La référence de l'article (entre 5 et 8 caractères)</param>
-        /// <param name="Description">La description de l'article (entre 5 et 150 caractères)</param>
-        /// <param name="FamilyName">Le nom de la famille de l'article</param>
-        /// <param name="SubFamilyName">Le nom de la sous famille de l'article</param>
-        /// <param name="BrandName">Le nom de la marque de l'article</param>
+        /// <param name="ArticleRef">La référence de l'article (entre 3 et 8 caractères)</param>
+        /// <param name="Description">La description de l'article (entre 3 et 150 caractères)</param>
+        /// <param name="FamilyName">Le nom de la famille de l'article (entre 3 et 50 caractères)</param>
+        /// <param name="SubFamilyName">Le nom de la sous famille de l'article (entre 3 et 50 caractères)</param>
+        /// <param name="BrandName">Le nom de la marque de l'article (entre 3 et 50 caractères)</param>
         /// <param name="PriceAsString">Le prix de l'article</param>
         /// <returns>Un nouvel <code>ArticleDto</code> initialisé</returns>
         /// <exception cref="ParsingException">Si le prix n'est pas correcte, ou que les paramètres ne satisfont pas les
@@ -75,27 +75,27 @@ namespace GestionBDDApp.data.dto
         {
             float ParsedPrice;
 
-            if (Description == null || Description.Length > 150 || Description.Length < 5)
+            if (Description == null || Description.Length > 150 || Description.Length < 3)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne description");
             }
             
-            if (ArticleRef == null || ArticleRef.Length > 8 || ArticleRef.Length < 5)
+            if (ArticleRef == null || ArticleRef.Length > 8 || ArticleRef.Length < 3)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne ref");
             }
             
-            if (FamilyName == null || FamilyName.Length > 50 || FamilyName.Length < 5)
+            if (FamilyName == null || FamilyName.Length > 50 || FamilyName.Length < 3)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne famille");
             }
             
-            if (SubFamilyName == null || SubFamilyName.Length > 50 || SubFamilyName.Length < 5)
+            if (SubFamilyName == null || SubFamilyName.Length > 50 || SubFamilyName.Length < 3)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne sous-famille");
             }
             
-            if (BrandName == null || BrandName.Length > 11 || BrandName.Length < 5)
+            if (BrandName == null || BrandName.Length > 50 || BrandName.Length < 3)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne marque");
             }

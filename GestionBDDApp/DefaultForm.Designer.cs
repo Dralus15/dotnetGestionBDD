@@ -104,7 +104,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.NotValidateButton);
             this.Controls.Add(this.ValidateButton);
-            this.Name = "DefaultForm";
+            this.Name = "AjoutFormAutre";
             this.ResumeLayout(false);
             this.PerformLayout();
         }

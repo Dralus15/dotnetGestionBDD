@@ -12,7 +12,7 @@
         public int? Id { get; set; }
 
         /// <summary>
-        /// Le nom de cette famille
+        /// Le nom de cette famille (entre 3 et 50 caractères)
         /// </summary>
         public string Nom { get; set; }
         
@@ -20,7 +20,7 @@
         /// Creer une nouvelle famille
         /// </summary>
         /// <param name="Id">L'id de la famille, null si cet object n'est pas encore enregistré en base</param>
-        /// <param name="Nom">Le nom de cette famille (entre 5 et 50 caractères)</param>
+        /// <param name="Nom">Le nom de cette famille (entre 3 et 50 caractères)</param>
         public Familles(int? Id, string Nom)
         {
             this.Id = Id;
