@@ -3,6 +3,7 @@ using GestionBDDApp.data.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace GestionBDDApp
@@ -138,10 +139,59 @@ namespace GestionBDDApp
         /// <param name="Event"><b>EventArgs</b> contient l'événement</param>
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
-            // On vérifie que tous les champs sont remplis //TODO better verification + deduplication
-            if (BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 
-                    && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 
-                    && QuantityBox.Value >= 0)
+            // On vérifie que tous les champs sont remplis //TODO deduplication
+            var ErrorBuilder = new StringBuilder();
+            if (BrandComboBox.SelectedIndex == -1)
+            {
+                ErrorBuilder.AppendLine("Il faut choisir une marque !");
+            }
+
+            if (SubFamillyComboBox.SelectedIndex == -1)
+            {
+                ErrorBuilder.AppendLine("Il faut choisir une sous famille !");
+            }
+            
+            if (FamillyComboBox.SelectedIndex == -1)
+            {
+                ErrorBuilder.AppendLine("Il faut choisir une famille !");
+            }
+
+            if (PriceBox.Value < 0)
+            {
+                ErrorBuilder.AppendLine("Le prix ne peux pas être négatif");
+            }
+            
+            if (PriceBox.Value > int.MaxValue)
+            {
+                ErrorBuilder.AppendLine("Le prix est trop élevé");
+            }
+            
+            if (QuantityBox.Value < 0)
+            {
+                ErrorBuilder.AppendLine("La quantité ne peux pas être négative");
+            }
+
+            if (QuantityBox.Value > int.MaxValue)
+            {
+                ErrorBuilder.AppendLine("La quantité est trop élevée");
+            }
+
+            var Description = DescriptionBox.Text.Trim();
+            if (Description.Length > 150 || Description.Length < 5)
+            {
+                ErrorBuilder.AppendLine(
+                    "La description doit faire entre 5 et 150 caractères (espace avant et après non-inclus)");
+            }
+            
+            var Ref = ReferenceBox.Text.Trim();
+            if (Ref.Length > 8 || Ref.Length < 5)
+            {
+                ErrorBuilder.AppendLine(
+                    "La référence doit faire entre 5 et 8 caractères (espace avant et après non-inclus)");
+            }
+
+            var Error = ErrorBuilder.ToString();
+            if (Error.Length == 0)
             {
                 // Si il y a un article, on le modifie et l'enregistre
                 if (Article != null)
@@ -152,21 +202,22 @@ namespace GestionBDDApp
                     Article.Marque = (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value;
                     Article.SousFamille = (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value;
                     DaoRegistery.GetInstance.DaoArticle.Update(Article);
-                    Console.WriteLine("Modifcation de : " + Article.Description);
                 }
                 // Sinon on créer un article et on l'enregistre
                 else
                 {
                     Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, (float) PriceBox.Value, (int) QuantityBox.Value);
                     DaoRegistery.GetInstance.DaoArticle.Create(Article);
-                    Console.WriteLine("Création de : " + Article.Description);
                 }
                 DialogResult = DialogResult.OK;
                 Close();
             }
-            // On affiche un message d'erreur s'il y a un champ vide
+            // On affiche un message d'erreur s'il y a des erreurs
             else
-                MessageBox.Show("Veillez remplir tous les champs", "Error", MessageBoxButtons.OK);
+            {
+                MessageBox.Show("Les champs suivants sont en erreur dans le formulaire : \n\n" + Error + 
+                                "\nCorriger ces erreurs avant de sauvegarder.", "Error", MessageBoxButtons.OK);
+            }
         }
     }
 

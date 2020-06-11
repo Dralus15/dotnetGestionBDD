@@ -65,8 +65,8 @@ namespace GestionBDDApp
             if (File.Exists(Path))
             {
                 var ConfirmResult =  MessageBox.Show(
-                    "Un fichier de ce nom existe déjà à cet emplacement, cette opération va l'écraser, voulez-vous continuer ?",
-                    "Confirmation",
+                    "Un fichier de ce nom existe déjà à cet emplacement, cette opération va l'écraser, " +
+                    "voulez-vous continuer ?", "Confirmation",
                     MessageBoxButtons.YesNo);
                 // Si l'utilisateur ne veut pas écraser le fichier existat, on annule
                 if (ConfirmResult != DialogResult.Yes) return;
@@ -78,7 +78,8 @@ namespace GestionBDDApp
                 foreach (var Articles in DaoArticle.GetAll())
                 {
                     Writer.WriteLine(
-                        $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
+                        $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" + 
+                        $"{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
                 }
             }
             // On confirme à l'utilisateur que l'export

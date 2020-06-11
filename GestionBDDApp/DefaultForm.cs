@@ -1,6 +1,7 @@
 ﻿using GestionBDDApp.data.dao;
 using GestionBDDApp.data.model;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace GestionBDDApp
@@ -121,57 +122,65 @@ namespace GestionBDDApp
         private void ValidateButton_Click(object Sender, EventArgs Event)
         {
             // On vérifie que le champs de description est rempli
-            if ( NameBox.TextLength > 0 )
+            var ErrorBuilder = new StringBuilder();
+            var Description = NameBox.Text.Trim();
+            if (Description.Length > 50 || Description.Length < 5)
+            {
+                ErrorBuilder.AppendLine(
+                    "La description doit faire entre 5 et 150 caractères (espace avant et après non-inclus)");
+            }
+            var Error = ErrorBuilder.ToString();
+            if ( Error.Length == 0 )
             {
                 switch (Type)
                 {
                     case ActiveList.Brand:
+                    {
+                        // Si l'id a une valeur, on modifie le nom de la marque
+                        if (Id.HasValue)
                         {
-                            // Si l'id a une valeur, on modifie le nom de la marque
-                            if (Id.HasValue)
-                            {
-                                Brand.Nom = NameBox.Text;
-                            }
-                            // Sinon, on crée la marque
-                            else
-                            {
-                                Brand = new Marques(null, NameBox.Text);
-                            }
-                            DaoRegistery.GetInstance.DaoMarque.Save(Brand);
-                            break;
+                            Brand.Nom = NameBox.Text;
                         }
+                        // Sinon, on crée la marque
+                        else
+                        {
+                            Brand = new Marques(null, NameBox.Text);
+                        }
+                        DaoRegistery.GetInstance.DaoMarque.Save(Brand);
+                        break;
+                    }
                     case ActiveList.Family:
+                    {
+                        // Si l'id a une valeur, on modifie le nom de la famille
+                        if (Id.HasValue)
                         {
-                            // Si l'id a une valeur, on modifie le nom de la famille
-                            if (Id.HasValue)
-                            {
-                                Family.Nom = NameBox.Text;
-                            }
-                            // Sinon, on crée la famille
-                            else
-                            {
-                                Family = new Familles(Id, NameBox.Text);
-                            }
+                            Family.Nom = NameBox.Text;
+                        }
+                        // Sinon, on crée la famille
+                        else
+                        {
+                            Family = new Familles(Id, NameBox.Text);
+                        }
 
-                            DaoRegistery.GetInstance.DaoFamille.Save(Family);
-                            break;
-                        }
+                        DaoRegistery.GetInstance.DaoFamille.Save(Family);
+                        break;
+                    }
                     case ActiveList.Subfamily:
+                    {
+                        // Si l'id a une valeur, on modifie le nom de la sous-famille et la famille
+                        if (Id.HasValue)
                         {
-                            // Si l'id a une valeur, on modifie le nom de la sous-famille et la famille
-                            if (Id.HasValue)
-                            {
-                                SubFamily.Nom = NameBox.Text;
-                                SubFamily.Famille = (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value;
-                            }
-                            // Sinon, on crée la sous-famille
-                            else
-                            {
-                                SubFamily = new SousFamilles(Id, (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value, NameBox.Text);
-                            }
-                            DaoRegistery.GetInstance.DaoSousFamille.Save(SubFamily);
-                            break;
+                            SubFamily.Nom = NameBox.Text;
+                            SubFamily.Famille = (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value;
                         }
+                        // Sinon, on crée la sous-famille
+                        else
+                        {
+                            SubFamily = new SousFamilles(Id, (Familles)((ComboBoxItem)FamillyComboBox.SelectedItem).Value, NameBox.Text);
+                        }
+                        DaoRegistery.GetInstance.DaoSousFamille.Save(SubFamily);
+                        break;
+                    }
                 }
                 DialogResult = DialogResult.OK;
                 Close();
@@ -179,7 +188,8 @@ namespace GestionBDDApp
             // On affiche un message d'erreur s'il y a un champ vide
             else
             {
-                MessageBox.Show("Veillez remplir tous les champs", "Error", MessageBoxButtons.OK);
+                MessageBox.Show("Les champs suivants sont en erreur dans le formulaire : \n\n" + Error + 
+                                "\nCorriger ces erreurs avant de sauvegarder.", "Error", MessageBoxButtons.OK);
             }
         }
 
