@@ -14,6 +14,7 @@ namespace GestionBDDApp
             InitializeComponent();
             LoadItems();
             DisplayItems();
+            Text = "Formulaire de création d'un article";
         }
 
         public AjoutForm(string IdArticle)
@@ -29,6 +30,7 @@ namespace GestionBDDApp
             BrandComboBox.Text = Article.Marque.Nom;
             FamillyComboBox.Text = Article.SousFamille.Famille.Nom;
             SubFamillyComboBox.Text = Article.SousFamille.Nom;
+            Text = "Formulaire de modification d'un article";
         }
 
         private Articles Article;

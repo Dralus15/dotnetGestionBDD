@@ -217,7 +217,6 @@ namespace GestionBDDApp
             this.Controls.Add(this.FamillyComboBox);
             this.Controls.Add(this.BrandComboBox);
             this.Name = "AjoutForm";
-            this.Text = "Ajout/Modification";
             ((System.ComponentModel.ISupportInitialize) (this.PriceBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize) (this.QuantityBox)).EndInit();
             this.ResumeLayout(false);

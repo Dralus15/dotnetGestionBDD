@@ -24,6 +24,7 @@ namespace GestionBDDApp
         public AjoutFormAutre(ActiveList Type) //TODO encapsulation
         {
             InitializeComponent();
+            this.Text = "Formulaire de création";
             if (Type == ActiveList.Subfamily)
             {
                 FamillyComboBox.Visible = true;
@@ -36,6 +37,7 @@ namespace GestionBDDApp
         public AjoutFormAutre(ActiveList Type, int? Id)
         {
             InitializeComponent();
+            this.Text = "Formulaire de modification";
             type = Type;
             this.Id = Id;
             switch (Type)
@@ -59,18 +61,19 @@ namespace GestionBDDApp
                         break;
                     }
                 case ActiveList.Subfamily:
-                    if (Id.HasValue)
-                    {
-                        SubFamily = DaoRegistery.GetInstance.DaoSousFamille.GetSousFamilleById(Id.Value);
-                        DescriptionBox.Text = SubFamily.Nom;
-                    }
-                    FamillyComboBox.Visible = true;
-                    label2.Visible = true;
                     FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
                     foreach (var Family in FamilyModel)
                     {
                         FamillyComboBox.Items.Add(new ComboBoxItem(Family.Nom, Family));
                     }
+                    if (Id.HasValue)
+                    {
+                        SubFamily = DaoRegistery.GetInstance.DaoSousFamille.GetSousFamilleById(Id.Value);
+                        DescriptionBox.Text = SubFamily.Nom;
+                        FamillyComboBox.Text = SubFamily.Famille.Nom;
+                    }
+                    FamillyComboBox.Visible = true;
+                    label2.Visible = true;
                     break;
             }
         }
