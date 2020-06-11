@@ -167,7 +167,9 @@ namespace GestionBDDApp
             // 
             // PriceBox
             // 
+            this.PriceBox.DecimalPlaces = 2;
             this.PriceBox.Location = new System.Drawing.Point(199, 302);
+            this.PriceBox.Maximum = new decimal(new int[] {10000000, 0, 0, 0});
             this.PriceBox.Name = "PriceBox";
             this.PriceBox.Size = new System.Drawing.Size(137, 20);
             this.PriceBox.TabIndex = 5;
@@ -175,6 +177,7 @@ namespace GestionBDDApp
             // QuantityBox
             // 
             this.QuantityBox.Location = new System.Drawing.Point(199, 354);
+            this.QuantityBox.Maximum = new decimal(new int[] {10000, 0, 0, 0});
             this.QuantityBox.Name = "QuantityBox";
             this.QuantityBox.Size = new System.Drawing.Size(137, 20);
             this.QuantityBox.TabIndex = 6;

@@ -55,12 +55,22 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Lance l'import.
+        /// Lance l'import. Le formulaire est mis en mode attente le temps du traitement
         /// </summary>
         /// <param name="ShouldEraseBase"><c>true</c> si la base doit être supprimée avant l'import.</param>
         private async void Import(bool ShouldEraseBase)
         {
             SetBusy(true);
+            await PerformImport(ShouldEraseBase);
+            SetBusy(false);
+        }
+        
+        /// <summary>
+        /// Lance l'import.
+        /// </summary>
+        /// <param name="ShouldEraseBase"><c>true</c> si la base doit être supprimée avant l'import.</param>
+        private async Task PerformImport(bool ShouldEraseBase)
+        {
             var ChosenFilePath = PathChoosedFile.Text;
             if (ChosenFilePath.Length != 0) {
                 try
@@ -200,7 +210,6 @@ namespace GestionBDDApp
             {
                 MessageBox.Show("Veuillez choisir un fichier", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            SetBusy(false);
         }
 
         /// <summary>

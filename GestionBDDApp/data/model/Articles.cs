@@ -6,12 +6,12 @@
     public class Articles
     {
         /// <summary>
-        /// Une référence unique (entre 3 et 8 caractères).
+        /// Une référence unique (entre 1 et 8 caractères).
         /// </summary>
         public string RefArticle { get; }
 
         /// <summary>
-        /// Une description de l'article (entre 3 et 150 caractères).
+        /// Une description de l'article (entre 1 et 150 caractères).
         /// </summary>
         public string Description { get; set; }
 
@@ -39,7 +39,7 @@
         /// Crée un article avec les valeurs passées en paramètres.
         /// </summary>
         /// <param name="RefArticle">Une référence unique (entre 3 et 8 caractères).</param>
-        /// <param name="Description">Une description de l'article (entre 3 et 150 caractères).</param>
+        /// <param name="Description">Une description de l'article (entre 1 et 150 caractères).</param>
         /// <param name="SubFamily">Une sous-famille.</param>
         /// <param name="Marque">La marque de l'article.</param>
         /// <param name="Price">Le prix de l'article (float >= 0).</param>

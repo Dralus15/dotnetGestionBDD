@@ -124,10 +124,10 @@ namespace GestionBDDApp
             // On vérifie que le champs de description est rempli.
             var ErrorBuilder = new StringBuilder();
             var Description = NameBox.Text.Trim();
-            if (Description.Length > 50 || Description.Length < 5)
+            if (Description.Length > 50 || Description.Length < 1)
             {
                 ErrorBuilder.AppendLine(
-                    "La description doit faire entre 5 et 150 caractères (espace avant et après non-inclus)");
+                    "La description doit faire entre 1 et 150 caractères (espace avant et après non-inclus)");
             }
             var Error = ErrorBuilder.ToString();
             if ( Error.Length == 0 )

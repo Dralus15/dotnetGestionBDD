@@ -180,10 +180,10 @@ namespace GestionBDDApp
             }
 
             var Description = DescriptionBox.Text.Trim();
-            if (Description.Length > 150 || Description.Length < 5)
+            if (Description.Length > 150 || Description.Length < 1)
             {
                 ErrorBuilder.AppendLine(
-                    "La description doit faire entre 5 et 150 caractères (espace avant et après non-inclus)");
+                    "La description doit faire entre 1 et 150 caractères (espace avant et après non-inclus)");
             }
             
             var Ref = ReferenceBox.Text.Trim();
