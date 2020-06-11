@@ -98,7 +98,7 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE Nom = '@name'", Connection))
+                using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE Nom = @name", Connection))
                 {
                     Command.Parameters.AddWithValue("@name", FamilleName);
                     using (var Reader = Command.ExecuteReader())

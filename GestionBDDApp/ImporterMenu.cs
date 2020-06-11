@@ -172,23 +172,17 @@ namespace GestionBDDApp
                             // on onleve les doublons de la liste des articles à sauvegarder
                             if (NamesakeStrategyChosen == NamesakeStrategy.Ignore)
                             {
-                                foreach (var Articles in NewArticles)
+                                var KeysToRemove = new List<string>();
+                                foreach (var ArticleNameSakePair in NewArticles)
                                 {
-                                    if (Articles.Key != null)
+                                    if (ArticleNameSakePair.Value.Second != null)
                                     {
-                                        var KeysToRemove = new List<string>();
-                                        foreach (var ArticleNameSakePair in NewArticles)
-                                        {
-                                            if (ArticleNameSakePair.Value.Second != null)
-                                            {
-                                                KeysToRemove.Add(ArticleNameSakePair.Key);
-                                            }
-                                        }
-                                        foreach (var Key in KeysToRemove)
-                                        {
-                                            NewArticles.Remove(Key);
-                                        }
+                                        KeysToRemove.Add(ArticleNameSakePair.Key);
                                     }
+                                }
+                                foreach (var Key in KeysToRemove)
+                                {
+                                    NewArticles.Remove(Key);
                                 }
                             }
                         }
@@ -374,7 +368,7 @@ namespace GestionBDDApp
                     }
                 }
 
-                var SubFamilyName = ArticlesDto.FamilyName;
+                var SubFamilyName = ArticlesDto.SubFamilyName;
                 if (!NewSubFamilies.ContainsKey(SubFamilyName))
                 {
                     var SubFamilyNameSake = SubFamilyDao.GetSubFamiliesByName(SubFamilyName);
@@ -526,11 +520,27 @@ namespace GestionBDDApp
         Ignore
     }
     
+    /// <summary>
+    /// Conteneur mutable pour stocker 2 objects.
+    /// </summary>
+    /// <typeparam name="T1">Le type de l'objet 1.</typeparam>
+    /// <typeparam name="T2">Le type de l'objet 2.</typeparam>
     internal class Pair<T1, T2>
     {
+        /// <summary>
+        /// L'object 1
+        /// </summary>
         public T1 First { get; set; }
+        /// <summary>
+        /// L'object 2
+        /// </summary>
         public T2 Second { get; set; }
 
+        /// <summary>
+        /// Constucteur de ce conteneur à 2 places.
+        /// </summary>
+        /// <param name="First">le premier object.</param>
+        /// <param name="Second">le deuxieme object.</param>
         public Pair(T1 First, T2 Second)
         {
             this.First = First;

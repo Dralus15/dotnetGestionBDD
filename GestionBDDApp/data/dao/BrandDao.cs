@@ -166,7 +166,7 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE Nom = '@name'", Connection))
+                using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE Nom = @name", Connection))
                 {
                     Command.Parameters.AddWithValue("@name", BrandName);
                     using (var Reader = Command.ExecuteReader())
