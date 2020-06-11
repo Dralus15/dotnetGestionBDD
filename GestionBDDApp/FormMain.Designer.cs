@@ -63,12 +63,12 @@ namespace GestionBDDApp
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ToolStripMenuItem SupprimerLaBaseToolStripMenuItem;
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.actualiserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exporterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.supprimerLaBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ActuliserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImporterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExporterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -83,6 +83,7 @@ namespace GestionBDDApp
             this.ajoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.suppressionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            SupprimerLaBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize) (this.splitContainer1)).BeginInit();
@@ -91,6 +92,13 @@ namespace GestionBDDApp
             this.splitContainer1.SuspendLayout();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // SupprimerLaBaseToolStripMenuItem
+            // 
+            SupprimerLaBaseToolStripMenuItem.Name = "SupprimerLaBaseToolStripMenuItem";
+            SupprimerLaBaseToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            SupprimerLaBaseToolStripMenuItem.Text = "Supprimer la base";
+            SupprimerLaBaseToolStripMenuItem.Click += new System.EventHandler(this.SupprimerLaBaseToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -103,38 +111,31 @@ namespace GestionBDDApp
             // 
             // fichierToolStripMenuItem
             // 
-            this.fichierToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.actualiserToolStripMenuItem, this.importerToolStripMenuItem, this.exporterToolStripMenuItem, this.supprimerLaBaseToolStripMenuItem});
+            this.fichierToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.ActuliserToolStripMenuItem, this.ImporterToolStripMenuItem, this.ExporterToolStripMenuItem, SupprimerLaBaseToolStripMenuItem});
             this.fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
             this.fichierToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
             this.fichierToolStripMenuItem.Text = "Fichier";
             // 
-            // actualiserToolStripMenuItem
+            // ActuliserToolStripMenuItem
             // 
-            this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
-            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.actualiserToolStripMenuItem.Text = "Actualiser";
-            this.actualiserToolStripMenuItem.Click += new System.EventHandler(this.ActualiserToolStripMenuItem_Click);
+            this.ActuliserToolStripMenuItem.Name = "ActuliserToolStripMenuItem";
+            this.ActuliserToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.ActuliserToolStripMenuItem.Text = "Actualiser";
+            this.ActuliserToolStripMenuItem.Click += new System.EventHandler(this.ActualiserToolStripMenuItem_Click);
             // 
-            // importerToolStripMenuItem
+            // ImporterToolStripMenuItem
             // 
-            this.importerToolStripMenuItem.Name = "importerToolStripMenuItem";
-            this.importerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.importerToolStripMenuItem.Text = "Importer";
-            this.importerToolStripMenuItem.Click += new System.EventHandler(this.importerToolStripMenuItem_Click);
+            this.ImporterToolStripMenuItem.Name = "ImporterToolStripMenuItem";
+            this.ImporterToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.ImporterToolStripMenuItem.Text = "Importer";
+            this.ImporterToolStripMenuItem.Click += new System.EventHandler(this.importerToolStripMenuItem_Click);
             // 
-            // exporterToolStripMenuItem
+            // ExporterToolStripMenuItem
             // 
-            this.exporterToolStripMenuItem.Name = "exporterToolStripMenuItem";
-            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.exporterToolStripMenuItem.Text = "Exporter";
-            this.exporterToolStripMenuItem.Click += new System.EventHandler(this.exporterToolStripMenuItem_Click);
-            // 
-            // supprimerLaBaseToolStripMenuItem
-            // 
-            this.supprimerLaBaseToolStripMenuItem.Name = "supprimerLaBaseToolStripMenuItem";
-            this.supprimerLaBaseToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.supprimerLaBaseToolStripMenuItem.Text = "Supprimer la base";
-            this.supprimerLaBaseToolStripMenuItem.Click += new System.EventHandler(this.SupprimerLaBaseToolStripMenuItem_Click);
+            this.ExporterToolStripMenuItem.Name = "ExporterToolStripMenuItem";
+            this.ExporterToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.ExporterToolStripMenuItem.Text = "Exporter";
+            this.ExporterToolStripMenuItem.Click += new System.EventHandler(this.exporterToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -268,14 +269,14 @@ namespace GestionBDDApp
             this.PerformLayout();
         }
 
-        private System.Windows.Forms.ToolStripMenuItem actualiserToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ActuliserToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ajoutToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenu;
         private System.Windows.Forms.ColumnHeader Description;
-        private System.Windows.Forms.ToolStripMenuItem exporterToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ExporterToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader Familles;
         private System.Windows.Forms.ToolStripMenuItem fichierToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ImporterToolStripMenuItem;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ColumnHeader Marques;
         private System.Windows.Forms.MenuStrip menuStrip1;
@@ -286,7 +287,6 @@ namespace GestionBDDApp
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StatusText;
         private System.Windows.Forms.ToolStripMenuItem suppressionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem supprimerLaBaseToolStripMenuItem;
         private System.Windows.Forms.TreeView treeView1;
 
         #endregion
