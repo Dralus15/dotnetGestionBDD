@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -67,16 +67,16 @@
   <ItemGroup>
     <Compile Include="data\csv\CSVReader.cs" />
     <Compile Include="data\dao\AbstractDao.cs" />
-    <Compile Include="data\dao\DAOArticle.cs" />
-    <Compile Include="data\dao\DAOFamille.cs" />
-    <Compile Include="data\dao\DAOMarque.cs" />
-    <Compile Include="data\dao\DaoRegistery.cs" />
-    <Compile Include="data\dao\DAOSousFamille.cs" />
+    <Compile Include="data\dao\ArticleDao.cs" />
+    <Compile Include="data\dao\FamilyDao.cs" />
+    <Compile Include="data\dao\BrandDao.cs" />
+    <Compile Include="data\dao\DaoRegistry.cs" />
+    <Compile Include="data\dao\SubFamilyDao.cs" />
     <Compile Include="data\dto\ArticlesDto.cs" />
     <Compile Include="data\model\Articles.cs" />
-    <Compile Include="data\model\Familles.cs" />
+    <Compile Include="data\model\Family.cs" />
     <Compile Include="data\model\Marques.cs" />
-    <Compile Include="data\model\SousFamilles.cs" />
+    <Compile Include="data\model\SubFamily.cs" />
     <Compile Include="data\ParsingException.cs" />
     <Compile Include="data\utils\CollectionsUtils.cs" />
     <Compile Include="ExporterMenu.cs">
