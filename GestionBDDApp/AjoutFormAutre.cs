@@ -1,13 +1,6 @@
 ﻿using GestionBDDApp.data.dao;
 using GestionBDDApp.data.model;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GestionBDDApp
@@ -18,13 +11,12 @@ namespace GestionBDDApp
         private int? Id;
         private Marques Brand;
         private Familles Family;
-        private List<Familles> FamilyModel = new List<Familles>();
         private SousFamilles SubFamily;
         private ActiveList type;
         public AjoutFormAutre(ActiveList Type) //TODO encapsulation
         {
             InitializeComponent();
-            this.Text = "Formulaire de création";
+            Text = "Formulaire de création";
             if (Type == ActiveList.Subfamily)
             {
                 FamillyComboBox.Visible = true;
@@ -37,7 +29,7 @@ namespace GestionBDDApp
         public AjoutFormAutre(ActiveList Type, int? Id)
         {
             InitializeComponent();
-            this.Text = "Formulaire de modification";
+            Text = "Formulaire de modification";
             type = Type;
             this.Id = Id;
             switch (Type)
@@ -61,8 +53,7 @@ namespace GestionBDDApp
                         break;
                     }
                 case ActiveList.Subfamily:
-                    FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
-                    foreach (var Family in FamilyModel)
+                    foreach (var Family in DaoRegistery.GetInstance.DaoFamille.GetAllFamilles())
                     {
                         FamillyComboBox.Items.Add(new ComboBoxItem(Family.Nom, Family));
                     }
@@ -126,6 +117,7 @@ namespace GestionBDDApp
                             break;
                         }
                 }
+                DialogResult = DialogResult.OK;
                 Close();
             }
             else
@@ -136,6 +128,7 @@ namespace GestionBDDApp
 
         private void NotValidateButton_Click(object Sender, EventArgs Event)
         {
+            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

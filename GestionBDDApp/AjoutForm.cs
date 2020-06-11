@@ -74,6 +74,7 @@ namespace GestionBDDApp
         }
         private void CancelButton_Click(object Sender, EventArgs Event)
         {
+            DialogResult = DialogResult.Cancel;
             Close();
         }
 
@@ -97,6 +98,7 @@ namespace GestionBDDApp
                     DaoRegistery.GetInstance.DaoArticle.Create(Article);
                     Console.WriteLine("Création de : " + Article.Description);
                 }
+                DialogResult = DialogResult.OK;
                 Close();
             }
             else

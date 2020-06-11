@@ -29,7 +29,11 @@ namespace GestionBDDApp
             using (var ImporterMenu = new ImporterMenu())
             {
                 ImporterMenu.StartPosition = FormStartPosition.CenterParent;
-                ImporterMenu.ShowDialog(this);
+                var Result = ImporterMenu.ShowDialog(this);
+                if (Result == DialogResult.OK)
+                {
+                    ReloadList();
+                }
             }
         }
         
@@ -98,12 +102,17 @@ namespace GestionBDDApp
 
         private void LoadCorrespondingList(TreeNode TreeNodeSelected)
         {
-            LastTreeNodeSelected = TreeNodeSelected;
+            listView1.BeginUpdate();
             BrandFilter = null;
             SubFamilyFilter = null;
-            SupprColonne();
+            if (LastTreeNodeSelected != TreeNodeSelected)
+            {
+                SupprColonne();
+            }
+            LastTreeNodeSelected = TreeNodeSelected;
             listView1.Groups.Clear();
             listView1.SelectedItems.Clear();
+            if (LastTreeNodeSelected == null) { }
             if (TreeNodeSelected.Equals(AllArticles))
             {
                 LoadArticles();
@@ -146,6 +155,7 @@ namespace GestionBDDApp
                 }
             }
             SortColumn(0);
+            listView1.EndUpdate();
             UpdateStatusBar();
         }
 
@@ -360,7 +370,7 @@ namespace GestionBDDApp
                 var ListView1Group = listView1.Groups[FirstLetter.ToLower()];
                 if (ListView1Group == null)
                 {
-                    listView1.Groups.Add(ListView1Group = new ListViewGroup(FirstLetter.ToLower(), FirstLetter));
+                    listView1.Groups.Add(ListView1Group = new ListViewGroup(FirstLetter.ToLower(), FirstLetter.ToUpper()));
                 }
 
                 ListView1Item.Group = ListView1Group;
@@ -392,6 +402,7 @@ namespace GestionBDDApp
             if (KeyData == Keys.F5)
             {
                 ReloadList();
+                return true;
             }
             return base.ProcessCmdKey(ref Message, KeyData);
         }
@@ -411,102 +422,140 @@ namespace GestionBDDApp
 
         private void contextMenu_Click(object Sender, ToolStripItemClickedEventArgs Event)
         {
-            string ArticleId;
-            int Id;
+            DialogResult Result;
+            contextMenu.Hide();
             switch (Event.ClickedItem.Text)
             {
                 case "Ajout":
-                    if (ActiveList.Article == ArticleViewOn)
-                        using (AjoutForm AjoutFormulaire = new AjoutForm())
-                        {
-                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                            AjoutFormulaire.ShowDialog(this);
-                        }
-                    else
-                    {
-                        using (AjoutFormAutre AjoutFormulaire = new AjoutFormAutre(ArticleViewOn))
-                        {
-                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                            AjoutFormulaire.ShowDialog(this);
-                        }
-                    }
+                    Result = OpenAddForm();
                     break;
                 case "Modification":
-                    if (ActiveList.Article == ArticleViewOn)
-                    {
-                        ArticleId = (string)listView1.FocusedItem.Tag;
-                        using (AjoutForm AjoutFormulaire = new AjoutForm(ArticleId))
-                            {
-                                AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                                AjoutFormulaire.ShowDialog(this);
-                            }
-                    }
-                        
-                    else
-                    {
-                        Id = (int)listView1.FocusedItem.Tag;
-                        using (AjoutFormAutre AjoutFormulaire = new AjoutFormAutre(ArticleViewOn, Id))
-                        {
-                            AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
-                            AjoutFormulaire.ShowDialog(this);
-                        }
-                    }
+                    Result = OpenEditForm();
                     break;
                 case "Suppression":
-                    DialogResult result = MessageBox.Show("Voulez vous supprimer cet article ?", "Confirmation", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
-                        Delete(listView1.FocusedItem);
+                    Result = Delete(listView1.FocusedItem);
                     break;
-                case null: break;
+                default: Result = DialogResult.None; break;
+            }
+            if (Result == DialogResult.OK)
+            {
+                ReloadList();
             }
         }
 
-        private void Delete(ListViewItem ItemToDelete)
+        private DialogResult OpenEditForm()
         {
-            try
+            DialogResult Result;
+            if (ActiveList.Article == ArticleViewOn)
             {
-                if (ActiveList.Article == ArticleViewOn)
+                var ArticleId = (string) listView1.FocusedItem.Tag;
+                using (var AjoutFormulaire = new AjoutForm(ArticleId))
                 {
-                    var ArticleId = (string) ItemToDelete.Tag;
-                    DaoRegistery.GetInstance.DaoArticle.Delete(ArticleId);
+                    AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                    Result = AjoutFormulaire.ShowDialog(this);
                 }
-                else
+            }
+            else
+            {
+                var Id = (int) listView1.FocusedItem.Tag;
+                using (var AjoutFormulaire = new AjoutFormAutre(ArticleViewOn, Id))
                 {
-                    var Id = (int) ItemToDelete.Tag;
-                    switch (ArticleViewOn)
+                    AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                    Result = AjoutFormulaire.ShowDialog(this);
+                }
+            }
+
+            return Result;
+        }
+
+        private DialogResult OpenAddForm()
+        {
+            DialogResult Result;
+            if (ActiveList.Article == ArticleViewOn)
+            {
+                using (var AjoutFormulaire = new AjoutForm())
+                {
+                    AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                    Result = AjoutFormulaire.ShowDialog(this);
+                }
+            }
+            else
+            {
+                using (var AjoutFormulaire = new AjoutFormAutre(ArticleViewOn))
+                {
+                    AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
+                    Result = AjoutFormulaire.ShowDialog(this);
+                }
+            }
+
+            return Result;
+        }
+
+        private DialogResult Delete(ListViewItem ItemToDelete)
+        {
+            var Result = MessageBox.Show("Voulez vous supprimer cet article ?", "Confirmation", 
+                MessageBoxButtons.YesNo);
+            if (Result == DialogResult.Yes)
+            {
+                try
+                {
+                    if (ActiveList.Article == ArticleViewOn)
                     {
-                        case ActiveList.Brand:
+                        var ArticleId = (string) ItemToDelete.Tag;
+                        DaoRegistery.GetInstance.DaoArticle.Delete(ArticleId);
+                    }
+                    else
+                    {
+                        var Id = (int) ItemToDelete.Tag;
+                        switch (ArticleViewOn)
                         {
-                            DaoRegistery.GetInstance.DaoMarque.Delete(Id);
-                            break;
-                        }
-                        case ActiveList.Family:
-                        {
-                            DaoRegistery.GetInstance.DaoFamille.Delete(Id);
-                            break;
-                        }
-                        case ActiveList.Subfamily:
-                        {
-                            DaoRegistery.GetInstance.DaoSousFamille.Delete(Id);
-                            break;
+                            case ActiveList.Brand:
+                            {
+                                DaoRegistery.GetInstance.DaoMarque.Delete(Id);
+                                break;
+                            }
+                            case ActiveList.Family:
+                            {
+                                DaoRegistery.GetInstance.DaoFamille.Delete(Id);
+                                break;
+                            }
+                            case ActiveList.Subfamily:
+                            {
+                                DaoRegistery.GetInstance.DaoSousFamille.Delete(Id);
+                                break;
+                            }
                         }
                     }
+
+                    listView1.Items.Remove(ItemToDelete);
+                    UpdateStatusBar();
                 }
-                listView1.Items.Remove(ItemToDelete);
-                UpdateStatusBar(); 
+                catch (Exception Error)
+                {
+                    MessageBox.Show("Cette opération a échouée : \n" + Error.Message, "Erreur");
+                    Result = DialogResult.Abort;
+                }
             }
-            catch (Exception Error)
-            {
-                MessageBox.Show("Cette opération a échouée : \n" + Error.Message, "Erreur");
-            }
+            return Result;
         }
 
         private void listView1_KeyDown(object Sender, KeyEventArgs KeyEvent)
         {
-            if (KeyEvent.KeyCode == Keys.Delete && listView1.SelectedItems.Count > 0)
+            if (listView1.SelectedItems.Count > 0)
             {
-                Delete(listView1.SelectedItems[0]);
+                if (KeyEvent.KeyCode == Keys.Delete)
+                {
+                    Delete(listView1.SelectedItems[0]);
+                } else if (KeyEvent.KeyCode == Keys.Enter)
+                {
+                    OpenEditForm();
+                }
             }
+        }
+
+        private void OnListDoubleClick(object Sender, EventArgs Event)
+        {
+            OpenEditForm();
         }
     }
 }

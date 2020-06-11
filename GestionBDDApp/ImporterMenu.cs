@@ -105,6 +105,7 @@ namespace GestionBDDApp
                         if (ConfirmResult == DialogResult.Cancel)
                         {
                             StatusText.Text = "Import annulé";
+                            DialogResult = DialogResult.Cancel;
                             return;
                         }
                     }
@@ -173,6 +174,7 @@ namespace GestionBDDApp
                             if (Result == DialogResult.Cancel)
                             {
                                 StatusText.Text = "Import annulé.";
+                                DialogResult = DialogResult.Cancel;
                                 return;
                             }
                         }
@@ -229,6 +231,7 @@ namespace GestionBDDApp
                             {
                                 case DialogResult.Cancel:
                                     StatusText.Text = "Import annulé.";
+                                    DialogResult = DialogResult.Cancel;
                                     return;
                                 case DialogResult.No:
                                     NamesakeStrategyChoosed = NamesakeStrategy.Replace;
@@ -294,6 +297,8 @@ namespace GestionBDDApp
                             NewArticles.Count + " nouveaux articles \n",
                         "Import terminé avec succés.",
                         MessageBoxButtons.OK);
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
                 catch (Exception Exception)
                 {

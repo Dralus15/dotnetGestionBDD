@@ -30,10 +30,13 @@ namespace GestionBDDApp
 
         public void InserColonne()
         {
-            listView1.Columns.Insert(1, this.Familles);
-            listView1.Columns.Insert(2, this.SousFamilles);
-            listView1.Columns.Insert(3, this.Marques);
-            listView1.Columns.Insert(4, this.Quantité);
+            if (listView1.Columns.Count == 1)
+            {
+                listView1.Columns.Insert(1, this.Familles);
+                listView1.Columns.Insert(2, this.SousFamilles);
+                listView1.Columns.Insert(3, this.Marques);
+                listView1.Columns.Insert(4, this.Quantité);
+            }
         }
         
 
@@ -44,7 +47,7 @@ namespace GestionBDDApp
 
         public void SupprColonne()
         {
-            if(listView1.Columns.IndexOf(Familles) != -1)
+            if (listView1.Columns.IndexOf(Familles) != -1)
                 listView1.Columns.RemoveAt(listView1.Columns.IndexOf(Familles));
             if (listView1.Columns.IndexOf(SousFamilles) != -1)
                 listView1.Columns.RemoveAt(listView1.Columns.IndexOf(SousFamilles));
@@ -193,6 +196,7 @@ namespace GestionBDDApp
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
+            this.listView1.DoubleClick += new System.EventHandler(this.OnListDoubleClick);
             this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             this.listView1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.View_MouseDown);
             // 

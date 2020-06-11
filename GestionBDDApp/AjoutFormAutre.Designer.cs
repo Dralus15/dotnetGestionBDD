@@ -105,7 +105,6 @@
             this.Controls.Add(this.NotValidateButton);
             this.Controls.Add(this.ValidateButton);
             this.Name = "AjoutFormAutre";
-            this.Text = "AjoutFormAutre";
             this.ResumeLayout(false);
             this.PerformLayout();
         }
