@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using GestionBDDApp.data.dao;
+using GestionBDDApp.data.dto;
 
 namespace GestionBDDApp
 {
@@ -74,16 +75,26 @@ namespace GestionBDDApp
             // On affiche la progression de l'export.
             using (var Writer = new StreamWriter(FileChoosedBox.Text, false, Encoding.Default))
             {
-                Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T."); //TODO barre de chargement
+                Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T.");
+
+                // On met la barre de chargement à 0 en mode pas à pas
+                ExportProgress.Style = ProgressBarStyle.Continuous;
+                ExportProgress.Maximum = DaoArticle.Count();
+                ExportProgress.Minimum = 0;
+                ExportProgress.Value = 0;
+
                 var All = DaoArticle.GetAll();
-                for (var Index = 0; Index < All.Count; Index++)
+                foreach (var Articles in DaoArticle.GetAll())
                 {
-                    var Articles = All[Index];
                     Writer.WriteLine(
                         $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" +
                         $"{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
+                    // Progression de la barre de chargement
+                    ExportProgress.Value += 1;
                 }
+
             }
+            ExportProgress.Refresh();
             // On confirme à l'utilisateur que l'export est terminé.
             MessageBox.Show("Export terminé !", "Information", MessageBoxButtons.OK);
         }

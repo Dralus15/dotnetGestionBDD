@@ -34,12 +34,13 @@ namespace GestionBDDApp
             this.ExportCsvButton = new System.Windows.Forms.Button();
             this.BrowseButton = new System.Windows.Forms.Button();
             this.FileChoosedBox = new System.Windows.Forms.TextBox();
+            this.ExportProgress = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // ExportCsvButton
             // 
             this.ExportCsvButton.Enabled = false;
-            this.ExportCsvButton.Location = new System.Drawing.Point(260, 83);
+            this.ExportCsvButton.Location = new System.Drawing.Point(263, 73);
             this.ExportCsvButton.Name = "ExportCsvButton";
             this.ExportCsvButton.Size = new System.Drawing.Size(75, 23);
             this.ExportCsvButton.TabIndex = 1;
@@ -65,11 +66,19 @@ namespace GestionBDDApp
             this.FileChoosedBox.Size = new System.Drawing.Size(220, 20);
             this.FileChoosedBox.TabIndex = 3;
             // 
+            // ExportProgress
+            // 
+            this.ExportProgress.Location = new System.Drawing.Point(12, 102);
+            this.ExportProgress.Name = "ExportProgress";
+            this.ExportProgress.Size = new System.Drawing.Size(357, 23);
+            this.ExportProgress.TabIndex = 5;
+            // 
             // ExporterMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(354, 120);
+            this.ClientSize = new System.Drawing.Size(388, 142);
+            this.Controls.Add(this.ExportProgress);
             this.Controls.Add(this.FileChoosedBox);
             this.Controls.Add(this.BrowseButton);
             this.Controls.Add(this.ExportCsvButton);
@@ -77,6 +86,7 @@ namespace GestionBDDApp
             this.Text = "ExporterMenu";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private System.Windows.Forms.Button BrowseButton;
@@ -84,5 +94,7 @@ namespace GestionBDDApp
         private System.Windows.Forms.TextBox FileChoosedBox;
 
         #endregion
+
+        private System.Windows.Forms.ProgressBar ExportProgress;
     }
 }
