@@ -75,10 +75,12 @@ namespace GestionBDDApp
             using (var Writer = new StreamWriter(FileChoosedBox.Text, false, Encoding.Default))
             {
                 Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T."); //TODO barre de chargement
-                foreach (var Articles in DaoArticle.GetAll())
+                var All = DaoArticle.GetAll();
+                for (var Index = 0; Index < All.Count; Index++)
                 {
+                    var Articles = All[Index];
                     Writer.WriteLine(
-                        $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" + 
+                        $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};" +
                         $"{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");
                 }
             }
