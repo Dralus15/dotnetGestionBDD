@@ -271,12 +271,6 @@ namespace GestionBDDApp
         /// </summary>
         private void LoadFamilies()
         {
-            //On charge le modèle
-            SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
-                .GroupBy(SousFamille => SousFamille.Famille.Id)
-                .ToDictionary(SousFamille => SousFamille.Key, 
-                    Grouping => Grouping.Select(SousFamille => SousFamille)
-                    .ToList());
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
             // On sauvegarde les sous-familles déjà chargées
             var SubFamiliesToLoad = new List<int>();
@@ -306,9 +300,14 @@ namespace GestionBDDApp
         /// <summary>
         /// Charge les sous-amilles dans le modèle
         /// </summary>
-        private void LoadSubFamily(TreeNode ParentNode, int FamilyId)//TODO FIXME
+        private void LoadSubFamily(TreeNode ParentNode, int FamilyId)
         {
             ParentNode.Nodes.Clear();
+            if (SubFamilyModel.ContainsKey(FamilyId))
+            {
+                SubFamilyModel.Remove(FamilyId);
+            }
+            SubFamilyModel.Add(FamilyId, DaoRegistery.GetInstance.DaoSousFamille.GetSubFamilyOfFamily(FamilyId));
             foreach (var SubFamily in SubFamilyModel[FamilyId])
             {
                 if (! SubFamily.Id.HasValue) return;
@@ -452,6 +451,20 @@ namespace GestionBDDApp
                     {
                         var ArticleId = (string) ItemToDelete.Tag;
                         DaoRegistery.GetInstance.DaoArticle.Delete(ArticleId);
+                        // Sur la suppression d'un article, on ne rafraîchi que la liste
+                        var RemoveIndex = -1;
+                        for (var Index = 0; Index < ArticlesModel.Count; Index++)
+                        {
+                            if (ArticleId.Equals(ArticlesModel[Index].RefArticle))
+                            {
+                                RemoveIndex = Index;
+                                break;
+                            }
+                        }
+                        if (RemoveIndex != -1)
+                        {
+                            ArticlesModel.RemoveAt(RemoveIndex);
+                        }
                     }
                     else
                     {
@@ -460,22 +473,25 @@ namespace GestionBDDApp
                         {
                             case ActiveList.Brand:
                             {
+                                LastTreeNodeSelected = AllBrandNode;
                                 DaoRegistery.GetInstance.DaoMarque.Delete(Id);
                                 break;
                             }
                             case ActiveList.Family:
                             {
+                                LastTreeNodeSelected = AllFamilyNode;
                                 DaoRegistery.GetInstance.DaoFamille.Delete(Id);
                                 break;
                             }
                             case ActiveList.Subfamily:
                             {
+                                LastTreeNodeSelected = AllFamilyNode;
                                 DaoRegistery.GetInstance.DaoSousFamille.Delete(Id);
                                 break;
                             }
                         }
+                        ReloadList();
                     }
-
                     listView1.Items.Remove(ItemToDelete);
                     UpdateStatusBar();
                 }

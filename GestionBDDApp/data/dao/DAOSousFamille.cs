@@ -107,7 +107,7 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT count(*) FROM Familles WHERE RefFamille = @refFamily", Connection))
+                using (var Command = new SQLiteCommand("SELECT count(*) FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
                 {
                     Command.Parameters.AddWithValue("@refFamily", FamilyId);
                     using (var Reader = Command.ExecuteReader())
@@ -160,9 +160,29 @@ namespace GestionBDDApp.data.dao
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE Nom = '@name'", Connection))
+                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE Nom = @name", Connection))
                 {
                     Command.Parameters.AddWithValue("@name", SubFamilyName);
+                    using (var Reader = Command.ExecuteReader())
+                    {
+                        SubFamilies = ParseQueryResult(Reader);
+                    }
+                }
+            }
+
+            return SubFamilies;
+        }
+
+        public List<SousFamilles> GetSubFamilyOfFamily(int FamilyId)
+        {
+            List<SousFamilles> SubFamilies;
+
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
+            {
+                Connection.Open();
+                using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE RefFamille = @refFamily", Connection))
+                {
+                    Command.Parameters.AddWithValue("@refFamily", FamilyId);
                     using (var Reader = Command.ExecuteReader())
                     {
                         SubFamilies = ParseQueryResult(Reader);
