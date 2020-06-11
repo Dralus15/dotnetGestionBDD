@@ -7,33 +7,44 @@ namespace GestionBDDApp.data.dao
     public abstract class AbstractDao
     {
         private readonly string BaseName;
+        private readonly bool IsAutoIncrement;
 
-        protected const string ConnectionString = "Data Source=Bacchus.SQLite";
+        protected const string CONNECTION_STRING = "Data Source=Bacchus.SQLite";
 
-        public AbstractDao(String BaseName)
+        protected AbstractDao(string BaseName, bool IsAutoIncrement)
         {
             this.BaseName = BaseName;
+            this.IsAutoIncrement = IsAutoIncrement;
         }
 
-        public void clear()
+        public void Clear()
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (var Command = new SQLiteCommand(String.Format("DELETE FROM {0}; VACUUM;", BaseName), Connection))
+                using (var Command = new SQLiteCommand($"DELETE FROM {BaseName}; VACUUM;", Connection))
                 {
                     Command.ExecuteNonQuery();
+                }
+                
+                if (IsAutoIncrement)
+                {
+                    using (var Command = new SQLiteCommand(
+                        $"update sqlite_sequence set seq = 0 where name='{BaseName}'", Connection))
+                    {
+                        Command.ExecuteNonQuery();
+                    }
                 }
             }
         }
 
-        public int count()
+        public int Count()
         {
-            int Result = 0;
-            using (SQLiteConnection Connection = new SQLiteConnection(ConnectionString))
+            var Result = 0;
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
-                using (SQLiteCommand Command = new SQLiteCommand(String.Format("SELECT count(*) FROM {0}", BaseName), Connection))
+                using (var Command = new SQLiteCommand($"SELECT count(*) FROM {BaseName}", Connection))
                 {
                     using (var Reader = Command.ExecuteReader())
                     {

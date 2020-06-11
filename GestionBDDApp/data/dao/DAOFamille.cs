@@ -5,15 +5,15 @@ using System.Data.SQLite;
 
 namespace GestionBDDApp.data.dao
 {
-    public class DAOFamille : AbstractDao
+    public class DaoFamille : AbstractDao
     {
-        public DAOFamille() : base("Familles") { }
+        public DaoFamille() : base("Familles", true) { }
 
         public List<Familles> GetAllFamilles()
         {
             List<Familles> Familles;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Familles;", Connection))
@@ -30,7 +30,7 @@ namespace GestionBDDApp.data.dao
 
         private static List<Familles> ParseQueryResult(SQLiteDataReader DataReader)
         {
-            List<Familles> Familles = new List<Familles>();
+            var Familles = new List<Familles>();
             if (!DataReader.HasRows) return Familles;
             while (DataReader.Read())
             {
@@ -45,7 +45,7 @@ namespace GestionBDDApp.data.dao
         {
             Familles Famille = null;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE RefFamille = @refFamille", Connection))
@@ -70,7 +70,7 @@ namespace GestionBDDApp.data.dao
         {
             List<Familles> Familles;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Familles WHERE Nom = '@name'", Connection))
@@ -86,9 +86,9 @@ namespace GestionBDDApp.data.dao
             return Familles;
         }
 
-        public void save(Familles Famille)
+        public void Save(Familles Famille)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(Connection))
@@ -112,7 +112,7 @@ namespace GestionBDDApp.data.dao
             }
         }
 
-        public void delete(int Id)
+        public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoSousFamille.CountSubFamilyOfFamily(Id);
             if (UseCount > 0)
@@ -130,7 +130,7 @@ namespace GestionBDDApp.data.dao
                 }
                 throw new ArgumentException(Error);
             }
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("DELETE FROM Familles WHERE RefFamille = @ref", Connection))

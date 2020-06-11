@@ -1,15 +1,16 @@
 ﻿﻿using System;
  using GestionBDDApp.data.model;
 using System.Collections.Generic;
-using System.Data.SQLite;
+ using System.Data.Common;
+ using System.Data.SQLite;
 
 namespace GestionBDDApp.data.dao
 {
-    public class DAOSousFamille : AbstractDao
+    public class DaoSousFamille : AbstractDao
     {
-        private readonly DAOFamille DaoFamille;
+        private readonly DaoFamille DaoFamille;
 
-        public DAOSousFamille(DAOFamille DaoFamille) : base("SousFamilles")
+        public DaoSousFamille(DaoFamille DaoFamille) : base("SousFamilles", true)
         {
             this.DaoFamille = DaoFamille;
         }
@@ -18,7 +19,7 @@ namespace GestionBDDApp.data.dao
         {
             List<SousFamilles> SousFamilles;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles", Connection))
@@ -33,49 +34,49 @@ namespace GestionBDDApp.data.dao
             return SousFamilles;
         }
 
-        private List<SousFamilles> ParseQueryResult(SQLiteDataReader DataReader)
+        private List<SousFamilles> ParseQueryResult(DbDataReader DataReader)
         {
-            List<SousFamilles> SousFamilles = new List<SousFamilles>();
+            var SubFamilyRed = new List<SousFamilles>();
             if (DataReader.HasRows)
             {
                 while (DataReader.Read())
                 {
-                    Familles Famille = this.DaoFamille.GetFamilleById(DataReader.GetInt32(1));
-                    SousFamilles.Add(new SousFamilles(DataReader.GetInt32(0), Famille, DataReader.GetString(2)));
+                    var Family = DaoFamille.GetFamilleById(DataReader.GetInt32(1));
+                    SubFamilyRed.Add(new SousFamilles(DataReader.GetInt32(0), Family, DataReader.GetString(2)));
                 }
             }
 
-            return SousFamilles;
+            return SubFamilyRed;
         }
 
-        public SousFamilles getSousFamilleById(int id)
+        public SousFamilles GetSousFamilleById(int Id)
         {
-            SousFamilles SousFamilles = null;
+            SousFamilles SubFamilyFound = null;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand( "SELECT * FROM SousFamilles WHERE RefSousFamille = @refSousFamille", Connection))
                 { 
-                    Command.Parameters.AddWithValue("@refSousFamille", id);
+                    Command.Parameters.AddWithValue("@refSousFamille", Id);
                     using (var Reader = Command.ExecuteReader())
                     {
                         if (Reader.HasRows)
                         {
                             Reader.Read();
-                            Familles Famille = this.DaoFamille.GetFamilleById(Reader.GetInt32(1));
-                            SousFamilles = new SousFamilles(Reader.GetInt32(0), Famille, Reader.GetString(2));
+                            var Famille = DaoFamille.GetFamilleById(Reader.GetInt32(1));
+                            SubFamilyFound = new SousFamilles(Reader.GetInt32(0), Famille, Reader.GetString(2));
                         }
                     }
                 }
             }
 
-            return SousFamilles;
+            return SubFamilyFound;
         }
 
-        public void save(SousFamilles SousFamille)
+        public void Save(SousFamilles SousFamille)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(Connection))
@@ -103,7 +104,7 @@ namespace GestionBDDApp.data.dao
         public int CountSubFamilyOfFamily(int FamilyId)
         {
             var Result = 0;
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT count(*) FROM Familles WHERE RefFamille = @refFamily", Connection))
@@ -123,7 +124,7 @@ namespace GestionBDDApp.data.dao
             return Result;
         }
 
-        public void delete(int Id)
+        public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfSubFamily(Id);
             if (UseCount > 0)
@@ -141,7 +142,7 @@ namespace GestionBDDApp.data.dao
                 }
                 throw new ArgumentException(Error);
             }
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("DELETE FROM SousFamilles WHERE RefSousFamille = @ref", Connection) )
@@ -156,7 +157,7 @@ namespace GestionBDDApp.data.dao
         {
             List<SousFamilles> SubFamilies;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles WHERE Nom = '@name'", Connection))

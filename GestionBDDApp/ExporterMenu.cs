@@ -8,7 +8,7 @@ namespace GestionBDDApp
 {
     public partial class ExporterMenu : Form
     {
-        private DAOArticle DaoArticle;
+        private DaoArticle DaoArticle;
 
         public ExporterMenu()
         {
@@ -16,16 +16,18 @@ namespace GestionBDDApp
             DaoArticle = DaoRegistery.GetInstance.DaoArticle;
         }
 
-        private void BrowseButton_Click(object sender, EventArgs e)
+        private void BrowseButton_Click(object Sender, EventArgs Event)
         {
-            SaveFileDialog SaveFileDialog = new SaveFileDialog();
-            SaveFileDialog.Title = "Choose where to export your base";
-            SaveFileDialog.DefaultExt = "csv";
-            SaveFileDialog.Filter = "Directory | directory";
-            SaveFileDialog.CheckFileExists = false;
-            SaveFileDialog.CheckPathExists = true;
-            SaveFileDialog.FileName = "Export.csv";
-            DialogResult Result = SaveFileDialog.ShowDialog();
+            var SaveFileDialog = new SaveFileDialog
+            {
+                Title = "Choisir l'emplacement de l'export",
+                DefaultExt = "csv",
+                Filter = "Directory | directory",
+                CheckFileExists = false,
+                CheckPathExists = true,
+                FileName = "Export.csv"
+            };
+            var Result = SaveFileDialog.ShowDialog();
             if (Result == DialogResult.OK)
             {
                 FileChoosedBox.Text = SaveFileDialog.FileName;
@@ -33,20 +35,21 @@ namespace GestionBDDApp
             }
         }
 
-        private void ExportCsvButton_Click(object sender, EventArgs e)
+        private void ExportCsvButton_Click(object Sender, EventArgs Event)
         {
-            string path = FileChoosedBox.Text;
-            if (File.Exists(path))
+            var Path = FileChoosedBox.Text;
+            if (File.Exists(Path))
             {
-                var ConfirmResult =  MessageBox.Show("Un fichier de ce nom existe déjà à cet emplacement, cette opération va l'écraser, voulez-vous continuer ?",
+                var ConfirmResult =  MessageBox.Show(
+                    "Un fichier de ce nom existe déjà à cet emplacement, cette opération va l'écraser, voulez-vous continuer ?",
                     "Confirmation",
                     MessageBoxButtons.YesNo);
                 if (ConfirmResult != DialogResult.Yes) return;
             }
-            using (StreamWriter Writer = new StreamWriter(FileChoosedBox.Text, false, Encoding.Default))
+            using (var Writer = new StreamWriter(FileChoosedBox.Text, false, Encoding.Default))
             {
                 Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T."); //TODO barre de chargement
-                foreach (var Articles in DaoArticle.getAll())
+                foreach (var Articles in DaoArticle.GetAll())
                 {
                     Writer.WriteLine(
                         $"{Articles.Description};{Articles.RefArticle};{Articles.Marque.Nom};{Articles.SousFamille.Famille.Nom};{Articles.SousFamille.Nom};{Articles.Prix}");

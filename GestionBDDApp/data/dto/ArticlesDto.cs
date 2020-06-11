@@ -4,53 +4,54 @@ namespace GestionBDDApp.data.dto
 {
     public class ArticlesDto
     {
-        public string RefArticle { get; }
+        public string ArticleRef { get; }
 
         public string Description { get; }
 
-        public string SousFamille { get; }
+        public string SubFamilyName { get; }
 
-        public string Marque { get; }
+        public string BrandName { get; }
 
-        public float Prix { get; }
+        public float Price { get; }
 
-        public string Famille { get; }
+        public string FamilyName { get; }
 
-        private ArticlesDto(string RefArticle, string Description, string SousFamille, string Marque, float Prix, string Famille)
+        private ArticlesDto(string ArticleRef, string Description, string SubFamilyName, string BrandName, float Price, 
+            string FamilyName)
         {
-            this.RefArticle = RefArticle;
+            this.ArticleRef = ArticleRef;
             this.Description = Description;
-            this.SousFamille = SousFamille;
-            this.Marque = Marque;
-            this.Prix = Prix;
-            this.Famille = Famille;
+            this.SubFamilyName = SubFamilyName;
+            this.BrandName = BrandName;
+            this.Price = Price;
+            this.FamilyName = FamilyName;
         }
         
-        public static ArticlesDto FromRawData(string DescStr, string RefStr, string MarqueStr, string FamilleStr,
-            string SousFamilleStr, string PrixStr)
+        public static ArticlesDto FromRawData(string Description, string ArticleRef, string BrandName, string FamilyName,
+            string SubFamily, string PriceAsString)
         {
-            float Prix;
+            float ParsedPrice;
 
-            if (DescStr == null || DescStr.Length > 150 || DescStr.Length < 5)
+            if (Description == null || Description.Length > 150 || Description.Length < 5)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne description");
             }
             
-            if (RefStr == null || RefStr.Length > 8 || RefStr.Length < 5)
+            if (ArticleRef == null || ArticleRef.Length > 8 || ArticleRef.Length < 5)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne ref");
             }
             
             try
             {
-                Prix = float.Parse(PrixStr);
+                ParsedPrice = float.Parse(PriceAsString);
             }
             catch (Exception)
             {
                 throw new ParsingException("Valeur incorrecte pour la colonne prix");
             }
 
-            return new ArticlesDto(RefStr, DescStr, SousFamilleStr, MarqueStr, Prix, FamilleStr);
+            return new ArticlesDto(ArticleRef, Description, SubFamily, BrandName, ParsedPrice, FamilyName);
         }
     }
 }

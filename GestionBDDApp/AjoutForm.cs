@@ -32,22 +32,22 @@ namespace GestionBDDApp
             SubFamillyComboBox.Text = Article.SousFamille.Nom;
         }
 
-        private Articles Article = null;
+        private Articles Article;
         private List<Marques> BrandModel = new List<Marques>();
-        private List<Familles> FamillyModel = new List<Familles>();
+        private List<Familles> FamilyModel = new List<Familles>();
         private Dictionary<int?, List<SousFamilles>> SubFamilyModel = new Dictionary<int?, List<SousFamilles>>();
         private void LoadItems()
         {
             BrandModel = DaoRegistery.GetInstance.DaoMarque.GetAllMarques();
-            FamillyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
+            FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
             SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
                 .GroupBy(SousFamille => SousFamille.Famille.Id)
-                .ToDictionary(SousFamille => SousFamille.Key, v => v.Select(f => f).ToList());
+                .ToDictionary(SousFamille => SousFamille.Key, V => V.Select(F => F).ToList());
         }
 
-        private void Familles_SelectedIndexChanged(object sender, EventArgs e)
+        private void Familles_SelectedIndexChanged(object Sender, EventArgs Event)
         {
-            DisplaySubFamilly(((ComboBox)sender).SelectedIndex + 1);
+            DisplaySubFamilly(((ComboBox)Sender).SelectedIndex + 1);
         }
 
         private void DisplayItems()
@@ -56,7 +56,7 @@ namespace GestionBDDApp
             {
                 BrandComboBox.Items.Add(new ComboBoxItem(Brand.Nom, Brand));
             }
-            foreach (var Familly in FamillyModel)
+            foreach (var Familly in FamilyModel)
             {
                 FamillyComboBox.Items.Add(new ComboBoxItem(Familly.Nom, Familly));
             }
@@ -71,12 +71,12 @@ namespace GestionBDDApp
                 SubFamillyComboBox.Items.Add(new ComboBoxItem(SubFamilly.Nom, SubFamilly));
             }
         }
-        private void CancelButton_Click(object sender, EventArgs e)
+        private void CancelButton_Click(object Sender, EventArgs Event)
         {
-            this.Close();
+            Close();
         }
 
-        private void ValidateButton_Click(object sender, EventArgs e)
+        private void ValidateButton_Click(object Sender, EventArgs Event)
         {
             if(BrandComboBox.SelectedIndex != -1 && FamillyComboBox.SelectedIndex != -1 && SubFamillyComboBox.SelectedIndex != -1 && DescriptionBox.TextLength > 0 && PriceBox.Value >= 0 && QuantityBox.Value >= 0)
             {
@@ -89,10 +89,10 @@ namespace GestionBDDApp
                 {
 
                     Article = new Articles(ReferenceBox.Text, DescriptionBox.Text, (SousFamilles)((ComboBoxItem)SubFamillyComboBox.SelectedItem).Value, (Marques)((ComboBoxItem)BrandComboBox.SelectedItem).Value, (float) PriceBox.Value, (int) QuantityBox.Value);
-                    DaoRegistery.GetInstance.DaoArticle.create(Article);
+                    DaoRegistery.GetInstance.DaoArticle.Create(Article);
                     Console.WriteLine("Création de : " + Article.Description);
                 }
-                this.Close();
+                Close();
             }
             else
                 MessageBox.Show("Veillez remplir tous les champs", "Error", MessageBoxButtons.OK);

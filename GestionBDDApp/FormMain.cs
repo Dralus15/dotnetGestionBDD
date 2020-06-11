@@ -8,7 +8,7 @@ using GestionBDDApp.Properties;
 
 namespace GestionBDDApp
 {
-    public enum ActiveList
+    internal enum ActiveList
     {
         Article,
         Brand,
@@ -47,15 +47,15 @@ namespace GestionBDDApp
         private TreeNode AllBrandNode;
         private TreeNode LastTreeNodeSelected;
 
-        public void View_MouseDown(object sender, MouseEventArgs Event)
+        private void View_MouseDown(object Sender, MouseEventArgs Event)
         {
             if(Event.Button == MouseButtons.Right)
             {
-                contextMenu.Show(Control.MousePosition);
+                contextMenu.Show(MousePosition);
             }
         }
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs Event)
+        private void treeView1_AfterSelect(object Sender, TreeViewEventArgs Event)
         {
             if (Event.Action == TreeViewAction.ByMouse || Event.Action == TreeViewAction.ByKeyboard)
             {
@@ -116,7 +116,7 @@ namespace GestionBDDApp
             UpdateStatusBar();
         }
 
-        private void supprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
+        private void SupprimerLaBaseToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             var Result = MessageBox.Show("Cette action est irreversible, êtes vous certain de continuer ?",
                 "Suppression de la base, confirmation", MessageBoxButtons.YesNoCancel);
@@ -166,15 +166,15 @@ namespace GestionBDDApp
 
         private void UpdateStatusBar()
         {
-            var CountArticle = DaoRegistery.GetInstance.DaoArticle.count();
-            var CountFamily = DaoRegistery.GetInstance.DaoFamille.count();
-            var CountBrand = DaoRegistery.GetInstance.DaoMarque.count();
-            var CountSubFamily = DaoRegistery.GetInstance.DaoSousFamille.count();
+            var CountArticle = DaoRegistery.GetInstance.DaoArticle.Count();
+            var CountFamily = DaoRegistery.GetInstance.DaoFamille.Count();
+            var CountBrand = DaoRegistery.GetInstance.DaoMarque.Count();
+            var CountSubFamily = DaoRegistery.GetInstance.DaoSousFamille.Count();
             StatusText.Text = CountArticle + " articles, " + CountFamily + " familles, " + CountSubFamily + " sous-familles et " + CountBrand + " marques en base.";
         }
 
-        private int? SubFamilyFilter = null;
-        private int? BrandFilter = null;
+        private int? SubFamilyFilter;
+        private int? BrandFilter;
 
 
         private ActiveList ArticleViewOn = ActiveList.Unknown;
@@ -218,14 +218,16 @@ namespace GestionBDDApp
             {
                 if (! BrandFilter.HasValue || BrandFilter.Equals(Article.Marque.Id))
                 {
-                    if (!SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SousFamille.Id))
+                    if (! SubFamilyFilter.HasValue || SubFamilyFilter.Equals(Article.SousFamille.Id))
                     {
-                        listView1.Items.Add(new ListViewItem(new [] {
-                            Article.Description, 
-                            Article.SousFamille.Famille.Nom,
-                            Article.SousFamille.Nom, 
-                            Article.Marque.Nom, 
-                            Article.Quantite.ToString()}) { Tag = Article.RefArticle });
+                        listView1.Items.Add(
+                            new ListViewItem(new [] {
+                                Article.Description, 
+                                Article.SousFamille.Famille.Nom,
+                                Article.SousFamille.Nom, 
+                                Article.Marque.Nom, 
+                                Article.Quantite.ToString()
+                            }) { Tag = Article.RefArticle });
                     }
                 }
             }
@@ -233,7 +235,7 @@ namespace GestionBDDApp
 
         private void LoadArticles()
         {
-            ArticlesModel = DaoRegistery.GetInstance.DaoArticle.getAll();
+            ArticlesModel = DaoRegistery.GetInstance.DaoArticle.GetAll();
         }
 
         private void LoadBrands()
@@ -251,9 +253,11 @@ namespace GestionBDDApp
         {
             SubFamilyModel = DaoRegistery.GetInstance.DaoSousFamille.GetAllSousFamilles()
                 .GroupBy(SousFamille => SousFamille.Famille.Id)
-                .ToDictionary(SousFamille => SousFamille.Key, v => v.Select(f => f).ToList());
+                .ToDictionary(SousFamille => SousFamille.Key, 
+                    Grouping => Grouping.Select(SousFamille => SousFamille)
+                    .ToList());
             FamilyModel = DaoRegistery.GetInstance.DaoFamille.GetAllFamilles();
-            //On sauvegarde les sous familles chargés
+            //On sauvegarde les sous familles chargées
             var SubFamiliesToLoad = new List<int>();
             foreach (TreeNode Node in AllFamilyNode.Nodes)
             {
@@ -359,7 +363,7 @@ namespace GestionBDDApp
             return base.ProcessCmdKey(ref Message, KeyData);
         }
 
-        private void actualiserToolStripMenuItem_Click(object Sender, EventArgs Event)
+        private void ActualiserToolStripMenuItem_Click(object Sender, EventArgs Event)
         {
             ReloadList();
         }
@@ -372,20 +376,20 @@ namespace GestionBDDApp
             }
         }
 
-        private void contextMenu_Click(object sender, ToolStripItemClickedEventArgs e)
+        private void contextMenu_Click(object Sender, ToolStripItemClickedEventArgs Event)
         {
-            switch (e.ClickedItem.Text)
+            switch (Event.ClickedItem.Text)
             {
                 case "Ajout":
-                    using (AjoutForm AjoutFormulaire = new AjoutForm())
+                    using (var AjoutFormulaire = new AjoutForm())
                     {
                         AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                         AjoutFormulaire.ShowDialog(this);
                     }
                     break;
                 case "Modification":
-                    string ArticleId = (string)listView1.FocusedItem.Tag;
-                    using (AjoutForm AjoutFormulaire = new AjoutForm(ArticleId))
+                    var ArticleId = (string)listView1.FocusedItem.Tag;
+                    using (var AjoutFormulaire = new AjoutForm(ArticleId))
                     {
                         AjoutFormulaire.StartPosition = FormStartPosition.CenterParent;
                         AjoutFormulaire.ShowDialog(this);
@@ -394,13 +398,6 @@ namespace GestionBDDApp
                 case "Supprimer":
                 case null: break;
             }
-
-                
-        }
-
-        private void FormMain_KeyDown(object Sender, KeyEventArgs KeyEvent)
-        {
-            //todo remove
         }
 
         private void Delete(ListViewItem ItemToDelete)
@@ -409,27 +406,27 @@ namespace GestionBDDApp
             {
                 if (ActiveList.Article == ArticleViewOn)
                 {
-                    string ArticleId = (string) ItemToDelete.Tag;
-                    DaoRegistery.GetInstance.DaoArticle.delete(ArticleId);
+                    var ArticleId = (string) ItemToDelete.Tag;
+                    DaoRegistery.GetInstance.DaoArticle.Delete(ArticleId);
                 }
                 else
                 {
-                    int Id = (int) ItemToDelete.Tag;
+                    var Id = (int) ItemToDelete.Tag;
                     switch (ArticleViewOn)
                     {
                         case ActiveList.Brand:
                         {
-                            DaoRegistery.GetInstance.DaoMarque.delete(Id);
+                            DaoRegistery.GetInstance.DaoMarque.Delete(Id);
                             break;
                         }
                         case ActiveList.Family:
                         {
-                            DaoRegistery.GetInstance.DaoFamille.delete(Id);
+                            DaoRegistery.GetInstance.DaoFamille.Delete(Id);
                             break;
                         }
                         case ActiveList.Subfamily:
                         {
-                            DaoRegistery.GetInstance.DaoSousFamille.delete(Id);
+                            DaoRegistery.GetInstance.DaoSousFamille.Delete(Id);
                             break;
                         }
                     }

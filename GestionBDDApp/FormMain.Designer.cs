@@ -113,7 +113,7 @@ namespace GestionBDDApp
             this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
             this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.actualiserToolStripMenuItem.Text = "Actualiser";
-            this.actualiserToolStripMenuItem.Click += new System.EventHandler(this.actualiserToolStripMenuItem_Click);
+            this.actualiserToolStripMenuItem.Click += new System.EventHandler(this.ActualiserToolStripMenuItem_Click);
             // 
             // importerToolStripMenuItem
             // 
@@ -134,7 +134,7 @@ namespace GestionBDDApp
             this.supprimerLaBaseToolStripMenuItem.Name = "supprimerLaBaseToolStripMenuItem";
             this.supprimerLaBaseToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.supprimerLaBaseToolStripMenuItem.Text = "Supprimer la base";
-            this.supprimerLaBaseToolStripMenuItem.Click += new System.EventHandler(this.supprimerLaBaseToolStripMenuItem_Click);
+            this.supprimerLaBaseToolStripMenuItem.Click += new System.EventHandler(this.SupprimerLaBaseToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -255,7 +255,6 @@ namespace GestionBDDApp
             this.Text = "Bacchus";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);

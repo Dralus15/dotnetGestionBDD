@@ -5,15 +5,15 @@ using System.Data.SQLite;
 
 namespace GestionBDDApp.data.dao
 {
-    public class DAOMarque : AbstractDao
+    public class DaoMarque : AbstractDao
     {
-        public DAOMarque() : base("Marques") { }
+        public DaoMarque() : base("Marques", true) { }
         
         public List<Marques> GetAllMarques()
         {
             List<Marques> Marques;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Marques;", Connection))
@@ -30,7 +30,7 @@ namespace GestionBDDApp.data.dao
 
         private static List<Marques> ParseQueryResult(SQLiteDataReader DataReader)
         {
-            List<Marques> Marques = new List<Marques>();
+            var Marques = new List<Marques>();
             if (DataReader.HasRows)
             {
                 while (DataReader.Read())
@@ -46,7 +46,7 @@ namespace GestionBDDApp.data.dao
         {
             Marques Marque = null;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE RefMarque = @refMarque", Connection))
@@ -66,9 +66,9 @@ namespace GestionBDDApp.data.dao
             return Marque;
         }
 
-        public void save(Marques Marques)
+        public void Save(Marques Marques)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(Connection))
@@ -92,7 +92,7 @@ namespace GestionBDDApp.data.dao
             }
         }
 
-        public void delete(int Id)
+        public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfBrand(Id);
             if (UseCount > 0)
@@ -110,7 +110,7 @@ namespace GestionBDDApp.data.dao
                 }
                 throw new ArgumentException(Error);
             }
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("DELETE FROM Marques WHERE RefMarque = @ref", Connection) )
@@ -125,7 +125,7 @@ namespace GestionBDDApp.data.dao
         {
             List<Marques> Brand;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Marques WHERE Nom = '@name'", Connection))

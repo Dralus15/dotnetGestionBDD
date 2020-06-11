@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using GestionBDDApp.data;
 using GestionBDDApp.data.csv;
 using GestionBDDApp.data.dao;
@@ -11,15 +10,15 @@ using GestionBDDApp.data.dto;
 using GestionBDDApp.data.model;
 using GestionBDDApp.data.utils;
 
-
+//TODO verifier que le mode ecrasement reset bien la vue
 namespace GestionBDDApp
 {
     public partial class ImporterMenu : Form
     {
-        private DAOArticle DaoArticle;
-        private DAOFamille DaoFamille;
-        private DAOMarque DaoMarque;
-        private DAOSousFamille DaoSousFamille;
+        private DaoArticle DaoArticle;
+        private DaoFamille DaoFamille;
+        private DaoMarque DaoMarque;
+        private DaoSousFamille DaoSousFamille;
 
         public ImporterMenu()
         {
@@ -30,12 +29,12 @@ namespace GestionBDDApp
             DaoSousFamille = DaoRegistery.GetInstance.DaoSousFamille;
         }
 
-        private void AppendModeButton_Click(object sender, EventArgs e)
+        private void AppendModeButton_Click(object Sender, EventArgs Event)
         {
             Import(false);
         }
 
-        private void EreaseModeButton_Click(object sender, EventArgs e)
+        private void EreaseModeButton_Click(object Sender, EventArgs Event)
         {
             var ConfirmResult =  MessageBox.Show("Cette action va écraser la base, êtes-vous sur de continuer ?",
                 "Confirmation",
@@ -49,8 +48,7 @@ namespace GestionBDDApp
         private async void Import(bool ShouldEreaseBase)
         {
             SetBusy(false);
-            int Id = 0;
-            string ChoosedFilePath = this.PathChoosedFile.Text;
+            var ChoosedFilePath = PathChoosedFile.Text;
             if (ChoosedFilePath.Length != 0) {
                 try
                 {
@@ -61,14 +59,14 @@ namespace GestionBDDApp
                     ImportProgress.MarqueeAnimationSpeed = 30;
                     ImportProgress.Maximum = 100;
                     StatusText.Text = "Lecture du fichier en cours...";
-                    CSVReader.ReadFile(ChoosedFilePath, (Strings, LineNumber) => {
+                    CsvReader.ReadFile(ChoosedFilePath, (Strings, LineNumber) => {
                         try
                         {
                             var DescStr = Strings[1];
-                            int previousLineDefinition;
-                            if (ArticlesRef.TryGetValue(DescStr, out previousLineDefinition))
+                            int PreviousLineDefinition;
+                            if (ArticlesRef.TryGetValue(DescStr, out PreviousLineDefinition))
                             {
-                                Annomalies.Add(LineNumber, String.Format("Réference d'article en doublon (précédement défini à la ligne {0})", previousLineDefinition));
+                                Annomalies.Add(LineNumber, String.Format("Réference d'article en doublon (précédement défini à la ligne {0})", PreviousLineDefinition));
                             }
                             else
                             {
@@ -94,7 +92,7 @@ namespace GestionBDDApp
                     //si annomalie(s), demander confirmation
                     if (Annomalies.Count > 0)
                     {
-                        StringBuilder AnnomaliesError = new StringBuilder();
+                        var AnnomaliesError = new StringBuilder();
                         foreach (var Annomaly in Annomalies)
                         {
                             AnnomaliesError.Append(String.Format(" - Line {0} : {1}\n", Annomaly.Key, Annomaly.Value));
@@ -118,7 +116,7 @@ namespace GestionBDDApp
                     int DuplicateFamilyCount = 0, DuplicateBrandCount = 0, DuplicateSubFamilyCount = 0;
 
                     //namesake
-                    StringBuilder NameSakeErrorBuilder = new StringBuilder();
+                    var NameSakeErrorBuilder = new StringBuilder();
                     if (! ShouldEreaseBase)
                     {
                         ImportProgress.Maximum = ToImport.Count * 2;
@@ -128,7 +126,7 @@ namespace GestionBDDApp
                         {
                             ImportProgress.Value += 1;
 
-                            var FamilyName = ArticlesDto.Famille;
+                            var FamilyName = ArticlesDto.FamilyName;
                             if (! NewFamilies.ContainsKey(FamilyName))
                             {
                                 var FamilyNameSake = DaoFamille.GetFamilleByName(FamilyName);
@@ -139,7 +137,7 @@ namespace GestionBDDApp
                                 }
                             }
                             
-                            var BrandName = ArticlesDto.Marque;
+                            var BrandName = ArticlesDto.BrandName;
                             if (! NewBrands.ContainsKey(BrandName))
                             {
                                 var BrandNameSake = DaoMarque.GetBrandByName(BrandName);
@@ -150,7 +148,7 @@ namespace GestionBDDApp
                                 }
                             }
                             
-                            var SubFamilyName = ArticlesDto.Famille;
+                            var SubFamilyName = ArticlesDto.FamilyName;
                             if (! NewSubFamilies.ContainsKey(SubFamilyName))
                             {
                                 var SubFamilyNameSake = DaoSousFamille.GetSubFamiliesByName(SubFamilyName);
@@ -164,10 +162,7 @@ namespace GestionBDDApp
                         NameSakeErrorBuilder.AppendFormat("{0} doublons de familles ont été détéctés\n", DuplicateFamilyCount);
                         NameSakeErrorBuilder.AppendFormat("{0} doublons de sous-familles ont été détéctés\n", DuplicateSubFamilyCount);
                         NameSakeErrorBuilder.AppendFormat("{0} doublons de marques ont été détéctés\n", DuplicateBrandCount);
-                    }
-
-                    if (!ShouldEreaseBase)
-                    {
+                        
                         var Error = NameSakeErrorBuilder.ToString();
                         if (Error.Length > 0)
                         {
@@ -184,7 +179,7 @@ namespace GestionBDDApp
                     }
                     
                     var NewArticles = new Dictionary<Articles, Articles>();
-                    int ArticleNameSakeCount = 0;
+                    var ArticleNameSakeCount = 0;
 
                     //calculer les autres tables crées
                     foreach (var ArticleDto in ToImport)
@@ -193,44 +188,53 @@ namespace GestionBDDApp
                         ImportProgress.Value += 1;
                         
                         //résolution des dépendances des marques
-                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticleDto.Marque, () => new Marques(null, ArticleDto.Marque));
+                        var Marque = CollectionsUtils.GetOrCreate(NewBrands, ArticleDto.BrandName, () => new Marques(null, ArticleDto.BrandName));
                         
                         //résolution des dépendances des Familles
-                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.Famille, () => new Familles(null, ArticleDto.Famille));
+                        var Famille = CollectionsUtils.GetOrCreate(NewFamilies, ArticleDto.FamilyName, () => new Familles(null, ArticleDto.FamilyName));
                         
                         //résolution des dépendances des Sous-Familles
-                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SousFamille,() => new SousFamilles(null, Famille, ArticleDto.SousFamille));
+                        var SousFamille = CollectionsUtils.GetOrCreate(NewSubFamilies, ArticleDto.SubFamilyName,() => new SousFamilles(null, Famille, ArticleDto.SubFamilyName));
 
-                        var ArticleNameSake = DaoArticle.GetArticleById(ArticleDto.RefArticle);
+                        Articles ArticleNameSake;
+                        if (ShouldEreaseBase)
+                        {
+                            ArticleNameSake = null;
+                        }
+                        else
+                        {
+                            ArticleNameSake = DaoArticle.GetArticleById(ArticleDto.ArticleRef);
+                        }
                         if (ArticleNameSake != null)
                         {
                             ArticleNameSakeCount++;
                         }
-                        NewArticles.Add(new Articles(ArticleDto.RefArticle, ArticleDto.Description, SousFamille, Marque, ArticleDto.Prix, 0), ArticleNameSake);
+                        NewArticles.Add(new Articles(ArticleDto.ArticleRef, ArticleDto.Description, SousFamille, Marque, ArticleDto.Price, 0), ArticleNameSake);
                     }
 
-                    var NamesakeStrategyChoosed = NamesakeStrategy.IGNORE;
-                    
-                    if (ArticleNameSakeCount > 0)
-                    {
-                        var Result = MessageBox.Show(
-                            String.Format("{0} doublons d'articles ont été détéctés : \n", ArticleNameSakeCount) +
-                            "Voulez-vous ignorer ces doublons ? (sinon les valeurs dans la base seront mise à jour)",
-                            "Doublons détéctés", MessageBoxButtons.YesNoCancel);
-                        switch (Result)
-                        {
-                            case DialogResult.Cancel:
-                                StatusText.Text = "Import annulé.";
-                                return;
-                            case DialogResult.No:
-                                NamesakeStrategyChoosed = NamesakeStrategy.REPLACE;
-                                break;
-                        }
-                    }
-
+                    var NamesakeStrategyChoosed = NamesakeStrategy.Ignore;
                     if (ShouldEreaseBase)
                     {
                         DaoRegistery.GetInstance.ClearAll();
+                    }
+                    else
+                    {
+                        if (ArticleNameSakeCount > 0)
+                        {
+                            var Result = MessageBox.Show(
+                                String.Format("{0} doublons d'articles ont été détéctés : \n", ArticleNameSakeCount) +
+                                "Voulez-vous ignorer ces doublons ? (sinon les valeurs dans la base seront mise à jour)",
+                                "Doublons détéctés", MessageBoxButtons.YesNoCancel);
+                            switch (Result)
+                            {
+                                case DialogResult.Cancel:
+                                    StatusText.Text = "Import annulé.";
+                                    return;
+                                case DialogResult.No:
+                                    NamesakeStrategyChoosed = NamesakeStrategy.Replace;
+                                    break;
+                            }
+                        }
                     }
 
                     StatusText.Text = "Import des données...";
@@ -241,7 +245,7 @@ namespace GestionBDDApp
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des marques " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        await Task.Run(() => DaoMarque.save(Marques));
+                        await Task.Run(() => DaoMarque.Save(Marques));
                     }
                     
                     ImportProgress.Value = 0;
@@ -250,7 +254,7 @@ namespace GestionBDDApp
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        await Task.Run(() => DaoFamille.save(Familles));
+                        await Task.Run(() => DaoFamille.Save(Familles));
                     }
                     
                     ImportProgress.Value = 0;
@@ -259,7 +263,7 @@ namespace GestionBDDApp
                     {
                         ImportProgress.Value++;
                         StatusText.Text = "Import des sous-familles " + ImportProgress.Value + "/" + ImportProgress.Maximum;
-                        await Task.Run(() => DaoSousFamille.save(SousFamille));
+                        await Task.Run(() => DaoSousFamille.Save(SousFamille));
                     }
                     
                     ImportProgress.Value = 0;
@@ -271,13 +275,13 @@ namespace GestionBDDApp
                         //pas de doublons
                         if (ArticlePair.Value == null)
                         {
-                            await Task.Run(() => DaoArticle.create(ArticlePair.Key));
+                            await Task.Run(() => DaoArticle.Create(ArticlePair.Key));
                         }
                         else
                         {
-                            if (NamesakeStrategyChoosed == NamesakeStrategy.REPLACE)
+                            if (NamesakeStrategyChoosed == NamesakeStrategy.Replace)
                             {
-                                await Task.Run(() => DaoArticle.update(ArticlePair.Key));
+                                await Task.Run(() => DaoArticle.Update(ArticlePair.Key));
                             }
                         }
                     }
@@ -315,13 +319,15 @@ namespace GestionBDDApp
 
         private void SelectCsvButton_Click(object Sender, EventArgs Event)
         {
-            OpenFileDialog OpenFileDialog = new OpenFileDialog();
-            OpenFileDialog.Title = "Choose a csv file to import";
-            OpenFileDialog.DefaultExt = "csv";
-            OpenFileDialog.Filter = "csv files (*.csv)|*.csv";
-            OpenFileDialog.CheckFileExists = true;
-            OpenFileDialog.CheckPathExists = true;
-            DialogResult Result = OpenFileDialog.ShowDialog();
+            var OpenFileDialog = new OpenFileDialog
+            {
+                Title = "Choisir un fichier csv à importer",
+                DefaultExt = "csv",
+                Filter = "csv files (*.csv)|*.csv",
+                CheckFileExists = true,
+                CheckPathExists = true
+            };
+            var Result = OpenFileDialog.ShowDialog();
             if (Result == DialogResult.OK)
             {
                 StatusText.Text = "Prêt à importer";
@@ -332,9 +338,9 @@ namespace GestionBDDApp
         }
     }
 
-    public enum NamesakeStrategy
+    internal enum NamesakeStrategy
     {
-        REPLACE,
-        IGNORE
+        Replace,
+        Ignore
     }
 }

@@ -5,22 +5,22 @@ using GestionBDDApp.data.model;
 
 namespace GestionBDDApp.data.dao
 {
-    public class DAOArticle : AbstractDao
+    public class DaoArticle : AbstractDao
     {
-        private readonly DAOSousFamille DaoSousFamille;
-        private readonly DAOMarque DaoMarque;
+        private readonly DaoSousFamille DaoSousFamille;
+        private readonly DaoMarque DaoMarque;
 
-        public DAOArticle(DAOSousFamille DaoSousFamille, DAOMarque DaoMarque): base("Articles")
+        public DaoArticle(DaoSousFamille DaoSousFamille, DaoMarque DaoMarque): base("Articles", false)
         {
             this.DaoSousFamille = DaoSousFamille;
             this.DaoMarque = DaoMarque;
         }
 
-        public List<Articles> getAll()
+        public List<Articles> GetAll()
         {
             var Articles = new List<Articles>();
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Articles;", Connection))
@@ -30,7 +30,7 @@ namespace GestionBDDApp.data.dao
                         if (!Reader.HasRows) return Articles;
                         while (Reader.Read())
                         {
-                            var SousFamille = DaoSousFamille.getSousFamilleById(Reader.GetInt32(2));
+                            var SousFamille = DaoSousFamille.GetSousFamilleById(Reader.GetInt32(2));
                             var Marque = DaoMarque.GetMarqueById(Reader.GetInt32(3));
                             if (Marque == null || SousFamille == null)
                             {
@@ -53,7 +53,7 @@ namespace GestionBDDApp.data.dao
         public int CountArticleOfSubFamily(int SubFamilyId)
         {
             var Result = 0;
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefSousFamille = @refSubFamily", Connection))
@@ -76,7 +76,7 @@ namespace GestionBDDApp.data.dao
         public int CountArticleOfBrand(int BrandId)
         {
             var Result = 0;
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefMarque = @refBrand", Connection))
@@ -99,7 +99,7 @@ namespace GestionBDDApp.data.dao
         {
             Articles Article = null;
 
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("SELECT * FROM Articles WHERE RefArticle = @refArticle", Connection))
@@ -110,7 +110,7 @@ namespace GestionBDDApp.data.dao
                         if (Reader.HasRows)
                         {
                             Reader.Read();
-                            var SousFamille = DaoSousFamille.getSousFamilleById(Reader.GetInt32(2));
+                            var SousFamille = DaoSousFamille.GetSousFamilleById(Reader.GetInt32(2));
                             var Marque = DaoMarque.GetMarqueById(Reader.GetInt32(3));
                             Article = new Articles(
                                 Reader.GetString(0), 
@@ -126,9 +126,9 @@ namespace GestionBDDApp.data.dao
             return Article;
         }
 
-        public void create(Articles Article)
+        public void Create(Articles Article)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(
@@ -147,9 +147,9 @@ namespace GestionBDDApp.data.dao
             }
         }
 
-        public void update(Articles Article)
+        public void Update(Articles Article)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand(
@@ -168,9 +168,9 @@ namespace GestionBDDApp.data.dao
             }
         }
 
-        public void delete(string Id)
+        public void Delete(string Id)
         {
-            using (var Connection = new SQLiteConnection(ConnectionString))
+            using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
                 using (var Command = new SQLiteCommand("DELETE FROM Articles WHERE RefArticle = @ref", Connection))

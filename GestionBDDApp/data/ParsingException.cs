@@ -3,11 +3,10 @@
 namespace GestionBDDApp.data
 {
     [Serializable]
-    class ParsingException : Exception
+    internal class ParsingException : Exception
     {
 
-        public ParsingException(string Error)
-            : base(Error)
+        public ParsingException(string Error) : base(Error)
         {
 
         }

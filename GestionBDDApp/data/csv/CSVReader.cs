@@ -4,13 +4,13 @@ using System.Text;
 
 namespace GestionBDDApp.data.csv
 {
-    class CSVReader
+    class CsvReader
     {
-        public static void ReadFile(String Path, Action<string[], int> WhatToDo)
+        public static void ReadFile(string Path, Action<string[], int> WhatToDo)
         {
             try
             {
-                using (StreamReader Reader = new StreamReader(Path, Encoding.Default))
+                using (var Reader = new StreamReader(Path, Encoding.Default))
                 {
                     if (! Reader.EndOfStream)
                     {
@@ -18,10 +18,10 @@ namespace GestionBDDApp.data.csv
                         Reader.ReadLine();
                     }
 
-                    int LineNumber = 0;
+                    var LineNumber = 0;
                     while (! Reader.EndOfStream)
                     {
-                        string Line = Reader.ReadLine();
+                        var Line = Reader.ReadLine();
                         if (Line != null)
                         {
                             WhatToDo.Invoke(Line.Split(';'), LineNumber);
