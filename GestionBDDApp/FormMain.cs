@@ -109,10 +109,8 @@ namespace GestionBDDApp
             listView1.SelectedItems.Clear();
             listView1.Items.Clear();
             
-            // Si aucun noeud n'est séléctionné on ne fait rien.
-            if (LastTreeNodeSelected == null) { }
-            // Si le noeud des articles est séléctionné.
-            if (TreeNodeSelected.Equals(AllArticles))
+            // Si aucun noeud n'est séléctionné ou si le noeud des articles est séléctionné.
+            if (TreeNodeSelected == null || TreeNodeSelected.Equals(AllArticles))
             {
                 // on charge les articles.
                 LoadArticles();
