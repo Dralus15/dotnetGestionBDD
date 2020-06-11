@@ -14,28 +14,28 @@ namespace GestionBDDApp
     {
 
         /// <summary>
-        /// Article à modifier ou créer
+        /// Article à modifier ou créer.
         /// </summary>
         private Articles Article;
         /// <summary>
-        /// La liste des marques
+        /// La liste des marques.
         /// </summary>
         private List<Marques> BrandModel = new List<Marques>();
         /// <summary>
-        /// La liste des familles
+        /// La liste des familles.
         /// </summary>
         private List<Familles> FamilyModel = new List<Familles>();
         /// <summary>
-        /// L'ensemble de toutes les sous-familles
+        /// L'ensemble de toutes les sous-familles.
         /// </summary>
         private Dictionary<int, List<SousFamilles>> SubFamilyModel = new Dictionary<int, List<SousFamilles>>();
 
         /// <summary>
-        /// Créer la fênetre de création d'article.
+        /// Crée la fênetre de création d'article.
         /// </summary>
         public ArticleForm()
         {
-            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
+            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>.
             InitializeComponent();
             LoadItems();
             SetTitle("Formulaire de création d'un article");
@@ -43,21 +43,21 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Créer la fênetre de modification d'article.
+        /// Crée la fênetre de modification d'article.
         /// </summary>
-        /// <param name="IdArticle">La <b>String</b> d'id de l'article</param>
+        /// <param name="IdArticle">La <b>String</b> d'id de l'article.</param>
         public ArticleForm(string IdArticle)
         {
-            // On récupère l'article
+            // On récupère l'article.
             Article = DaoRegistery.GetInstance.DaoArticle.GetArticleById(IdArticle);
 
-            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>
+            // On récupère les données des listes et les affiche dans les <b>ComboBox</b>.
             InitializeComponent();
             LoadItems();
             SetTitle("Formulaire de modification d'un article");
             DisplayItems();
             
-            // On rempli le formulaire avec les informations de l'article
+            // On rempli le formulaire avec les informations de l'article.
             ReferenceBox.Text = Article.RefArticle;
             DescriptionBox.Text = Article.Description;
             QuantityBox.Value = Article.Quantite;
@@ -94,12 +94,12 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Charge les sous-familles dans la <b>ComboBox</b> en fonction de la clé de la famille sélectionné.
+        /// Charge les sous-familles dans la <b>ComboBox</b> en fonction de la clé de la famille sélectionnée.
         /// </summary>
-        /// <param name="SubFamillyKey">La clé de la famille selectionnée</param>
+        /// <param name="SubFamillyKey">La clé de la famille selectionnée.</param>
         private void DisplaySubFamilly(int SubFamillyKey)
         {
-            // On nettoye la liste des sous-famille dans la <b>ComboBox</b> et on la re-rempli avec les sous-familles de la famille selectionné
+            // On nettoie la liste des sous-familles dans la <b>ComboBox</b> et on la re-rempli avec les sous-familles de la famille selectionnée.
             SubFamillyComboBox.Items.Clear();
             foreach (var SubFamilly in SubFamilyModel[SubFamillyKey])
             {

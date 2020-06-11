@@ -11,7 +11,7 @@ namespace GestionBDDApp.data.csv
     {
         /// <summary>
         /// Lit le fichier CSV dont le chemin est passé en paramètre (<paramref name="Path"/>),
-        /// chaque ligne est séparé par ses points virgules et envoyé dans la fonction de retour <paramref name="WhatToDo"/>
+        /// chaque ligne est séparée par des points virgules puis est envoyée dans la fonction de retour <paramref name="WhatToDo"/>
         /// </summary>
         /// <param name="Path">Le chemin vers le fichier à lire</param>
         /// <param name="WhatToDo">Fonction définissant le traitement à faire sur chaque ligne lue</param>

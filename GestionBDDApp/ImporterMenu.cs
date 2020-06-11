@@ -13,37 +13,37 @@ using GestionBDDApp.data.utils;
 namespace GestionBDDApp
 {
     /// <summary>
-    /// Fenetre d'importation de base à partir d'un fichier au format CSV
-    /// Elle gère 2 mode d'import :
-    ///  - Ajout : ajoute les nouvelles entrée aux donnée existante
-    ///  - Ecrasement : supprime la base et importe les données
+    /// Fenetre d'importation de base à partir d'un fichier au format CSV.
+    /// Elle gère 2 modes d'import :
+    ///  - Ajout : ajoute les nouvelles entrées aux données existantes.
+    ///  - Ecrasement : supprime la base éventuellement importée précédemment et importe les données.
     ///
-    /// Elle gère aussi le dédoublonnage dans le fichier d'import, et avec les données existante (en mode ajout)
+    /// Elle gère aussi le dédoublonnage dans le fichier d'import, et avec les données existantes (en mode ajout).
     /// </summary>
     public partial class ImporterMenu : Form
     {
         /// <summary>
-        /// Un dao pour accéder aux articles
+        /// Un dao pour accéder aux articles.
         /// </summary>
         private DaoArticle DaoArticle;
         
         /// <summary>
-        /// Un dao pour accéder aux familles
+        /// Un dao pour accéder aux familles.
         /// </summary>
         private DaoFamille DaoFamille;
         
         /// <summary>
-        /// Un dao pour accéder aux marques
+        /// Un dao pour accéder aux marques.
         /// </summary>
         private DaoMarque DaoMarque;
         
         /// <summary>
-        /// Un dao pour accéder aux sous-familles
+        /// Un dao pour accéder aux sous-familles.
         /// </summary>
         private DaoSousFamille DaoSousFamille;
 
         /// <summary>
-        /// Instancie un nouveau menu d'import
+        /// Instancie un nouveau menu d'import.
         /// </summary>
         public ImporterMenu()
         {
@@ -55,9 +55,9 @@ namespace GestionBDDApp
         }
 
         /// <summary>
-        /// Lance l'import
+        /// Lance l'import.
         /// </summary>
-        /// <param name="ShouldEraseBase"><c>true</c> si la base doit être supprimé avant l'import</param>
+        /// <param name="ShouldEraseBase"><c>true</c> si la base doit être supprimée avant l'import.</param>
         private async void Import(bool ShouldEraseBase)
         {
             SetBusy(true);
@@ -69,14 +69,14 @@ namespace GestionBDDApp
                     var ExistingArticlesCountByRef = new Dictionary<string, int>();
                     var ArticlesDtosRead = new List<ArticlesDto>();
                     
-                    //On ne donne pas d'étape de chargement pour la lecture du fichier
+                    //On ne donne pas d'étape de chargement pour la lecture du fichier.
                     ImportProgress.Style = ProgressBarStyle.Marquee;
                     ImportProgress.MarqueeAnimationSpeed = 30;
                     ImportProgress.Maximum = 100;
                     StatusText.Text = "Lecture du fichier en cours...";
                     ReadFile(ChoosedFilePath, ExistingArticlesCountByRef, Annomalies, ArticlesDtosRead);
                     
-                    //Si des annomalies sont présentes dans le fichier on demande une confirmation
+                    //Si des anomalies sont présentes dans le fichier on demande une confirmation.
                     if (Annomalies.Count > 0)
                     {
                         var AnnomaliesError = new StringBuilder();
@@ -86,7 +86,7 @@ namespace GestionBDDApp
                         }
                         StatusText.Text = "Résolution des annomalies...";
                         var ConfirmResult =  MessageBox.Show("Il y a " + Annomalies.Count + 
-                             " annomalies dans le fichier d'import, ces articles ne seront pas importés :\n" + 
+                             " anomalies dans le fichier d'import, ces articles ne seront pas importés :\n" + 
                              AnnomaliesError + "\n Voulez vous annuler l'opération ?",
                             "Annomalies détéctées",
                             MessageBoxButtons.OKCancel);

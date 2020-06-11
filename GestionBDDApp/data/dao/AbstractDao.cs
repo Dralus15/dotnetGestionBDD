@@ -3,13 +3,13 @@
 namespace GestionBDDApp.data.dao
 {
     /// <summary>
-    /// Classe abstraite regroupant les traitement commun pour accéder au donnée via une base SQLite,
+    /// Classe abstraite regroupant les traitements communs pour accéder aux données via une base SQLite,
     /// chaque classe étendant <c>AbstactDao</c> correspond à un moyen d'accéder à une table de la base
     /// </summary>
     public abstract class AbstractDao
     {
         /// <summary>
-        /// La chaîne de connection pour accéder à la base SQLite, par défaut on créer une connection avec
+        /// La chaîne de connection pour accéder à la base SQLite, par défaut on crée une connection avec
         /// le fichier Bacchus.SQLite
         /// </summary>
         protected const string CONNECTION_STRING = "Data Source=Bacchus.SQLite";
@@ -25,7 +25,12 @@ namespace GestionBDDApp.data.dao
         /// </summary>
         private readonly bool IsAutoIncrement;
 
-
+        /// <summary>
+        /// Constructeur appelé par les classes héritant de AbstractDao.
+        /// </summary>
+        /// <param name="TableName">Nom de la table pour le DAO appelant.</param>
+        /// <param name="IsAutoIncrement">Un entier qui indique si l'id de la table est 
+        /// auto-incrémenté.</param>
         protected AbstractDao(string TableName, bool IsAutoIncrement)
         {
             this.TableName = TableName;
@@ -36,7 +41,7 @@ namespace GestionBDDApp.data.dao
         /// Supprime toutes les données de la table associée à ce Dao, si la clé primaire
         /// de la table est auto-incrémentée, l'index d'auto-incrémentation est remis à 0.
         /// </summary>
-        /// <exception cref="SQLiteException">Si la connection est interrompue</exception>
+        /// <exception cref="SQLiteException">Si la connection est interrompue.</exception>
         public void Clear()
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -46,7 +51,7 @@ namespace GestionBDDApp.data.dao
                 {
                     Command.ExecuteNonQuery();
                 }
-                //On reset l'auto-incrémentation si la table à une clé primaire auto-incrémentée
+                //On reset l'auto-incrémentation si la table a une clé primaire auto-incrémentée
                 if (IsAutoIncrement)
                 {
                     using (var Command = new SQLiteCommand(
@@ -59,10 +64,10 @@ namespace GestionBDDApp.data.dao
         }
 
         /// <summary>
-        /// Retourne le nombre de ligne de la table associée à ce Dao
+        /// Retourne le nombre de ligne de la table associée à ce Dao.
         /// </summary>
-        /// <returns>Le nombre de ligne de la table</returns>
-        /// <exception cref="SQLiteException">Si la connection est interrompue</exception>
+        /// <returns>Le nombre de ligne de la table.</returns>
+        /// <exception cref="SQLiteException">Si la connection est interrompue.</exception>
         public int Count()
         {
             var Result = 0;

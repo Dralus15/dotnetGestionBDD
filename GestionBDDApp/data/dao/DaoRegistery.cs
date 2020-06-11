@@ -1,37 +1,37 @@
 ﻿namespace GestionBDDApp.data.dao
 {
     /// <summary>
-    /// Point d'accès aux différents DAO, c'est un Singleton
+    /// Point d'accès aux différents DAO, c'est un Singleton.
     /// </summary>
     public class DaoRegistery
     {
         /// <summary>
-        /// Le DAO des sous-familles
+        /// Le DAO des sous-familles.
         /// </summary>
         public DaoSousFamille DaoSousFamille { get; }
         
         /// <summary>
-        /// Le DAO des articles
+        /// Le DAO des articles.
         /// </summary>
         public DaoArticle DaoArticle { get; }
         
         /// <summary>
-        /// Le DAO des familles
+        /// Le DAO des familles.
         /// </summary>
         public DaoFamille DaoFamille { get; }
         
         /// <summary>
-        /// Le DAO des marques
+        /// Le DAO des marques.
         /// </summary>
         public DaoMarque DaoMarque { get; }
         
         /// <summary>
-        /// Unique instance du registre (Singleton)
+        /// Unique instance du registre (Singleton).
         /// </summary>
         private static DaoRegistery Instance;
 
         /// <summary>
-        /// Constructeur privé du registre, instancie les DAOs
+        /// Constructeur privé du registre, instancie les DAOs.
         /// </summary>
         private DaoRegistery()
         {
@@ -42,7 +42,7 @@
         }
 
         /// <summary>
-        /// Vide la base de donnée
+        /// Vide la base de données.
         /// </summary>
         public void ClearAll()
         {
@@ -53,7 +53,7 @@
         }
 
         /// <summary>
-        /// Accesseur du singleton
+        /// Accesseur du singleton.
         /// </summary>
         public static DaoRegistery GetInstance
         {
