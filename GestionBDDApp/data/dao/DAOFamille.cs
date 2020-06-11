@@ -5,19 +5,32 @@ using System.Data.SQLite;
 
 namespace GestionBDDApp.data.dao
 {
+    /// <summary>
+    /// Classe du Dao pour les familles, elle permet de faire des traitements sur la table Familles
+    /// </summary>
     public class DaoFamille : AbstractDao
     {
+        /// <summary>
+        /// Instancie le Dao des familles
+        /// </summary>
         public DaoFamille() : base("Familles", true) { }
 
+        /// <summary>
+        /// Récupère toutes les familles dans la base et les retourne dans une <b>List'<'Familles'>'</b>
+        /// </summary>
         public List<Familles> GetAllFamilles()
         {
             List<Familles> Familles;
 
+            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
+
+                // Création de la requête
                 using (var Command = new SQLiteCommand("SELECT * FROM Familles;", Connection))
                 {
+                    // On récupère la requête et on la parse pour obtenir une liste des familles 
                     using (var Reader = Command.ExecuteReader())
                     {
                         Familles = ParseQueryResult(Reader);
@@ -28,6 +41,10 @@ namespace GestionBDDApp.data.dao
             return Familles;
         }
 
+        /// <summary>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'Familles'>'</b>
+        /// </summary>
+        /// <param name="DataReader">Le réultat de la requête SQL</param>
         private static List<Familles> ParseQueryResult(SQLiteDataReader DataReader)
         {
             var Familles = new List<Familles>();
@@ -40,7 +57,10 @@ namespace GestionBDDApp.data.dao
             return Familles;
         }
 
-
+        /// <summary>
+        /// Cherche la famille par id et la retourne
+        /// </summary>
+        /// <param name="Id">id de la famille recherchée</param>
         public Familles GetFamilleById(int Id)
         {
             Familles Famille = null;
@@ -66,6 +86,10 @@ namespace GestionBDDApp.data.dao
             return Famille;
         }
 
+        /// <summary>
+        /// Cherche la marque par id et le retourne
+        /// </summary>
+        /// <param name="FamilleName">Nom de la marque</param>
         public List<Familles> GetFamilleByName(string FamilleName)
         {
             List<Familles> Familles;
@@ -86,6 +110,10 @@ namespace GestionBDDApp.data.dao
             return Familles;
         }
 
+        /// <summary>
+        /// Sauvegarde la famille dans la base (si elle existe déjà, alors elle est mise à jour)
+        /// </summary>
+        /// <param name="Famille">La famille à sauvegarder</param>
         public void Save(Familles Famille)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -112,11 +140,18 @@ namespace GestionBDDApp.data.dao
             }
         }
 
+        /// <summary>
+        /// Supprime la famille dans la base
+        /// Si la famille est utilisé des sous-familles alors un message d'erreur est renvoyé.
+        /// </summary>
+        /// <param name="Id">Id de la famille à supprimer</param>
         public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoSousFamille.CountSubFamilyOfFamily(Id);
+
+            // Vérifie si la famille est utilisée par une sous-famille, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
-            {                
+            {
                 string Error;
                 if (UseCount == 1)
                 {
