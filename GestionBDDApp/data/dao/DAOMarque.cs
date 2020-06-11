@@ -5,19 +5,32 @@ using System.Data.SQLite;
 
 namespace GestionBDDApp.data.dao
 {
+    /// <summary>
+    /// Classe du Dao pour les marques, elle permet de faire des traitements sur la table Marques
+    /// </summary>
     public class DaoMarque : AbstractDao
     {
+        /// <summary>
+        /// Instancie le Dao des marques
+        /// </summary>
         public DaoMarque() : base("Marques", true) { }
-        
+
+        /// <summary>
+        /// Récupère toutes les marques dans la base et les retourne dans une <b>List'<'Marques'>'</b>
+        /// </summary>
         public List<Marques> GetAllMarques()
         {
             List<Marques> Marques;
 
+            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
+
+                // Création de la requête
                 using (var Command = new SQLiteCommand("SELECT * FROM Marques;", Connection))
                 {
+                    // On récupère la requête et on la parse pour obtenir une liste des marques 
                     using (var Reader = Command.ExecuteReader())
                     {
                         Marques = ParseQueryResult(Reader);
@@ -28,6 +41,10 @@ namespace GestionBDDApp.data.dao
             return Marques;
         }
 
+        /// <summary>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'Marques'>'</b>
+        /// </summary>
+        /// <param name="DataReader">Le réultat de la requête SQL</param>
         private static List<Marques> ParseQueryResult(SQLiteDataReader DataReader)
         {
             var Marques = new List<Marques>();
@@ -42,6 +59,10 @@ namespace GestionBDDApp.data.dao
             return Marques;
         }
 
+        /// <summary>
+        /// Cherche la marque par id et la retourne
+        /// </summary>
+        /// <param name="Id">id de la marque recherchée</param>
         public Marques GetMarqueById(int Id)
         {
             Marques Marque = null;
@@ -66,6 +87,10 @@ namespace GestionBDDApp.data.dao
             return Marque;
         }
 
+        /// <summary>
+        /// Sauvegarde la marque dans la base (si elle existe déjà, alors elle est mise à jour)
+        /// </summary>
+        /// <param name="Marques">La marque à sauvegarder</param>
         public void Save(Marques Marques)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -92,9 +117,16 @@ namespace GestionBDDApp.data.dao
             }
         }
 
+        /// <summary>
+        /// Supprime la marque dans la base.
+        /// Si la marque est utilisé des articles alors un message d'erreur est renvoyé.
+        /// </summary>
+        /// <param name="Id">Id de la marque à supprimer</param>
         public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfBrand(Id);
+
+            // Vérifie si la marque est utilisée par un article, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
             {
                 string Error;
@@ -120,7 +152,11 @@ namespace GestionBDDApp.data.dao
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Cherche la marque par nom et la retourne
+        /// </summary>
+        /// <param name="BrandName">Le nom de la marque</param>
         public List<Marques> GetBrandByName(string BrandName)
         {
             List<Marques> Brand;

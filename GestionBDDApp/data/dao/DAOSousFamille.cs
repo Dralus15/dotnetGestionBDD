@@ -6,24 +6,41 @@ using System.Collections.Generic;
 
 namespace GestionBDDApp.data.dao
 {
+    /// <summary>
+    /// Classe du Dao pour les sous-familles, elle permet de faire des traitements sur la table SousFamilles
+    /// </summary>
     public class DaoSousFamille : AbstractDao
     {
+        /// <summary>
+        /// Le Dao de la famille parent des sous-familles
+        /// </summary>
         private readonly DaoFamille DaoFamille;
 
+        /// <summary>
+        /// Instancie le Dao des sous-familles, il faut le Dao de la famille parent
+        /// </summary>
+        /// <param name="DaoFamille">Dao de la famille</param>
         public DaoSousFamille(DaoFamille DaoFamille) : base("SousFamilles", true)
         {
             this.DaoFamille = DaoFamille;
         }
 
+        /// <summary>
+        /// Récupère toutes les sous-familles dans la base et les retourne dans une <b>List'<'SousFamilles'>'</b>
+        /// </summary>
         public List<SousFamilles> GetAllSousFamilles()
         {
             List<SousFamilles> SousFamilles;
 
+            // On se connecte à la base de donnée pour envoyer la requête et on récupère la réponse dans une <b>List'<'Marques'>'</b>
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
             {
                 Connection.Open();
+
+                // Création de la requête
                 using (var Command = new SQLiteCommand("SELECT * FROM SousFamilles", Connection))
                 {
+                    // On récupère la requête et on la parse pour obtenir une liste des sous-familles 
                     using (var Reader = Command.ExecuteReader())
                     {
                         SousFamilles = ParseQueryResult(Reader);
@@ -34,6 +51,10 @@ namespace GestionBDDApp.data.dao
             return SousFamilles;
         }
 
+        /// <summary>
+        /// Parse le resultat de la requête SQL pour le retourner dans une <b>List'<'SousFamilles'>'</b>
+        /// </summary>
+        /// <param name="DataReader">Le réultat de la requête SQL</param>
         private List<SousFamilles> ParseQueryResult(DbDataReader DataReader)
         {
             var SubFamilyRed = new List<SousFamilles>();
@@ -49,6 +70,10 @@ namespace GestionBDDApp.data.dao
             return SubFamilyRed;
         }
 
+        /// <summary>
+        /// Cherche la sous-famille par id et la retourne
+        /// </summary>
+        /// <param name="Id">id de la sous-famille recherchée</param>
         public SousFamilles GetSousFamilleById(int Id)
         {
             SousFamilles SubFamilyFound = null;
@@ -74,6 +99,10 @@ namespace GestionBDDApp.data.dao
             return SubFamilyFound;
         }
 
+        /// <summary>
+        /// Sauvegarde la sous-famille dans la base (si elle existe déjà, alors elle est mise à jour)
+        /// </summary>
+        /// <param name="SousFamille">Sous-famille à sauvegarder</param>
         public void Save(SousFamilles SousFamille)
         {
             using (var Connection = new SQLiteConnection(CONNECTION_STRING))
@@ -101,6 +130,11 @@ namespace GestionBDDApp.data.dao
                 }
             }
         }
+
+        /// <summary>
+        /// Compte le nombre de de sous-famille d'une famille
+        /// </summary>
+        /// <param name="FamilyId">id de la famille parent</param>
         public int CountSubFamilyOfFamily(int FamilyId)
         {
             var Result = 0;
@@ -124,9 +158,16 @@ namespace GestionBDDApp.data.dao
             return Result;
         }
 
+        /// <summary>
+        /// Supprime la sous-famille dans la base
+        /// Si la sous-famille est utilisé des articles alors un message d'erreur est renvoyé.
+        /// </summary>
+        /// <param name="Id">Id de la sous-famille à supprimer</param>
         public void Delete(int Id)
         {
             var UseCount = DaoRegistery.GetInstance.DaoArticle.CountArticleOfSubFamily(Id);
+
+            // Vérifie si la sousfamille est utilisée par un article, et renvoie un message d'erreur si c'est le cas
             if (UseCount > 0)
             {
                 string Error;
@@ -151,8 +192,13 @@ namespace GestionBDDApp.data.dao
                     Command.ExecuteNonQuery();
                 }
             }
-        }        
-        
+        }
+
+
+        /// <summary>
+        /// Cherche les sous-familles d'une famille parent en utilisant le nom de la famille
+        /// </summary>
+        /// <param name="SubFamilyName">Id de la marque à supprimer</param>
         public List<SousFamilles> GetSubFamiliesByName(string SubFamilyName)
         {
             List<SousFamilles> SubFamilies;
